@@ -1,0 +1,1016 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SIRKUL — Sistem Monitoring Mini Refinery</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --green: #1a5c38; --green2: #2d7a52; --green3: #3d9967;
+  --green-light: #e6f4ed; --green-pale: #f0f8f4;
+  --accent: #22c55e; --yellow: #f59e0b; --red: #ef4444; --blue: #3b82f6;
+  --bg: #eef4f1; --card: #fff; --sidebar-bg: #0d3320;
+  --sidebar-w: 230px; --text: #1c3327; --muted: #5a7a68;
+  --border: #cce0d5; --radius: 14px;
+  --shadow: 0 2px 14px rgba(26,92,56,0.09);
+}
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); display: flex; min-height: 100vh; font-size: 14px; }
+
+/* ── SIDEBAR ── */
+.sidebar { width: var(--sidebar-w); background: var(--sidebar-bg); min-height: 100vh; position: fixed; top: 0; left: 0; display: flex; flex-direction: column; z-index: 100; transition: transform 0.3s; }
+.sidebar-logo { padding: 24px 20px 18px; border-bottom: 1px solid rgba(255,255,255,0.08); }
+.logo-mark { font-size: 24px; font-weight: 900; color: #fff; letter-spacing: -1px; display: flex; align-items: center; gap: 8px; }
+.logo-mark .dot { width: 10px; height: 10px; background: var(--accent); border-radius: 50%; display: inline-block; animation: pulse 1.4s infinite; }
+.logo-sub { font-size: 10px; color: #6aa882; margin-top: 5px; line-height: 1.5; letter-spacing: 0.3px; }
+.nav { flex: 1; padding: 14px 10px; display: flex; flex-direction: column; gap: 3px; }
+.nav-section { font-size: 9px; font-weight: 700; color: #4a7a5e; letter-spacing: 1.5px; padding: 10px 12px 4px; text-transform: uppercase; }
+.nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 10px; cursor: pointer; color: #8abfa0; font-size: 13px; font-weight: 500; transition: all 0.15s; user-select: none; }
+.nav-item:hover { background: rgba(255,255,255,0.07); color: #d4f1e3; }
+.nav-item.active { background: var(--green2); color: #fff; font-weight: 600; }
+.nav-item .nav-icon { font-size: 16px; width: 20px; text-align: center; flex-shrink: 0; }
+.sidebar-footer { padding: 14px 18px; border-top: 1px solid rgba(255,255,255,0.07); }
+.live-row { display: flex; align-items: center; gap: 7px; color: #6aa882; font-size: 11px; }
+.live-dot { width: 8px; height: 8px; background: var(--accent); border-radius: 50%; flex-shrink: 0; animation: pulse 1.4s infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.25} }
+.cycle-info { font-size: 11px; color: #4a7a5e; margin-top: 6px; }
+
+/* ── MAIN ── */
+.main { margin-left: var(--sidebar-w); flex: 1; min-height: 100vh; display: flex; flex-direction: column; }
+.topbar { background: var(--card); border-bottom: 1px solid var(--border); padding: 13px 28px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 50; box-shadow: 0 1px 8px rgba(26,92,56,0.06); }
+.topbar-left { display: flex; align-items: center; gap: 14px; }
+.hamburger { display: none; background: none; border: none; font-size: 22px; cursor: pointer; color: var(--text); padding: 4px; }
+.page-title { font-size: 17px; font-weight: 700; color: var(--text); }
+.topbar-right { display: flex; align-items: center; gap: 12px; }
+.clock { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; background: var(--green-light); padding: 5px 12px; border-radius: 20px; font-weight: 500; }
+.bell-btn { position: relative; background: var(--green-light); border: none; width: 38px; height: 38px; border-radius: 11px; cursor: pointer; font-size: 17px; display: flex; align-items: center; justify-content: center; transition: background 0.15s; }
+.bell-btn:hover { background: #d0ead9; }
+.bell-count { position: absolute; top: -5px; right: -5px; background: var(--red); color: #fff; font-size: 9px; font-weight: 800; width: 17px; height: 17px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid var(--card); }
+.content { padding: 28px; flex: 1; }
+.page { display: none; }
+.page.active { display: block; animation: fadeIn 0.2s ease; }
+@keyframes fadeIn { from{opacity:0;transform:translateY(4px)} to{opacity:1;transform:translateY(0)} }
+
+/* ── STAT CARDS ── */
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px; margin-bottom: 22px; }
+.stat-card { background: var(--card); border-radius: var(--radius); padding: 18px 18px 16px; box-shadow: var(--shadow); border: 1px solid var(--border); position: relative; overflow: hidden; cursor: default; transition: transform 0.15s; }
+.stat-card:hover { transform: translateY(-2px); }
+.stat-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:var(--green); border-radius:var(--radius) var(--radius) 0 0; }
+.stat-card.c-blue::before { background:var(--blue); }
+.stat-card.c-warn::before { background:var(--yellow); }
+.stat-card.c-red::before { background:var(--red); }
+.stat-card.c-accent::before { background:var(--accent); }
+.stat-icon { font-size: 20px; margin-bottom: 10px; line-height: 1; }
+.stat-label { font-size: 10px; font-weight: 700; color: var(--muted); letter-spacing: 0.8px; text-transform: uppercase; }
+.stat-value { font-size: 26px; font-weight: 800; color: var(--text); margin: 5px 0 3px; line-height: 1; font-variant-numeric: tabular-nums; }
+.stat-unit { font-size: 13px; font-weight: 500; color: var(--muted); }
+.stat-sub { font-size: 11px; color: var(--accent); font-weight: 600; }
+.stat-sub.warn { color: var(--yellow); }
+.stat-sub.muted { color: var(--muted); }
+
+/* ── GRID LAYOUTS ── */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 22px; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 18px; margin-bottom: 22px; }
+
+/* ── CARDS ── */
+.card { background: var(--card); border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow); border: 1px solid var(--border); }
+.card-title { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; }
+.card-title .ct-sub { font-size: 11px; color: var(--muted); font-weight: 500; }
+.card-title .ct-badge { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 10px; background: var(--green-light); color: var(--green); }
+.chart-wrap { position: relative; height: 200px; }
+.section-mb { margin-bottom: 22px; }
+
+/* ── SECTION HEADER ── */
+.section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.section-title { font-size: 14px; font-weight: 700; color: var(--text); display: flex; align-items: center; gap: 9px; }
+.section-title::before { content:''; display:block; width:4px; height:16px; background:var(--green); border-radius:2px; }
+
+/* ── TANK CARDS ── */
+.tank-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 22px; }
+.tank-card { background: var(--card); border-radius: var(--radius); padding: 20px 16px; box-shadow: var(--shadow); border: 2px solid var(--border); text-align: center; cursor: pointer; transition: all 0.2s; }
+.tank-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(26,92,56,0.14); }
+.tank-card.ok { border-color: var(--accent); }
+.tank-card.warn { border-color: var(--yellow); }
+.tank-card.danger { border-color: var(--red); }
+.tank-badge { display: inline-block; font-size: 10px; font-weight: 700; color: var(--muted); letter-spacing: 1px; background: var(--bg); padding: 2px 8px; border-radius: 8px; margin-bottom: 8px; }
+.tank-icon { font-size: 36px; margin: 8px 0; display: block; }
+.tank-name { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 10px; }
+.tank-status { display: inline-flex; align-items: center; gap: 5px; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; }
+.tank-status.ok { background: #dcfce7; color: #166534; }
+.tank-status.warn { background: #fef3c7; color: #92400e; }
+.tank-status.danger { background: #fee2e2; color: #991b1b; }
+.tank-metrics { display: flex; justify-content: center; gap: 18px; margin-top: 12px; }
+.tm-val { font-size: 16px; font-weight: 700; color: var(--text); }
+.tm-label { font-size: 10px; color: var(--muted); margin-top: 2px; }
+
+/* ── BADGES ── */
+.badge { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; }
+.badge.ok { background: #dcfce7; color: #166534; }
+.badge.warn { background: #fef3c7; color: #92400e; }
+.badge.bad { background: #fee2e2; color: #991b1b; }
+.badge.blue { background: #dbeafe; color: #1d4ed8; }
+.badge.muted { background: #f3f4f6; color: #6b7280; }
+
+/* ── ALERTS ── */
+.alert-list { display: flex; flex-direction: column; gap: 8px; }
+.alert-item { display: flex; align-items: flex-start; gap: 10px; padding: 11px 14px; border-radius: 10px; font-size: 12px; line-height: 1.5; }
+.alert-item.info { background: var(--green-light); border: 1px solid #c0deca; }
+.alert-item.warn { background: #fffbeb; border: 1px solid #fde68a; }
+.alert-item.danger { background: #fff1f2; border: 1px solid #fecdd3; }
+.alert-icon { font-size: 15px; flex-shrink: 0; margin-top: 1px; }
+.alert-text { flex: 1; color: var(--text); }
+.alert-time { font-size: 10px; color: var(--muted); flex-shrink: 0; white-space: nowrap; }
+
+/* ── PHASE INDICATOR ── */
+.phase-col { display: flex; flex-direction: column; gap: 3px; border-radius: 12px; overflow: hidden; height: 130px; border: 2px solid var(--border); flex-shrink: 0; }
+.phase-gas { background: linear-gradient(135deg,#dbeafe,#eff6ff); flex: 2; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: #1d4ed8; gap: 5px; }
+.phase-liquid { background: linear-gradient(135deg,#dcfce7,#f0fdf4); flex: 3; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: #15803d; gap: 5px; }
+.phase-solid { background: linear-gradient(135deg,#fef3c7,#fffbeb); flex: 2; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: #b45309; gap: 5px; }
+
+/* ── INFO ROWS ── */
+.info-rows { display: flex; flex-direction: column; }
+.info-row { display: flex; justify-content: space-between; align-items: center; padding: 9px 0; border-bottom: 1px solid #f3f4f6; font-size: 13px; }
+.info-row:last-child { border-bottom: none; }
+.info-label { color: var(--muted); }
+.info-val { font-weight: 700; color: var(--text); }
+
+/* ── PROGRESS BAR ── */
+.prog-wrap { margin: 8px 0; }
+.prog-label-row { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); margin-bottom: 5px; }
+.prog-bar { height: 9px; background: #e5e7eb; border-radius: 5px; overflow: hidden; }
+.prog-fill { height: 100%; border-radius: 5px; transition: width 0.5s ease; }
+
+/* ── GAUGE ── */
+.gauge-svg { display: block; margin: 0 auto; }
+
+/* ── TABLE ── */
+.data-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.data-table th { background: var(--green-light); color: var(--green); font-weight: 700; padding: 10px 14px; text-align: left; font-size: 11px; letter-spacing: 0.5px; text-transform: uppercase; }
+.data-table th:first-child { border-radius: 8px 0 0 0; }
+.data-table th:last-child { border-radius: 0 8px 0 0; }
+.data-table td { padding: 10px 14px; border-bottom: 1px solid #f3f4f6; color: var(--text); }
+.data-table tr:last-child td { border-bottom: none; }
+.data-table tr:hover td { background: var(--green-pale); }
+
+/* ── BUTTONS ── */
+.btn { padding: 9px 18px; border-radius: 10px; font-size: 13px; font-weight: 600; cursor: pointer; border: none; transition: all 0.15s; display: inline-flex; align-items: center; gap: 7px; }
+.btn-primary { background: var(--green); color: #fff; }
+.btn-primary:hover { background: var(--green2); transform: translateY(-1px); }
+.btn-outline { background: transparent; border: 2px solid var(--green); color: var(--green); }
+.btn-outline:hover { background: var(--green-light); }
+
+/* ── SETTINGS ── */
+.setting-group { margin-bottom: 24px; }
+.setting-group-title { font-size: 13px; font-weight: 700; color: var(--text); padding-bottom: 8px; border-bottom: 2px solid var(--green-light); margin-bottom: 10px; }
+.setting-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #f3f4f6; }
+.setting-row:last-child { border-bottom: none; }
+.setting-label { font-size: 13px; color: var(--text); }
+.setting-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+.setting-input { width: 90px; padding: 7px 10px; border: 1.5px solid var(--border); border-radius: 8px; font-size: 13px; color: var(--text); text-align: right; transition: border-color 0.15s; }
+.setting-input:focus { outline: none; border-color: var(--green); }
+.toggle { width: 44px; height: 24px; background: #d1d5db; border-radius: 12px; position: relative; cursor: pointer; transition: background 0.2s; border: none; flex-shrink: 0; }
+.toggle.on { background: var(--green); }
+.toggle::after { content:''; position:absolute; width:18px; height:18px; background:#fff; border-radius:50%; top:3px; left:3px; transition:transform 0.2s; box-shadow:0 1px 4px rgba(0,0,0,0.2); }
+.toggle.on::after { transform: translateX(20px); }
+
+/* ── PRODUCT CARDS ── */
+.product-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 22px; }
+.product-card { background: var(--card); border-radius: var(--radius); padding: 24px; box-shadow: var(--shadow); border: 1px solid var(--border); }
+.product-icon { font-size: 40px; margin-bottom: 12px; display: block; }
+.product-name { font-size: 16px; font-weight: 800; color: var(--text); margin-bottom: 3px; }
+.product-sub { font-size: 12px; color: var(--muted); margin-bottom: 16px; }
+
+/* ── OVERLAY ── */
+.sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 99; }
+.sidebar-overlay.show { display: block; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 960px) {
+  .sidebar { transform: translateX(-230px); }
+  .sidebar.open { transform: translateX(0); }
+  .main { margin-left: 0; }
+  .hamburger { display: block; }
+  .grid-2, .grid-3 { grid-template-columns: 1fr; }
+  .tank-grid { grid-template-columns: 1fr; }
+  .product-grid { grid-template-columns: 1fr; }
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  .content { padding: 16px; }
+}
+@media (max-width: 480px) {
+  .stats-grid { grid-template-columns: 1fr 1fr; }
+  .topbar { padding: 12px 16px; }
+  .clock { display: none; }
+}
+</style>
+</head>
+<body>
+
+<div class="sidebar-overlay" id="overlay" onclick="closeSidebar()"></div>
+
+<!-- ── SIDEBAR ── -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-mark"><span class="dot"></span>SIRKUL</div>
+    <div class="logo-sub">Sistem Integrasi Resource,<br>Karbon, Uap &amp; Limbah</div>
+  </div>
+  <nav class="nav">
+    <div class="nav-section">Utama</div>
+    <div class="nav-item active" onclick="showPage('dashboard',this)"><span class="nav-icon">📊</span>Dashboard</div>
+    <div class="nav-section">Tabung</div>
+    <div class="nav-item" onclick="showPage('bioreaktor',this)"><span class="nav-icon">🧪</span>Tabung 1 — Bioreaktor</div>
+    <div class="nav-item" onclick="showPage('scrubber',this)"><span class="nav-icon">🔬</span>Tabung 2 — Scrubber</div>
+    <div class="nav-item" onclick="showPage('storage',this)"><span class="nav-icon">🛢️</span>Tabung 3 — Penyimpanan</div>
+    <div class="nav-section">Produksi</div>
+    <div class="nav-item" onclick="showPage('produk',this)"><span class="nav-icon">🌱</span>Produk Turunan</div>
+    <div class="nav-item" onclick="showPage('riwayat',this)"><span class="nav-icon">📋</span>Riwayat &amp; Laporan</div>
+    <div class="nav-item" onclick="showPage('pengaturan',this)"><span class="nav-icon">⚙️</span>Pengaturan</div>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="live-row"><div class="live-dot"></div>Sistem Aktif — LIVE</div>
+    <div class="cycle-info">Siklus Hari ke-<span id="sbDay">12</span> / 21</div>
+  </div>
+</aside>
+
+<!-- ── MAIN ── -->
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-left">
+      <button class="hamburger" onclick="toggleSidebar()">☰</button>
+      <div class="page-title" id="pageTitle">Dashboard Utama</div>
+    </div>
+    <div class="topbar-right">
+      <div class="clock" id="clock">00:00:00</div>
+      <button class="bell-btn" onclick="showPage('riwayat',document.querySelectorAll('.nav-item')[6])">
+        🔔<div class="bell-count" id="bellCount">3</div>
+      </button>
+    </div>
+  </div>
+
+  <div class="content">
+
+  <!-- ════════════════════════════
+       PAGE: DASHBOARD
+  ════════════════════════════ -->
+  <div class="page active" id="page-dashboard">
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-icon">🔥</div><div class="stat-label">Total Biogas</div><div class="stat-value"><span id="d-biogas">1,847</span><span class="stat-unit"> L</span></div><div class="stat-sub">↑ +124 L hari ini</div></div>
+      <div class="stat-card c-blue"><div class="stat-icon">⚗️</div><div class="stat-label">Kemurnian CH₄</div><div class="stat-value"><span id="d-ch4">85.3</span><span class="stat-unit">%</span></div><div class="stat-sub" style="color:var(--blue)">Target ≥85% ✓</div></div>
+      <div class="stat-card"><div class="stat-icon">🌡️</div><div class="stat-label">Suhu Reaktor</div><div class="stat-value"><span id="d-temp">34.8</span><span class="stat-unit">°C</span></div><div class="stat-sub">Mesofilik optimal</div></div>
+      <div class="stat-card c-warn"><div class="stat-icon">📊</div><div class="stat-label">Tekanan Gas</div><div class="stat-value"><span id="d-pres">142</span><span class="stat-unit"> kPa</span></div><div class="stat-sub warn">Normal operasi</div></div>
+      <div class="stat-card c-accent"><div class="stat-icon">✅</div><div class="stat-label">Status Sistem</div><div class="stat-value" style="font-size:16px;padding-top:6px;"><span class="badge ok" id="d-status">● AKTIF</span></div><div class="stat-sub muted">Hari ke-<span id="d-day">12</span>/21</div></div>
+    </div>
+
+    <div class="grid-2 section-mb">
+      <div class="card">
+        <div class="card-title">Produksi Biogas Harian — Siklus 21 Hari <span class="ct-sub" id="cycleDay">Hari 12</span></div>
+        <div class="chart-wrap"><canvas id="chartDashMain"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Distribusi Penggunaan Gas <span class="ct-sub">Liter/Hari</span></div>
+        <div class="chart-wrap"><canvas id="chartGasDist"></canvas></div>
+      </div>
+    </div>
+
+    <div class="section-header">
+      <div class="section-title">Status 3 Tabung Utama</div>
+      <span class="badge ok">Semua Normal</span>
+    </div>
+    <div class="tank-grid">
+      <div class="tank-card ok" onclick="showPage('bioreaktor',document.querySelectorAll('.nav-item')[1])">
+        <div class="tank-badge">TABUNG 1</div>
+        <span class="tank-icon">🧪</span>
+        <div class="tank-name">Bioreaktor</div>
+        <div><span class="tank-status ok" id="t1-status">● OPTIMAL</span></div>
+        <div class="tank-metrics">
+          <div><div class="tm-val" id="t1-temp">34.8°C</div><div class="tm-label">Suhu</div></div>
+          <div><div class="tm-val" id="t1-ph">7.10</div><div class="tm-label">pH</div></div>
+        </div>
+      </div>
+      <div class="tank-card ok" onclick="showPage('scrubber',document.querySelectorAll('.nav-item')[2])">
+        <div class="tank-badge">TABUNG 2</div>
+        <span class="tank-icon">🔬</span>
+        <div class="tank-name">Scrubber</div>
+        <div><span class="tank-status ok" id="t2-status">● BAIK</span></div>
+        <div class="tank-metrics">
+          <div><div class="tm-val" id="t2-ch4">85.3%</div><div class="tm-label">CH₄</div></div>
+          <div><div class="tm-val" id="t2-h2s">3.2 ppm</div><div class="tm-label">H₂S</div></div>
+        </div>
+      </div>
+      <div class="tank-card warn" onclick="showPage('storage',document.querySelectorAll('.nav-item')[3])">
+        <div class="tank-badge">TABUNG 3</div>
+        <span class="tank-icon">🛢️</span>
+        <div class="tank-name">Penyimpanan Gas</div>
+        <div><span class="tank-status warn" id="t3-status">● 68% PENUH</span></div>
+        <div class="tank-metrics">
+          <div><div class="tm-val" id="t3-vol">1,256 L</div><div class="tm-label">Volume</div></div>
+          <div><div class="tm-val" id="t3-pres">142 kPa</div><div class="tm-label">Tekanan</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-header">
+      <div class="section-title">Notifikasi AI Terbaru</div>
+      <button class="btn btn-outline" style="padding:7px 14px;font-size:12px;" onclick="showPage('riwayat',document.querySelectorAll('.nav-item')[6])">Lihat Semua →</button>
+    </div>
+    <div class="card"><div class="alert-list" id="dashAlerts"></div></div>
+  </div>
+
+  <!-- ════════════════════════════
+       PAGE: BIOREAKTOR
+  ════════════════════════════ -->
+  <div class="page" id="page-bioreaktor">
+    <div class="stats-grid" style="grid-template-columns:repeat(4,1fr)">
+      <div class="stat-card"><div class="stat-icon">🌡️</div><div class="stat-label">Suhu</div><div class="stat-value"><span id="b-temp">34.8</span><span class="stat-unit">°C</span></div><div class="stat-sub">Target: 30–40°C</div></div>
+      <div class="stat-card c-blue"><div class="stat-icon">⚗️</div><div class="stat-label">pH</div><div class="stat-value"><span id="b-ph">7.10</span></div><div class="stat-sub" style="color:var(--blue)">Target: 6.8–7.2</div></div>
+      <div class="stat-card c-warn"><div class="stat-icon">📊</div><div class="stat-label">Tekanan</div><div class="stat-value"><span id="b-pres">142</span><span class="stat-unit"> kPa</span></div><div class="stat-sub warn">Normal</div></div>
+      <div class="stat-card c-accent"><div class="stat-icon">🦠</div><div class="stat-label">Status Bakteri</div><div class="stat-value" style="font-size:15px;padding-top:7px;"><span class="badge ok" id="b-bacteria">AKTIF</span></div><div class="stat-sub muted">Metanogen</div></div>
+    </div>
+
+    <div class="grid-2 section-mb">
+      <div class="card">
+        <div class="card-title">Suhu Reaktor (°C) <span class="ct-sub">Target mesofilik 35°C</span></div>
+        <div class="chart-wrap"><canvas id="chartBioTemp"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-title">pH Reaktor <span class="ct-sub">Target 6.8–7.2</span></div>
+        <div class="chart-wrap"><canvas id="chartBioPH"></canvas></div>
+      </div>
+    </div>
+
+    <div class="grid-2 section-mb">
+      <div class="card">
+        <div class="card-title">Tekanan dalam Reaktor (kPa)</div>
+        <div class="chart-wrap"><canvas id="chartBioPres"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Indikator Fase Pemisahan</div>
+        <div style="display:flex;gap:20px;align-items:flex-start;margin-top:6px;">
+          <div style="flex-shrink:0;">
+            <div class="phase-col" style="width:80px;">
+              <div class="phase-gas">💨 Gas</div>
+              <div class="phase-liquid">💧 Cair</div>
+              <div class="phase-solid">🪨 Padat</div>
+            </div>
+          </div>
+          <div class="info-rows" style="flex:1;">
+            <div class="info-row"><span class="info-label">💨 Fase Gas</span><span class="info-val" style="color:#1d4ed8;font-size:12px;">CH₄ + CO₂ + H₂S → Scrubber</span></div>
+            <div class="info-row"><span class="info-label">💧 Fase Cair</span><span class="info-val" style="color:#15803d;font-size:12px;">POC (N, P, K)</span></div>
+            <div class="info-row"><span class="info-label">🪨 Fase Padat</span><span class="info-val" style="color:#b45309;font-size:12px;">Media Maggot BSF</span></div>
+            <div class="info-row"><span class="info-label">Hari Fermentasi</span><span class="info-val">12 / 21 hari</span></div>
+            <div class="info-row"><span class="info-label">Status Bakteri</span><span class="badge ok" id="b-bacteria2">AKTIF</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card section-mb">
+      <div class="card-title">Notifikasi AI — Bioreaktor</div>
+      <div class="alert-list" id="bioAlerts"></div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════
+       PAGE: SCRUBBER
+  ════════════════════════════ -->
+  <div class="page" id="page-scrubber">
+    <div class="stats-grid" style="grid-template-columns:repeat(4,1fr)">
+      <div class="stat-card c-blue"><div class="stat-icon">✨</div><div class="stat-label">Kemurnian CH₄</div><div class="stat-value"><span id="s-ch4">85.3</span><span class="stat-unit">%</span></div><div class="stat-sub" style="color:var(--blue)">Target ≥85%</div></div>
+      <div class="stat-card"><div class="stat-icon">☣️</div><div class="stat-label">Kadar H₂S</div><div class="stat-value"><span id="s-h2s">3.2</span><span class="stat-unit"> ppm</span></div><div class="stat-sub">Target &lt;5 ppm</div></div>
+      <div class="stat-card c-warn"><div class="stat-icon">↕️</div><div class="stat-label">ΔP Scrubber</div><div class="stat-value"><span id="s-dp">8.4</span><span class="stat-unit"> kPa</span></div><div class="stat-sub warn">Masuk–Keluar</div></div>
+      <div class="stat-card"><div class="stat-icon">🧊</div><div class="stat-label">Status Adsorben</div><div class="stat-value" style="font-size:15px;padding-top:7px;"><span class="badge ok" id="s-adsorben">BAIK</span></div><div class="stat-sub muted">Ca(OH)₂</div></div>
+    </div>
+
+    <div class="grid-2 section-mb">
+      <div class="card">
+        <div class="card-title">ΔP Masuk vs Keluar (kPa) <span class="ct-sub">Real-time</span></div>
+        <div class="chart-wrap"><canvas id="chartScrDP"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Kemurnian CH₄ Output (%) <span class="ct-sub">Target ≥85%</span></div>
+        <div class="chart-wrap"><canvas id="chartScrCH4"></canvas></div>
+      </div>
+    </div>
+
+    <div class="grid-2 section-mb">
+      <div class="card">
+        <div class="card-title">Parameter Scrubber Detail</div>
+        <div class="info-rows">
+          <div class="info-row"><span class="info-label">Tekanan Masuk</span><span class="info-val" id="s-pin">150.4 kPa</span></div>
+          <div class="info-row"><span class="info-label">Tekanan Keluar</span><span class="info-val" id="s-pout">142.0 kPa</span></div>
+          <div class="info-row"><span class="info-label">ΔP Aktual</span><span class="info-val" id="s-dp2">8.4 kPa</span></div>
+          <div class="info-row"><span class="info-label">CO₂ Tersisa</span><span class="info-val" id="s-co2">14.2%</span></div>
+          <div class="info-row"><span class="info-label">Efisiensi Scrubber</span><span class="info-val" id="s-eff">96.1%</span></div>
+          <div class="info-row"><span class="info-label">Umur Adsorben</span><span class="info-val">7 / 14 hari</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Kapasitas Adsorben Ca(OH)₂</div>
+        <div class="prog-wrap" style="margin-bottom:14px;">
+          <div class="prog-label-row"><span>Kapasitas Tersisa</span><span id="s-ads-pct">52%</span></div>
+          <div class="prog-bar"><div class="prog-fill" id="s-ads-bar" style="width:52%;background:var(--accent);"></div></div>
+        </div>
+        <div style="margin-top:12px;">
+          <div class="info-row"><span class="info-label">Reaksi CO₂</span><span class="info-val" style="font-size:11px;">CO₂ + Ca(OH)₂ → CaCO₃ + H₂O</span></div>
+          <div class="info-row"><span class="info-label">Reaksi H₂S</span><span class="info-val" style="font-size:11px;">H₂S + Ca(OH)₂ → CaS + 2H₂O</span></div>
+          <div class="info-row"><span class="info-label">Est. Penggantian</span><span class="info-val" style="color:var(--yellow);">7 hari lagi</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card section-mb">
+      <div class="card-title">Notifikasi AI — Scrubber</div>
+      <div class="alert-list" id="scrAlerts"></div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════
+       PAGE: PENYIMPANAN
+  ════════════════════════════ -->
+  <div class="page" id="page-storage">
+    <div class="stats-grid" style="grid-template-columns:repeat(4,1fr)">
+      <div class="stat-card"><div class="stat-icon">🛢️</div><div class="stat-label">Volume Tersimpan</div><div class="stat-value"><span id="st-vol">1,256</span><span class="stat-unit"> L</span></div><div class="stat-sub">68% kapasitas</div></div>
+      <div class="stat-card c-warn"><div class="stat-icon">📊</div><div class="stat-label">Tekanan Tangki</div><div class="stat-value"><span id="st-pres">142</span><span class="stat-unit"> kPa</span></div><div class="stat-sub warn">Batas: 200 kPa</div></div>
+      <div class="stat-card c-blue"><div class="stat-icon">⏱️</div><div class="stat-label">Est. Sisa Pasokan</div><div class="stat-value"><span id="st-eta">18.4</span><span class="stat-unit"> jam</span></div><div class="stat-sub" style="color:var(--blue)">Pola normal</div></div>
+      <div class="stat-card"><div class="stat-icon">📉</div><div class="stat-label">Konsumsi Hari Ini</div><div class="stat-value"><span id="st-use">68</span><span class="stat-unit"> L</span></div><div class="stat-sub muted">Aerator + Masak</div></div>
+    </div>
+
+    <div class="grid-2 section-mb">
+      <div class="card">
+        <div class="card-title">Volume Gas Tersimpan</div>
+        <div style="text-align:center;padding:10px 0;">
+          <svg class="gauge-svg" viewBox="0 0 220 150" width="260">
+            <defs>
+              <linearGradient id="gGrad" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0%" stop-color="#22c55e"/>
+                <stop offset="60%" stop-color="#1a5c38"/>
+                <stop offset="100%" stop-color="#ef4444"/>
+              </linearGradient>
+            </defs>
+            <path d="M 25 130 A 90 90 0 0 1 195 130" fill="none" stroke="#e5e7eb" stroke-width="20" stroke-linecap="round"/>
+            <path id="gArc" d="M 25 130 A 90 90 0 0 1 195 130" fill="none" stroke="url(#gGrad)" stroke-width="20" stroke-linecap="round" stroke-dasharray="283 283" stroke-dashoffset="90"/>
+            <text id="gTxt" x="110" y="118" text-anchor="middle" font-size="32" font-weight="800" fill="#1a5c38">68%</text>
+            <text x="110" y="140" text-anchor="middle" font-size="12" fill="#5a7a68">Volume Tersimpan</text>
+            <text x="25" y="148" text-anchor="middle" font-size="10" fill="#9ca3af">0 L</text>
+            <text x="195" y="148" text-anchor="middle" font-size="10" fill="#9ca3af">1.850 L</text>
+          </svg>
+          <div style="font-size:22px;font-weight:800;color:var(--green);margin-top:-4px;" id="st-vol2">1,256 L</div>
+          <div style="font-size:12px;color:var(--muted);">dari kapasitas 1.850 L</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Penggunaan Gas (L/jam) <span class="ct-sub">Hari ini</span></div>
+        <div class="chart-wrap"><canvas id="chartStorUse"></canvas></div>
+      </div>
+    </div>
+
+    <div class="grid-2 section-mb">
+      <div class="card">
+        <div class="card-title">Tekanan Tangki (kPa) <span class="ct-sub">24 jam terakhir</span></div>
+        <div class="chart-wrap"><canvas id="chartStorPres"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Riwayat Penggunaan Gas</div>
+        <div class="info-rows">
+          <div class="info-row"><span class="info-label">🔌 Aerator/Generator</span><span class="info-val" id="use-aer">42 L</span></div>
+          <div class="info-row"><span class="info-label">🍳 Memasak</span><span class="info-val" id="use-cook">26 L</span></div>
+          <div class="info-row"><span class="info-label">Total digunakan</span><span class="info-val">68 L</span></div>
+          <div class="info-row"><span class="info-label">Rata-rata/hari</span><span class="info-val">72 L/hari</span></div>
+          <div class="info-row"><span class="info-label">Tekanan maks aman</span><span class="info-val" style="color:var(--red);">200 kPa</span></div>
+          <div class="info-row"><span class="info-label">Status Valve</span><span class="badge ok">TERBUKA</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card section-mb">
+      <div class="card-title">Notifikasi AI — Penyimpanan Gas</div>
+      <div class="alert-list" id="storAlerts"></div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════
+       PAGE: PRODUK TURUNAN
+  ════════════════════════════ -->
+  <div class="page" id="page-produk">
+    <div class="product-grid">
+      <div class="product-card">
+        <span class="product-icon">🌿</span>
+        <div class="product-name">Pupuk Organik Cair (POC)</div>
+        <div class="product-sub">Fase cair bioreaktor — kaya N, P, K · Purba (2025)</div>
+        <div class="info-rows">
+          <div class="info-row"><span class="info-label">Volume Tersedia</span><span class="info-val" style="color:var(--green);" id="poc-vol">48.5 L</span></div>
+          <div class="info-row"><span class="info-label">Kandungan N</span><span class="info-val">2.15%</span></div>
+          <div class="info-row"><span class="info-label">Kandungan P</span><span class="info-val">1.83%</span></div>
+          <div class="info-row"><span class="info-label">Kandungan K</span><span class="info-val">1.92%</span></div>
+          <div class="info-row"><span class="info-label">Standar SNI</span><span class="badge ok">✓ MEMENUHI</span></div>
+          <div class="info-row"><span class="info-label">Status</span><span class="badge ok">SIAP PAKAI</span></div>
+        </div>
+        <div class="prog-wrap" style="margin-top:14px;">
+          <div class="prog-label-row"><span>Progress panen (target 75 L)</span><span>65%</span></div>
+          <div class="prog-bar"><div class="prog-fill" style="width:65%;background:var(--green);"></div></div>
+        </div>
+      </div>
+
+      <div class="product-card">
+        <span class="product-icon">🪲</span>
+        <div class="product-name">Maggot BSF (Black Soldier Fly)</div>
+        <div class="product-sub">Fase padat bioreaktor — media larva BSF</div>
+        <div class="info-rows">
+          <div class="info-row"><span class="info-label">Est. Berat Panen</span><span class="info-val" style="color:var(--green);" id="mag-w">1,240 gram</span></div>
+          <div class="info-row"><span class="info-label">Usia Kultur</span><span class="info-val">12 hari</span></div>
+          <div class="info-row"><span class="info-label">Kandungan Protein</span><span class="info-val">40–50%</span></div>
+          <div class="info-row"><span class="info-label">Kandungan Lemak</span><span class="info-val">28%</span></div>
+          <div class="info-row"><span class="info-label">Pengganti Pakan</span><span class="info-val">25–30%</span></div>
+          <div class="info-row"><span class="info-label">Status</span><span class="badge warn">DALAM KULTUR</span></div>
+        </div>
+        <div class="prog-wrap" style="margin-top:14px;">
+          <div class="prog-label-row"><span>Menuju panen (hari ke-21)</span><span>57%</span></div>
+          <div class="prog-bar"><div class="prog-fill" style="width:57%;background:var(--yellow);"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-header">
+      <div class="section-title">Riwayat Panen</div>
+    </div>
+    <div class="card">
+      <table class="data-table">
+        <thead><tr><th>Siklus</th><th>Tanggal</th><th>POC (L)</th><th>Maggot (g)</th><th>NPK Terbaik</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td>Siklus 3</td><td>15 Apr 2026</td><td>71.3</td><td>1,420</td><td>N2.15% P1.83% K1.92%</td><td><span class="badge ok">✓ Selesai</span></td></tr>
+          <tr><td>Siklus 2</td><td>25 Mar 2026</td><td>68.7</td><td>1,180</td><td>N1.98% P1.67% K2.05%</td><td><span class="badge ok">✓ Selesai</span></td></tr>
+          <tr><td>Siklus 1</td><td>4 Mar 2026</td><td>62.1</td><td>980</td><td>N1.72% P1.45% K1.68%</td><td><span class="badge ok">✓ Selesai</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════
+       PAGE: RIWAYAT
+  ════════════════════════════ -->
+  <div class="page" id="page-riwayat">
+    <div class="section-header">
+      <div class="section-title">Rekap Produksi</div>
+      <button class="btn btn-primary" onclick="exportReport()">📄 Export Laporan</button>
+    </div>
+
+    <div class="stats-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:24px;">
+      <div class="stat-card"><div class="stat-label">Total Biogas (Siklus ini)</div><div class="stat-value">1,847<span class="stat-unit"> L</span></div><div class="stat-sub">Siklus ke-4</div></div>
+      <div class="stat-card c-blue"><div class="stat-label">Total Biogas (3 Siklus)</div><div class="stat-value">4,210<span class="stat-unit"> L</span></div><div class="stat-sub" style="color:var(--blue)">Kumulatif</div></div>
+      <div class="stat-card c-accent"><div class="stat-label">POC Dipanen</div><div class="stat-value">202<span class="stat-unit"> L</span></div><div class="stat-sub">3 siklus lalu</div></div>
+      <div class="stat-card"><div class="stat-label">Maggot Dipanen</div><div class="stat-value">3,580<span class="stat-unit"> g</span></div><div class="stat-sub muted">3 siklus lalu</div></div>
+    </div>
+
+    <div class="section-header">
+      <div class="section-title">Log Alert AI</div>
+      <span style="font-size:12px;color:var(--muted);" id="alertTotal">8 alert tercatat</span>
+    </div>
+    <div class="card">
+      <table class="data-table">
+        <thead><tr><th>Waktu</th><th>Sumber</th><th>Level</th><th>Pesan</th><th>Status</th></tr></thead>
+        <tbody id="alertTable"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════
+       PAGE: PENGATURAN
+  ════════════════════════════ -->
+  <div class="page" id="page-pengaturan">
+    <div class="grid-2">
+      <div class="card">
+        <div class="setting-group">
+          <div class="setting-group-title">🧪 Threshold Bioreaktor</div>
+          <div class="setting-row"><div><div class="setting-label">Suhu Minimum</div><div class="setting-sub">Alert jika di bawah nilai ini</div></div><div style="display:flex;align-items:center;gap:6px;"><input class="setting-input" type="number" value="30" id="th-tMin"> °C</div></div>
+          <div class="setting-row"><div><div class="setting-label">Suhu Maksimum</div></div><div style="display:flex;align-items:center;gap:6px;"><input class="setting-input" type="number" value="40" id="th-tMax"> °C</div></div>
+          <div class="setting-row"><div><div class="setting-label">pH Minimum</div></div><div style="display:flex;align-items:center;gap:6px;"><input class="setting-input" type="number" step="0.1" value="6.8" id="th-phMin"></div></div>
+          <div class="setting-row"><div><div class="setting-label">pH Maksimum</div></div><div style="display:flex;align-items:center;gap:6px;"><input class="setting-input" type="number" step="0.1" value="7.2" id="th-phMax"></div></div>
+        </div>
+        <div class="setting-group">
+          <div class="setting-group-title">🔬 Threshold Scrubber</div>
+          <div class="setting-row"><div><div class="setting-label">CH₄ Minimum</div><div class="setting-sub">Alert jika di bawah ini</div></div><div style="display:flex;align-items:center;gap:6px;"><input class="setting-input" type="number" value="85"> %</div></div>
+          <div class="setting-row"><div><div class="setting-label">H₂S Maksimum</div></div><div style="display:flex;align-items:center;gap:6px;"><input class="setting-input" type="number" value="5"> ppm</div></div>
+        </div>
+        <div class="setting-group">
+          <div class="setting-group-title">🛢️ Threshold Penyimpanan</div>
+          <div class="setting-row"><div><div class="setting-label">Tekanan Maks Aman</div></div><div style="display:flex;align-items:center;gap:6px;"><input class="setting-input" type="number" value="200"> kPa</div></div>
+          <div class="setting-row"><div><div class="setting-label">Volume Minimum Alert</div></div><div style="display:flex;align-items:center;gap:6px;"><input class="setting-input" type="number" value="100"> L</div></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="setting-group">
+          <div class="setting-group-title">🔔 Pengaturan Notifikasi</div>
+          <div class="setting-row"><div><div class="setting-label">Alert Suhu Bioreaktor</div></div><button class="toggle on" onclick="this.classList.toggle('on')"></button></div>
+          <div class="setting-row"><div><div class="setting-label">Alert pH Bioreaktor</div></div><button class="toggle on" onclick="this.classList.toggle('on')"></button></div>
+          <div class="setting-row"><div><div class="setting-label">Alert Tekanan Reaktor</div></div><button class="toggle on" onclick="this.classList.toggle('on')"></button></div>
+          <div class="setting-row"><div><div class="setting-label">Alert Adsorben Jenuh</div></div><button class="toggle on" onclick="this.classList.toggle('on')"></button></div>
+          <div class="setting-row"><div><div class="setting-label">Alert Tekanan Tangki</div></div><button class="toggle" onclick="this.classList.toggle('on')"></button></div>
+          <div class="setting-row"><div><div class="setting-label">Alert Volume Gas Rendah</div></div><button class="toggle on" onclick="this.classList.toggle('on')"></button></div>
+          <div class="setting-row"><div><div class="setting-label">Laporan Harian Otomatis</div></div><button class="toggle" onclick="this.classList.toggle('on')"></button></div>
+        </div>
+
+        <div class="setting-group">
+          <div class="setting-group-title">ℹ️ Informasi Sistem</div>
+          <div class="info-rows">
+            <div class="info-row"><span class="info-label">Versi Software</span><span class="info-val">SIRKUL v2.1.0</span></div>
+            <div class="info-row"><span class="info-label">Siklus Aktif</span><span class="info-val">Siklus ke-4</span></div>
+            <div class="info-row"><span class="info-label">Hari Fermentasi</span><span class="info-val">12 / 21</span></div>
+            <div class="info-row"><span class="info-label">Status Koneksi IoT</span><span class="badge ok">● TERHUBUNG</span></div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:10px;margin-top:10px;">
+          <button class="btn btn-primary" onclick="alert('✅ Pengaturan disimpan!')">💾 Simpan</button>
+          <button class="btn btn-outline" onclick="location.reload()">🔄 Reset</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  </div><!-- end content -->
+</div><!-- end main -->
+
+<script>
+// ═══════════════════════════════════════
+//  NAVIGATION
+// ═══════════════════════════════════════
+const PAGE_TITLES = {
+  dashboard:'Dashboard Utama', bioreaktor:'Tabung 1 — Bioreaktor',
+  scrubber:'Tabung 2 — Scrubber', storage:'Tabung 3 — Penyimpanan Gas',
+  produk:'Produk Turunan', riwayat:'Riwayat & Laporan', pengaturan:'Pengaturan'
+};
+
+let chartsReady = {};
+
+function showPage(id, navEl) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  document.getElementById('pageTitle').textContent = PAGE_TITLES[id];
+  if (navEl) navEl.classList.add('active');
+  closeSidebar();
+  if (!chartsReady[id]) { setTimeout(() => { initCharts(id); chartsReady[id] = true; }, 80); }
+}
+
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('overlay').classList.toggle('show');
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('overlay').classList.remove('show');
+}
+
+// ═══════════════════════════════════════
+//  CLOCK
+// ═══════════════════════════════════════
+function tick() { document.getElementById('clock').textContent = new Date().toLocaleTimeString('id-ID') + ' WIB'; }
+setInterval(tick, 1000); tick();
+
+// ═══════════════════════════════════════
+//  CHART FACTORY
+// ═══════════════════════════════════════
+const CI = {};
+const CHART_OPT = {
+  responsive: true, maintainAspectRatio: false,
+  plugins: { legend: { display: false }, tooltip: { mode: 'index', intersect: false } },
+  scales: {
+    x: { grid: { color: '#f3f4f6' }, ticks: { color: '#9ca3af', font: { size: 10 }, maxTicksLimit: 8 } },
+    y: { grid: { color: '#f3f4f6' }, ticks: { color: '#9ca3af', font: { size: 10 } } }
+  },
+  animation: { duration: 200 },
+  elements: { line: { tension: 0.4 }, point: { radius: 0, hoverRadius: 4 } }
+};
+
+function mkLine(canvasId, datasets, yOpts = {}) {
+  const ctx = document.getElementById(canvasId);
+  if (!ctx) return null;
+  return new Chart(ctx, {
+    type: 'line',
+    data: { labels: genLabels(30), datasets },
+    options: { ...CHART_OPT, scales: { ...CHART_OPT.scales, y: { ...CHART_OPT.scales.y, ...yOpts } } }
+  });
+}
+
+function mkBar(canvasId, datasets, xStacked=false, yStacked=false, legendDisplay=false) {
+  const ctx = document.getElementById(canvasId);
+  if (!ctx) return null;
+  return new Chart(ctx, {
+    type: 'bar',
+    data: { labels: genLabels(21, true), datasets },
+    options: {
+      ...CHART_OPT,
+      plugins: { legend: { display: legendDisplay, labels: { font:{size:11}, color:'#6b7280' } }, tooltip: { mode: 'index', intersect: false } },
+      scales: {
+        x: { stacked: xStacked, grid:{display:false}, ticks:{color:'#9ca3af',font:{size:10},maxTicksLimit:10} },
+        y: { stacked: yStacked, grid:{color:'#f3f4f6'}, ticks:{color:'#9ca3af',font:{size:10}} }
+      }
+    }
+  });
+}
+
+function ds(data, color, label='', fill=true) {
+  return { label, data, borderColor: color, backgroundColor: color + '18', borderWidth: 2, fill };
+}
+function dsDash(data, color, label) {
+  return { label, data, borderColor: color, backgroundColor:'transparent', borderWidth:1.5, borderDash:[6,4], fill:false, pointRadius:0 };
+}
+function rnd(b, d) { return parseFloat((b + (Math.random()-.5)*d*2).toFixed(2)); }
+function gen(b, d, n=30) { return Array.from({length:n}, () => rnd(b, d)); }
+function genLabels(n, isDay=false) {
+  if (isDay) return Array.from({length:n}, (_,i) => `H${i+1}`);
+  return Array.from({length:n}, (_,i) => `${i}:00`);
+}
+
+function initCharts(page) {
+  const CYCLE_DAY = 12;
+
+  if (page === 'dashboard') {
+    const prodData = Array.from({length:21}, (_,i) => i < CYCLE_DAY ? parseFloat((80+i*8+rnd(0,8)).toFixed(1)) : null);
+    const predData = Array.from({length:21}, (_,i) => i >= CYCLE_DAY ? parseFloat((80+i*8+rnd(0,6)).toFixed(1)) : null);
+    CI.dashMain = mkBar('chartDashMain', [
+      { label:'Aktual', data:prodData, backgroundColor:'#1a5c3890', borderColor:'#1a5c38', borderWidth:1.5, borderRadius:4 },
+      { label:'Prediksi', data:predData, backgroundColor:'#22c55e40', borderColor:'#22c55e', borderWidth:1.5, borderDash:[4,4], borderRadius:4 }
+    ], false, false, true);
+
+    const ctx2 = document.getElementById('chartGasDist');
+    if (ctx2) CI.gasDist = new Chart(ctx2, {
+      type: 'doughnut',
+      data: { labels:['Aerator/Generator','Memasak','Cadangan'], datasets:[{ data:[42,26,56], backgroundColor:['#1a5c38','#22c55e','#86efac'], borderWidth:3, borderColor:'#fff' }] },
+      options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{position:'bottom',labels:{font:{size:11},color:'#6b7280',padding:12}} }, cutout:'60%' }
+    });
+  }
+
+  if (page === 'bioreaktor') {
+    const tl = Array.from({length:30}, (_,i) => `${i}:00`);
+    CI.bTemp = new Chart(document.getElementById('chartBioTemp'), {
+      type:'line', data:{ labels:tl, datasets:[ds(gen(34.8,1.2),'#1a5c38','Suhu (°C)'), dsDash(Array(30).fill(35),'#22c55e','Target 35°C'), dsDash(Array(30).fill(30),'#f59e0b','Min 30°C'), dsDash(Array(30).fill(40),'#ef4444','Max 40°C')] },
+      options:{ ...CHART_OPT, plugins:{legend:{display:true,labels:{font:{size:10},color:'#6b7280'}},tooltip:{mode:'index',intersect:false}}, scales:{...CHART_OPT.scales,y:{...CHART_OPT.scales.y,min:26,max:44}} }
+    });
+    CI.bPH = new Chart(document.getElementById('chartBioPH'), {
+      type:'line', data:{ labels:tl, datasets:[ds(gen(7.0,0.25),'#3b82f6','pH'), dsDash(Array(30).fill(6.8),'#f59e0b','Min 6.8'), dsDash(Array(30).fill(7.2),'#ef4444','Max 7.2')] },
+      options:{ ...CHART_OPT, plugins:{legend:{display:true,labels:{font:{size:10},color:'#6b7280'}},tooltip:{mode:'index',intersect:false}}, scales:{...CHART_OPT.scales,y:{...CHART_OPT.scales.y,min:6.2,max:7.8}} }
+    });
+    CI.bPres = mkLine('chartBioPres', [ds(gen(142,8),'#8b5cf6','Tekanan (kPa)')]);
+  }
+
+  if (page === 'scrubber') {
+    const tl = Array.from({length:30}, (_,i) => `${i}:00`);
+    const inData = gen(150,4), outData = inData.map(v => parseFloat((v - rnd(8.4,1)).toFixed(2)));
+    CI.sDP = new Chart(document.getElementById('chartScrDP'), {
+      type:'line', data:{ labels:tl, datasets:[ds(inData,'#1a5c38','Tekanan Masuk'), ds(outData,'#22c55e','Tekanan Keluar')] },
+      options:{ ...CHART_OPT, plugins:{legend:{display:true,labels:{font:{size:10},color:'#6b7280'}},tooltip:{mode:'index',intersect:false}} }
+    });
+    CI.sCH4 = new Chart(document.getElementById('chartScrCH4'), {
+      type:'line', data:{ labels:tl, datasets:[ds(gen(85.3,0.7),'#3b82f6','CH₄ (%)'), dsDash(Array(30).fill(85),'#22c55e','Target 85%')] },
+      options:{ ...CHART_OPT, plugins:{legend:{display:true,labels:{font:{size:10},color:'#6b7280'}},tooltip:{mode:'index',intersect:false}}, scales:{...CHART_OPT.scales,y:{min:80,max:92}} }
+    });
+  }
+
+  if (page === 'storage') {
+    const hrs = Array.from({length:24}, (_,i) => `${i}:00`);
+    CI.stUse = new Chart(document.getElementById('chartStorUse'), {
+      type:'bar', data:{ labels:hrs, datasets:[
+        { label:'Aerator', data:gen(2.5,1.5,24).map(v=>Math.max(0,v)), backgroundColor:'#1a5c3888', borderRadius:3 },
+        { label:'Memasak', data:gen(1.2,1,24).map(v=>Math.max(0,v)), backgroundColor:'#22c55e88', borderRadius:3 }
+      ]},
+      options:{ ...CHART_OPT, plugins:{legend:{display:true,labels:{font:{size:10},color:'#6b7280'}},tooltip:{mode:'index',intersect:false}},
+        scales:{ x:{stacked:true,grid:{display:false},ticks:{color:'#9ca3af',font:{size:9},maxTicksLimit:8}}, y:{stacked:true,grid:{color:'#f3f4f6'},ticks:{color:'#9ca3af',font:{size:10}}} } }
+    });
+    CI.stPres = new Chart(document.getElementById('chartStorPres'), {
+      type:'line', data:{ labels:hrs, datasets:[ds(gen(142,7,24),'#f59e0b','Tekanan (kPa)'), dsDash(Array(24).fill(200),'#ef4444','Batas 200 kPa')] },
+      options:{ ...CHART_OPT, plugins:{legend:{display:true,labels:{font:{size:10},color:'#6b7280'}},tooltip:{mode:'index',intersect:false}}, scales:{...CHART_OPT.scales,y:{min:100,max:220}} }
+    });
+  }
+}
+
+// ═══════════════════════════════════════
+//  SIMULATION
+// ═══════════════════════════════════════
+let S = {
+  temp:34.8, ph:7.1, bPres:142, ch4:85.3, h2s:3.2,
+  dp:8.4, vol:1256, stPres:142, biogas:1847,
+};
+
+function simulate() {
+  S.temp = rnd(34.8, 1.2);
+  S.ph   = rnd(7.0, 0.22);
+  S.bPres = rnd(142, 7);
+  S.ch4  = rnd(85.3, 0.65);
+  S.h2s  = Math.max(0.5, rnd(3.2, 0.6));
+  S.dp   = rnd(8.4, 0.9);
+  S.vol  = rnd(1256, 18);
+  S.stPres = rnd(142, 6);
+  S.biogas += Math.random() * 2.8;
+
+  updateDOM();
+  pushCharts();
+  checkAlerts();
+}
+
+function set(id, val) { const el = document.getElementById(id); if (el) el.textContent = val; }
+
+function updateDOM() {
+  // Dashboard
+  set('d-biogas', Math.round(S.biogas).toLocaleString('id'));
+  set('d-ch4', S.ch4.toFixed(1));
+  set('d-temp', S.temp.toFixed(1));
+  set('d-pres', Math.round(S.stPres));
+
+  // Tanks
+  set('t1-temp', S.temp.toFixed(1) + '°C');
+  set('t1-ph', S.ph.toFixed(2));
+  set('t2-ch4', S.ch4.toFixed(1) + '%');
+  set('t2-h2s', S.h2s.toFixed(1) + ' ppm');
+  const vPct = Math.round((S.vol / 1850) * 100);
+  set('t3-vol', Math.round(S.vol).toLocaleString('id') + ' L');
+  set('t3-pres', Math.round(S.stPres) + ' kPa');
+  set('t3-status', `● ${vPct}% PENUH`);
+
+  const tc = document.getElementById('t3-status');
+  if (tc) { tc.className = 'tank-status ' + (vPct > 80 ? 'danger' : vPct > 60 ? 'warn' : 'ok'); }
+
+  // Bioreaktor
+  set('b-temp', S.temp.toFixed(1));
+  set('b-ph', S.ph.toFixed(2));
+  set('b-pres', Math.round(S.bPres));
+  const tempOk = S.temp >= 30 && S.temp <= 40;
+  const phOk   = S.ph >= 6.8 && S.ph <= 7.2;
+  ['b-bacteria','b-bacteria2'].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const ok = tempOk && phOk;
+    el.textContent = ok ? 'AKTIF' : 'TERHAMBAT';
+    el.className = 'badge ' + (ok ? 'ok' : 'warn');
+  });
+
+  // Scrubber
+  set('s-ch4', S.ch4.toFixed(1));
+  set('s-h2s', S.h2s.toFixed(1));
+  set('s-dp', S.dp.toFixed(1));
+  set('s-dp2', S.dp.toFixed(1) + ' kPa');
+  set('s-pin', (S.stPres + S.dp).toFixed(1) + ' kPa');
+  set('s-pout', S.stPres.toFixed(1) + ' kPa');
+  set('s-co2', Math.max(0, 100 - S.ch4 - S.h2s * 0.1).toFixed(1) + '%');
+  set('s-eff', (97 - S.h2s * 0.3).toFixed(1) + '%');
+
+  const adsPct = 52;
+  const adsBar = document.getElementById('s-ads-bar');
+  if (adsBar) adsBar.style.width = adsPct + '%';
+  const adsEl = document.getElementById('s-adsorben');
+  if (adsEl) { adsEl.textContent = 'BAIK'; adsEl.className = 'badge ok'; }
+
+  // Storage
+  set('st-vol', Math.round(S.vol).toLocaleString('id'));
+  set('st-vol2', Math.round(S.vol).toLocaleString('id') + ' L');
+  set('st-pres', Math.round(S.stPres));
+  set('st-eta', (S.vol / 68).toFixed(1));
+
+  // Gauge
+  const pct = S.vol / 1850;
+  const maxDash = 283;
+  const arc = document.getElementById('gArc');
+  const gtxt = document.getElementById('gTxt');
+  if (arc) arc.style.strokeDashoffset = maxDash - (pct * maxDash);
+  if (gtxt) gtxt.textContent = Math.round(pct * 100) + '%';
+  if (gtxt) gtxt.setAttribute('fill', pct > 0.85 ? '#ef4444' : '#1a5c38');
+}
+
+function pushCharts() {
+  const now = new Date().toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'});
+  function push(chart, ...vals) {
+    if (!chart) return;
+    vals.forEach((v,i) => { if(chart.data.datasets[i]){ chart.data.datasets[i].data.push(v); if(chart.data.datasets[i].data.length>40)chart.data.datasets[i].data.shift(); } });
+    chart.data.labels.push(now);
+    if (chart.data.labels.length > 40) chart.data.labels.shift();
+    chart.update('none');
+  }
+  push(CI.bTemp, S.temp, 35, 30, 40);
+  push(CI.bPH, S.ph, 6.8, 7.2);
+  push(CI.bPres, S.bPres);
+  push(CI.sDP, S.stPres + S.dp, S.stPres);
+  push(CI.sCH4, S.ch4, 85);
+  push(CI.stPres, S.stPres, 200);
+}
+
+// ═══════════════════════════════════════
+//  ALERTS
+// ═══════════════════════════════════════
+let alertLog = [];
+
+const STATIC_ALERTS = [
+  { level:'info',  src:'Bioreaktor', msg:'Suhu stabil 34.8°C — kondisi mesofilik terjaga dengan baik.', resolved:true },
+  { level:'info',  src:'Scrubber',   msg:'Kemurnian CH₄ 85.3% — target produksi tercapai.', resolved:true },
+  { level:'warn',  src:'Scrubber',   msg:'Adsorben Ca(OH)₂ 52% tersisa — estimasi penggantian 7 hari lagi.', resolved:false },
+  { level:'info',  src:'Sistem',     msg:'Siklus fermentasi hari ke-12 dari 21 berjalan normal.', resolved:true },
+  { level:'warn',  src:'Penyimpanan',msg:'Volume gas 68% — disarankan distribusikan ke aerator.', resolved:false },
+  { level:'info',  src:'POC',        msg:'Volume POC mencapai 48.5 L — siap dipanen sebagian.', resolved:true },
+  { level:'info',  src:'Maggot BSF', msg:'Usia kultur 12 hari, pertumbuhan larva berjalan optimal.', resolved:true },
+  { level:'info',  src:'Bioreaktor', msg:'pH 7.1 dalam rentang optimal untuk metanogenesis.', resolved:true },
+];
+
+function initAlerts() {
+  const now = new Date();
+  alertLog = STATIC_ALERTS.map((a, i) => ({ ...a, time: new Date(now - i * 22 * 60000), id: i }));
+  renderAllAlerts();
+  document.getElementById('bellCount').textContent = alertLog.filter(a=>!a.resolved).length;
+  document.getElementById('alertTotal').textContent = alertLog.length + ' alert tercatat';
+}
+
+function renderAllAlerts() {
+  renderAlerts('dashAlerts', null, 4);
+  renderAlerts('bioAlerts', ['Bioreaktor']);
+  renderAlerts('scrAlerts', ['Scrubber']);
+  renderAlerts('storAlerts', ['Penyimpanan']);
+  renderTable();
+}
+
+function renderAlerts(id, sources, limit) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  let list = sources ? alertLog.filter(a => sources.some(s => a.src.includes(s))) : alertLog;
+  if (!list.length) list = alertLog.slice(0, 3);
+  if (limit) list = list.slice(0, limit);
+  el.innerHTML = list.map(a => `
+    <div class="alert-item ${a.level}">
+      <span class="alert-icon">${a.level==='warn'?'⚠️':a.level==='danger'?'🚨':'ℹ️'}</span>
+      <div class="alert-text"><strong>${a.src}:</strong> ${a.msg}</div>
+      <span class="alert-time">${a.time.toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'})}</span>
+    </div>`).join('');
+}
+
+function renderTable() {
+  const tbody = document.getElementById('alertTable');
+  if (!tbody) return;
+  tbody.innerHTML = alertLog.map(a => `
+    <tr>
+      <td>${a.time.toLocaleString('id-ID',{hour:'2-digit',minute:'2-digit',day:'2-digit',month:'short'})}</td>
+      <td>${a.src}</td>
+      <td><span class="badge ${a.level==='info'?'ok':a.level==='warn'?'warn':'bad'}">${a.level.toUpperCase()}</span></td>
+      <td style="max-width:300px;">${a.msg}</td>
+      <td><span class="badge ${a.resolved?'ok':'warn'}">${a.resolved?'✓ Selesai':'Aktif'}</span></td>
+    </tr>`).join('');
+}
+
+function checkAlerts() {
+  if (S.temp < 30 || S.temp > 40) pushAlert('danger','Bioreaktor',`Suhu ${S.temp.toFixed(1)}°C di luar rentang aman 30–40°C!`);
+  if (S.ph < 6.8 || S.ph > 7.2)   pushAlert('warn','Bioreaktor',`pH ${S.ph.toFixed(2)} di luar rentang optimal 6.8–7.2`);
+  if (S.ch4 < 85)                   pushAlert('warn','Scrubber',`CH₄ ${S.ch4.toFixed(1)}% di bawah target 85%`);
+  if (S.stPres > 190)               pushAlert('danger','Penyimpanan',`Tekanan ${S.stPres.toFixed(0)} kPa mendekati batas aman 200 kPa!`);
+}
+
+function pushAlert(level, src, msg) {
+  alertLog.unshift({ level, src, msg, time: new Date(), id: Date.now(), resolved: false });
+  if (alertLog.length > 25) alertLog.pop();
+  renderAllAlerts();
+  document.getElementById('bellCount').textContent = Math.min(alertLog.filter(a=>!a.resolved).length, 9);
+  document.getElementById('alertTotal').textContent = alertLog.length + ' alert tercatat';
+}
+
+function exportReport() {
+  const txt = `LAPORAN SIRKUL — Siklus ke-4
+Tanggal: ${new Date().toLocaleDateString('id-ID',{weekday:'long',year:'numeric',month:'long',day:'numeric'})}
+
+=== RINGKASAN PRODUKSI ===
+Total Biogas      : ${Math.round(S.biogas).toLocaleString('id')} L
+Kemurnian CH₄     : ${S.ch4.toFixed(1)}%
+POC Tersedia      : 48.5 L
+Maggot BSF        : 1,240 gram (dalam kultur)
+
+=== STATUS SENSOR ===
+Suhu Reaktor      : ${S.temp.toFixed(1)}°C
+pH Reaktor        : ${S.ph.toFixed(2)}
+Tekanan Reaktor   : ${Math.round(S.bPres)} kPa
+H₂S (Scrubber)   : ${S.h2s.toFixed(1)} ppm
+Volume Tersimpan  : ${Math.round(S.vol).toLocaleString('id')} L
+Tekanan Tangki    : ${Math.round(S.stPres)} kPa
+
+=== ANALISIS EKONOMI ===
+Hemat LPG         : Rp300.000/bln
+Hemat Pakan       : Rp500.000/bln
+Hemat Pupuk       : Rp300.000/bln
+TOTAL HEMAT       : Rp1.100.000/bln
+Payback Period    : 2-3 bulan
+
+Diekspor oleh: SIRKUL v2.1.0`;
+
+  const blob = new Blob([txt], {type:'text/plain;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `laporan-sirkul-${new Date().toISOString().slice(0,10)}.txt`;
+  a.click();
+}
+
+// ═══════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════
+initAlerts();
+setTimeout(() => { initCharts('dashboard'); chartsReady['dashboard'] = true; }, 150);
+simulate();
+setInterval(simulate, 3000);
+['sbDay','d-day'].forEach(id => set(id,'12'));
+set('cycleDay','Hari 12');
+</script>
+</body>
+</html>
