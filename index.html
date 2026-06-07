@@ -3,1014 +3,863 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SIRKUL — Sistem Monitoring Mini Refinery</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<title>SIRKUL AI — Mini Refinery Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-:root {
-  --green: #1a5c38; --green2: #2d7a52; --green3: #3d9967;
-  --green-light: #e6f4ed; --green-pale: #f0f8f4;
-  --accent: #22c55e; --yellow: #f59e0b; --red: #ef4444; --blue: #3b82f6;
-  --bg: #eef4f1; --card: #fff; --sidebar-bg: #0d3320;
-  --sidebar-w: 230px; --text: #1c3327; --muted: #5a7a68;
-  --border: #cce0d5; --radius: 14px;
-  --shadow: 0 2px 14px rgba(26,92,56,0.09);
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --eco:#1a5c38;--eco2:#2a7d4f;--eco3:#0f3b23;--eco4:#134530;
+  --mint:#86efac;--mintd:#16a34a;--mint2:#dcfce7;
+  --rose:#e11d48;--roseb:#fff1f2;--roseb2:#fda4af;
+  --amber:#d97706;--amberb:#fffbeb;--amberb2:#fcd34d;
+  --blue:#2563eb;--blueb:#eff6ff;
+  --purple:#7c3aed;--purpleb:#f5f3ff;
+  --ok:#f0fdf4;--okb:#bbf7d0;
+  --bg:#eef2ee;--surface:#fff;--border:#e2e8f0;--border2:#f1f5f9;
+  --tx:#1e293b;--txm:#64748b;--txs:#94a3b8;
+  --fw:268px;--fh:62px;
+  --mono:'IBM Plex Mono',monospace;
+  --sans:'Plus Jakarta Sans',sans-serif;
+  --sh:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
+  --sh2:0 4px 12px rgba(0,0,0,.08);
 }
-body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); display: flex; min-height: 100vh; font-size: 14px; }
-
-/* ── SIDEBAR ── */
-.sidebar { width: var(--sidebar-w); background: var(--sidebar-bg); min-height: 100vh; position: fixed; top: 0; left: 0; display: flex; flex-direction: column; z-index: 100; transition: transform 0.3s; }
-.sidebar-logo { padding: 24px 20px 18px; border-bottom: 1px solid rgba(255,255,255,0.08); }
-.logo-mark { font-size: 24px; font-weight: 900; color: #fff; letter-spacing: -1px; display: flex; align-items: center; gap: 8px; }
-.logo-mark .dot { width: 10px; height: 10px; background: var(--accent); border-radius: 50%; display: inline-block; animation: pulse 1.4s infinite; }
-.logo-sub { font-size: 10px; color: #6aa882; margin-top: 5px; line-height: 1.5; letter-spacing: 0.3px; }
-.nav { flex: 1; padding: 14px 10px; display: flex; flex-direction: column; gap: 3px; }
-.nav-section { font-size: 9px; font-weight: 700; color: #4a7a5e; letter-spacing: 1.5px; padding: 10px 12px 4px; text-transform: uppercase; }
-.nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 10px; cursor: pointer; color: #8abfa0; font-size: 13px; font-weight: 500; transition: all 0.15s; user-select: none; }
-.nav-item:hover { background: rgba(255,255,255,0.07); color: #d4f1e3; }
-.nav-item.active { background: var(--green2); color: #fff; font-weight: 600; }
-.nav-item .nav-icon { font-size: 16px; width: 20px; text-align: center; flex-shrink: 0; }
-.sidebar-footer { padding: 14px 18px; border-top: 1px solid rgba(255,255,255,0.07); }
-.live-row { display: flex; align-items: center; gap: 7px; color: #6aa882; font-size: 11px; }
-.live-dot { width: 8px; height: 8px; background: var(--accent); border-radius: 50%; flex-shrink: 0; animation: pulse 1.4s infinite; }
-@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.25} }
-.cycle-info { font-size: 11px; color: #4a7a5e; margin-top: 6px; }
-
-/* ── MAIN ── */
-.main { margin-left: var(--sidebar-w); flex: 1; min-height: 100vh; display: flex; flex-direction: column; }
-.topbar { background: var(--card); border-bottom: 1px solid var(--border); padding: 13px 28px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 50; box-shadow: 0 1px 8px rgba(26,92,56,0.06); }
-.topbar-left { display: flex; align-items: center; gap: 14px; }
-.hamburger { display: none; background: none; border: none; font-size: 22px; cursor: pointer; color: var(--text); padding: 4px; }
-.page-title { font-size: 17px; font-weight: 700; color: var(--text); }
-.topbar-right { display: flex; align-items: center; gap: 12px; }
-.clock { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; background: var(--green-light); padding: 5px 12px; border-radius: 20px; font-weight: 500; }
-.bell-btn { position: relative; background: var(--green-light); border: none; width: 38px; height: 38px; border-radius: 11px; cursor: pointer; font-size: 17px; display: flex; align-items: center; justify-content: center; transition: background 0.15s; }
-.bell-btn:hover { background: #d0ead9; }
-.bell-count { position: absolute; top: -5px; right: -5px; background: var(--red); color: #fff; font-size: 9px; font-weight: 800; width: 17px; height: 17px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid var(--card); }
-.content { padding: 28px; flex: 1; }
-.page { display: none; }
-.page.active { display: block; animation: fadeIn 0.2s ease; }
-@keyframes fadeIn { from{opacity:0;transform:translateY(4px)} to{opacity:1;transform:translateY(0)} }
-
-/* ── STAT CARDS ── */
-.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px; margin-bottom: 22px; }
-.stat-card { background: var(--card); border-radius: var(--radius); padding: 18px 18px 16px; box-shadow: var(--shadow); border: 1px solid var(--border); position: relative; overflow: hidden; cursor: default; transition: transform 0.15s; }
-.stat-card:hover { transform: translateY(-2px); }
-.stat-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:var(--green); border-radius:var(--radius) var(--radius) 0 0; }
-.stat-card.c-blue::before { background:var(--blue); }
-.stat-card.c-warn::before { background:var(--yellow); }
-.stat-card.c-red::before { background:var(--red); }
-.stat-card.c-accent::before { background:var(--accent); }
-.stat-icon { font-size: 20px; margin-bottom: 10px; line-height: 1; }
-.stat-label { font-size: 10px; font-weight: 700; color: var(--muted); letter-spacing: 0.8px; text-transform: uppercase; }
-.stat-value { font-size: 26px; font-weight: 800; color: var(--text); margin: 5px 0 3px; line-height: 1; font-variant-numeric: tabular-nums; }
-.stat-unit { font-size: 13px; font-weight: 500; color: var(--muted); }
-.stat-sub { font-size: 11px; color: var(--accent); font-weight: 600; }
-.stat-sub.warn { color: var(--yellow); }
-.stat-sub.muted { color: var(--muted); }
-
-/* ── GRID LAYOUTS ── */
-.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 22px; }
-.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 18px; margin-bottom: 22px; }
-
-/* ── CARDS ── */
-.card { background: var(--card); border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow); border: 1px solid var(--border); }
-.card-title { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; }
-.card-title .ct-sub { font-size: 11px; color: var(--muted); font-weight: 500; }
-.card-title .ct-badge { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 10px; background: var(--green-light); color: var(--green); }
-.chart-wrap { position: relative; height: 200px; }
-.section-mb { margin-bottom: 22px; }
-
-/* ── SECTION HEADER ── */
-.section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
-.section-title { font-size: 14px; font-weight: 700; color: var(--text); display: flex; align-items: center; gap: 9px; }
-.section-title::before { content:''; display:block; width:4px; height:16px; background:var(--green); border-radius:2px; }
-
-/* ── TANK CARDS ── */
-.tank-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 22px; }
-.tank-card { background: var(--card); border-radius: var(--radius); padding: 20px 16px; box-shadow: var(--shadow); border: 2px solid var(--border); text-align: center; cursor: pointer; transition: all 0.2s; }
-.tank-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(26,92,56,0.14); }
-.tank-card.ok { border-color: var(--accent); }
-.tank-card.warn { border-color: var(--yellow); }
-.tank-card.danger { border-color: var(--red); }
-.tank-badge { display: inline-block; font-size: 10px; font-weight: 700; color: var(--muted); letter-spacing: 1px; background: var(--bg); padding: 2px 8px; border-radius: 8px; margin-bottom: 8px; }
-.tank-icon { font-size: 36px; margin: 8px 0; display: block; }
-.tank-name { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 10px; }
-.tank-status { display: inline-flex; align-items: center; gap: 5px; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; }
-.tank-status.ok { background: #dcfce7; color: #166534; }
-.tank-status.warn { background: #fef3c7; color: #92400e; }
-.tank-status.danger { background: #fee2e2; color: #991b1b; }
-.tank-metrics { display: flex; justify-content: center; gap: 18px; margin-top: 12px; }
-.tm-val { font-size: 16px; font-weight: 700; color: var(--text); }
-.tm-label { font-size: 10px; color: var(--muted); margin-top: 2px; }
-
-/* ── BADGES ── */
-.badge { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; }
-.badge.ok { background: #dcfce7; color: #166534; }
-.badge.warn { background: #fef3c7; color: #92400e; }
-.badge.bad { background: #fee2e2; color: #991b1b; }
-.badge.blue { background: #dbeafe; color: #1d4ed8; }
-.badge.muted { background: #f3f4f6; color: #6b7280; }
-
-/* ── ALERTS ── */
-.alert-list { display: flex; flex-direction: column; gap: 8px; }
-.alert-item { display: flex; align-items: flex-start; gap: 10px; padding: 11px 14px; border-radius: 10px; font-size: 12px; line-height: 1.5; }
-.alert-item.info { background: var(--green-light); border: 1px solid #c0deca; }
-.alert-item.warn { background: #fffbeb; border: 1px solid #fde68a; }
-.alert-item.danger { background: #fff1f2; border: 1px solid #fecdd3; }
-.alert-icon { font-size: 15px; flex-shrink: 0; margin-top: 1px; }
-.alert-text { flex: 1; color: var(--text); }
-.alert-time { font-size: 10px; color: var(--muted); flex-shrink: 0; white-space: nowrap; }
-
-/* ── PHASE INDICATOR ── */
-.phase-col { display: flex; flex-direction: column; gap: 3px; border-radius: 12px; overflow: hidden; height: 130px; border: 2px solid var(--border); flex-shrink: 0; }
-.phase-gas { background: linear-gradient(135deg,#dbeafe,#eff6ff); flex: 2; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: #1d4ed8; gap: 5px; }
-.phase-liquid { background: linear-gradient(135deg,#dcfce7,#f0fdf4); flex: 3; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: #15803d; gap: 5px; }
-.phase-solid { background: linear-gradient(135deg,#fef3c7,#fffbeb); flex: 2; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: #b45309; gap: 5px; }
-
-/* ── INFO ROWS ── */
-.info-rows { display: flex; flex-direction: column; }
-.info-row { display: flex; justify-content: space-between; align-items: center; padding: 9px 0; border-bottom: 1px solid #f3f4f6; font-size: 13px; }
-.info-row:last-child { border-bottom: none; }
-.info-label { color: var(--muted); }
-.info-val { font-weight: 700; color: var(--text); }
-
-/* ── PROGRESS BAR ── */
-.prog-wrap { margin: 8px 0; }
-.prog-label-row { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); margin-bottom: 5px; }
-.prog-bar { height: 9px; background: #e5e7eb; border-radius: 5px; overflow: hidden; }
-.prog-fill { height: 100%; border-radius: 5px; transition: width 0.5s ease; }
-
-/* ── GAUGE ── */
-.gauge-svg { display: block; margin: 0 auto; }
-
-/* ── TABLE ── */
-.data-table { width: 100%; border-collapse: collapse; font-size: 12px; }
-.data-table th { background: var(--green-light); color: var(--green); font-weight: 700; padding: 10px 14px; text-align: left; font-size: 11px; letter-spacing: 0.5px; text-transform: uppercase; }
-.data-table th:first-child { border-radius: 8px 0 0 0; }
-.data-table th:last-child { border-radius: 0 8px 0 0; }
-.data-table td { padding: 10px 14px; border-bottom: 1px solid #f3f4f6; color: var(--text); }
-.data-table tr:last-child td { border-bottom: none; }
-.data-table tr:hover td { background: var(--green-pale); }
-
-/* ── BUTTONS ── */
-.btn { padding: 9px 18px; border-radius: 10px; font-size: 13px; font-weight: 600; cursor: pointer; border: none; transition: all 0.15s; display: inline-flex; align-items: center; gap: 7px; }
-.btn-primary { background: var(--green); color: #fff; }
-.btn-primary:hover { background: var(--green2); transform: translateY(-1px); }
-.btn-outline { background: transparent; border: 2px solid var(--green); color: var(--green); }
-.btn-outline:hover { background: var(--green-light); }
-
-/* ── SETTINGS ── */
-.setting-group { margin-bottom: 24px; }
-.setting-group-title { font-size: 13px; font-weight: 700; color: var(--text); padding-bottom: 8px; border-bottom: 2px solid var(--green-light); margin-bottom: 10px; }
-.setting-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #f3f4f6; }
-.setting-row:last-child { border-bottom: none; }
-.setting-label { font-size: 13px; color: var(--text); }
-.setting-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
-.setting-input { width: 90px; padding: 7px 10px; border: 1.5px solid var(--border); border-radius: 8px; font-size: 13px; color: var(--text); text-align: right; transition: border-color 0.15s; }
-.setting-input:focus { outline: none; border-color: var(--green); }
-.toggle { width: 44px; height: 24px; background: #d1d5db; border-radius: 12px; position: relative; cursor: pointer; transition: background 0.2s; border: none; flex-shrink: 0; }
-.toggle.on { background: var(--green); }
-.toggle::after { content:''; position:absolute; width:18px; height:18px; background:#fff; border-radius:50%; top:3px; left:3px; transition:transform 0.2s; box-shadow:0 1px 4px rgba(0,0,0,0.2); }
-.toggle.on::after { transform: translateX(20px); }
-
-/* ── PRODUCT CARDS ── */
-.product-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 22px; }
-.product-card { background: var(--card); border-radius: var(--radius); padding: 24px; box-shadow: var(--shadow); border: 1px solid var(--border); }
-.product-icon { font-size: 40px; margin-bottom: 12px; display: block; }
-.product-name { font-size: 16px; font-weight: 800; color: var(--text); margin-bottom: 3px; }
-.product-sub { font-size: 12px; color: var(--muted); margin-bottom: 16px; }
-
-/* ── OVERLAY ── */
-.sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 99; }
-.sidebar-overlay.show { display: block; }
-
-/* ── RESPONSIVE ── */
-@media (max-width: 960px) {
-  .sidebar { transform: translateX(-230px); }
-  .sidebar.open { transform: translateX(0); }
-  .main { margin-left: 0; }
-  .hamburger { display: block; }
-  .grid-2, .grid-3 { grid-template-columns: 1fr; }
-  .tank-grid { grid-template-columns: 1fr; }
-  .product-grid { grid-template-columns: 1fr; }
-  .stats-grid { grid-template-columns: repeat(2, 1fr); }
-  .content { padding: 16px; }
-}
-@media (max-width: 480px) {
-  .stats-grid { grid-template-columns: 1fr 1fr; }
-  .topbar { padding: 12px 16px; }
-  .clock { display: none; }
-}
+html,body{height:100%;overflow:hidden;font-family:var(--sans)}
+body{display:grid;grid-template-columns:var(--fw) 1fr;grid-template-rows:var(--fh) 1fr;background:var(--bg);color:var(--tx)}
+#sb{grid-row:1/3;grid-column:1;background:var(--eco3);display:flex;flex-direction:column;overflow-y:auto;overflow-x:hidden;box-shadow:2px 0 12px rgba(0,0,0,.18)}
+#sb::-webkit-scrollbar{width:3px}
+#sb::-webkit-scrollbar-thumb{background:rgba(255,255,255,.12);border-radius:2px}
+.sb-brand{padding:18px 16px 14px;border-bottom:1px solid rgba(255,255,255,.08)}
+.sb-logo{display:flex;align-items:center;gap:11px;margin-bottom:12px}
+.sb-icon{width:38px;height:38px;background:linear-gradient(135deg,var(--eco2),#3da060);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:17px;color:#fff;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,.3)}
+.sb-name{font-size:16.5px;font-weight:800;color:#fff;letter-spacing:-.4px;line-height:1.1}
+.sb-tagline{font-size:8.5px;color:var(--mint);font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-top:1px}
+.sb-authors{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.07);border-radius:9px;padding:9px 11px}
+.sb-authors p{font-size:10px;color:rgba(255,255,255,.4);line-height:1.65}
+.sb-authors strong{color:var(--mint);font-weight:600}
+.sb-live{display:flex;align-items:center;gap:6px;margin-top:10px;padding:6px 10px;background:rgba(34,197,94,.1);border-radius:8px;border:1px solid rgba(34,197,94,.2)}
+.sb-live-dot{width:6px;height:6px;background:#22c55e;border-radius:50%;animation:pu 1.5s infinite;flex-shrink:0}
+@keyframes pu{0%,100%{box-shadow:0 0 0 0 rgba(34,197,94,.5)}50%{box-shadow:0 0 0 4px rgba(34,197,94,0)}}
+.sb-live span{font-size:9.5px;color:rgba(255,255,255,.5)}
+.sb-live strong{font-family:var(--mono);font-size:9.5px;color:#4ade80}
+.sb-sec{padding:14px 16px 3px;font-size:8.5px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.25)}
+.nav{display:flex;align-items:center;gap:9px;padding:9px 12px;margin:1px 8px;border-radius:9px;cursor:pointer;color:rgba(255,255,255,.5);font-size:12.5px;font-weight:500;transition:all .15s;user-select:none}
+.nav:hover{background:rgba(255,255,255,.06);color:rgba(255,255,255,.85)}
+.nav.on{background:linear-gradient(90deg,var(--eco2),rgba(42,125,79,.6));color:#fff;font-weight:700;box-shadow:0 2px 8px rgba(0,0,0,.2)}
+.nav i{width:15px;text-align:center;font-size:13px;flex-shrink:0}
+.nb{margin-left:auto;background:var(--rose);color:#fff;font-size:8px;font-weight:700;padding:1px 5px;border-radius:20px;min-width:16px;text-align:center}
+.sb-foot{margin-top:auto;padding:12px 16px;border-top:1px solid rgba(255,255,255,.06)}
+.sb-foot p{font-size:9px;color:rgba(255,255,255,.2);line-height:1.6}
+#tb{grid-row:1;grid-column:2;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 22px;gap:10px;box-shadow:var(--sh)}
+.tb-title{flex:1;min-width:0}
+.tb-title h2{font-size:14px;font-weight:700;color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tb-title p{font-size:10px;color:var(--txm);margin-top:1px}
+.pill{display:flex;align-items:center;gap:6px;padding:5px 11px;border-radius:20px;font-size:10.5px;font-weight:600;flex-shrink:0;white-space:nowrap}
+.pill-eco{background:var(--ok);border:1px solid var(--okb);color:var(--eco)}
+.pill-green{background:var(--ok);border:1px solid var(--okb);color:var(--mintd)}
+.pill-blue{background:var(--blueb);border:1px solid #bfdbfe;color:var(--blue)}
+.pill-rose{background:var(--roseb);border:1px solid var(--roseb2);color:var(--rose)}
+.pill-dot{width:7px;height:7px;background:#22c55e;border-radius:50%;animation:pu 1.5s infinite}
+.pb-wrap{display:flex;align-items:center;gap:7px}
+.pb-track{width:90px;height:4px;background:rgba(26,92,56,.15);border-radius:9px;overflow:hidden}
+.pb-fill{height:100%;background:var(--eco);border-radius:9px;width:57.1%}
+.clk{font-family:var(--mono);font-size:11.5px;color:var(--txm);font-weight:600;flex-shrink:0}
+#main{grid-row:2;grid-column:2;overflow-y:auto;overflow-x:hidden;padding:18px 20px 30px}
+#main::-webkit-scrollbar{width:4px}
+#main::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+.pg{display:none}.pg.on{display:block}
+.ph{margin-bottom:16px;display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.ph-l h1{font-size:17px;font-weight:800;color:var(--eco3);display:flex;align-items:center;gap:8px}
+.ph-l h1 i{font-size:15px;color:var(--eco)}
+.ph-l p{font-size:11px;color:var(--txm);margin-top:3px}
+.ph-r{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:14px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:14px}
+.g13{display:grid;grid-template-columns:1fr 2.2fr;gap:14px;margin-bottom:14px}
+.g5{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:14px}
+.mb{margin-bottom:14px}
+.c{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:15px;box-shadow:var(--sh);transition:border-color .25s,background .25s}
+.c.cdanger{background:#fff5f6;border-color:#fecdd3}
+.c.cwarn{background:#fffbf0;border-color:#fde68a}
+.c.cok{background:#f7fef9;border-color:#bbf7d0}
+.ct{font-size:11.5px;font-weight:700;color:var(--tx);margin-bottom:11px;display:flex;align-items:center;gap:7px}
+.ct i{color:var(--eco);font-size:12px}
+.ct-r{margin-left:auto;font-size:10px;font-weight:500;color:var(--txm)}
+.mc{display:flex;flex-direction:column}
+.mic{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:15px;margin-bottom:9px}
+.mg{background:#dcfce7;color:var(--eco)}.mb2{background:#dbeafe;color:var(--blue)}.ma{background:#fef3c7;color:#b45309}.mr{background:#ffe4e6;color:#be123c}.mp{background:#f5f3ff;color:var(--purple)}.mt{background:#e0f2fe;color:#0369a1}
+.mlb{font-size:9.5px;font-weight:600;color:var(--txm);text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px}
+.mv{font-family:var(--mono);font-size:22px;font-weight:700;color:var(--tx);line-height:1.1}
+.mv span{font-size:11px;font-weight:400;color:var(--txm)}
+.mst{font-size:10px;font-weight:600;display:flex;align-items:center;gap:3px;margin-top:4px}
+.ok{color:var(--mintd)}.warn{color:var(--amber)}.bad{color:var(--rose)}.neu{color:var(--txm)}
+.cw{position:relative}.xl{height:280px}.lg{height:240px}.md{height:200px}.sm{height:155px}.xs{height:110px}
+.flow{display:flex;align-items:center;justify-content:space-between;padding:10px 0 14px}
+.fn{display:flex;flex-direction:column;align-items:center;gap:5px}
+.fc{width:54px;height:54px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:19px;border:2.5px solid;transition:all .3s}
+.fc-g{background:#dcfce7;border-color:var(--eco);color:var(--eco)}
+.fc-a{background:#fef3c7;border-color:var(--amber);color:var(--amber)}
+.fc-b{background:#dbeafe;border-color:var(--blue);color:var(--blue)}
+.fc-r{background:#fff1f2;border-color:var(--rose);color:var(--rose);animation:jolt .3s infinite}
+@keyframes jolt{0%,100%{transform:translateX(0)}50%{transform:translateX(-2px)}}
+.fl{font-size:10px;font-weight:700;color:var(--tx)}.fs{font-size:9px;color:var(--txm)}
+.fa{flex:1;display:flex;align-items:center;padding:0 4px;max-width:55px}
+.fal{height:2px;flex:1;background:linear-gradient(90deg,var(--eco),var(--mint));border-radius:2px;position:relative;overflow:hidden}
+.fal::after{content:'';position:absolute;top:0;left:-60%;width:50%;height:100%;background:rgba(255,255,255,.6);animation:flo 1.5s linear infinite}
+@keyframes flo{to{left:110%}}
+.fah{width:0;height:0;border-top:5px solid transparent;border-bottom:5px solid transparent;border-left:8px solid var(--mint)}
+.con{background:#0b1120;border-radius:9px;padding:11px 12px;overflow-y:auto;font-family:var(--mono);font-size:10px;line-height:1.75}
+.con::-webkit-scrollbar{width:3px}
+.con::-webkit-scrollbar-thumb{background:#1e293b;border-radius:2px}
+.ll{margin-bottom:1px}
+.ll.ok{color:#4ade80}.ll.warn{color:#fbbf24}.ll.bad{color:#f87171}.ll.info{color:#60a5fa}.ll.sys{color:#94a3b8}
+.lt{color:#334155;margin-right:6px}
+.vwrap{display:flex;flex-direction:column;align-items:center}
+.vcap{width:112px;height:13px;background:#94a3b8;border-radius:5px 5px 0 0;display:flex;align-items:center;justify-content:center;font-size:7.5px;color:#fff;font-weight:700;letter-spacing:1.5px}
+.vessel{width:112px;height:250px;border:2px solid #94a3b8;border-top:none;border-radius:0 0 34px 34px;overflow:hidden;position:relative}
+.vg{position:absolute;top:0;left:0;right:0;height:25%;background:linear-gradient(180deg,rgba(254,249,195,.9),rgba(253,224,71,.3));border-bottom:1px dashed rgba(148,163,184,.4);display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:#78350f}
+.vl{position:absolute;top:25%;left:0;right:0;height:50%;background:linear-gradient(180deg,rgba(147,197,253,.45),rgba(56,189,248,.3));border-bottom:1px dashed rgba(148,163,184,.4);display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:#1e40af}
+.vs{position:absolute;bottom:0;left:0;right:0;height:25%;background:linear-gradient(180deg,rgba(92,40,10,.5),rgba(69,26,3,.75));display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:#fde68a}
+.dk{background:linear-gradient(135deg,var(--eco3),var(--eco4));border-radius:11px;padding:14px;color:#fff}
+.dk-l{font-size:8.5px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--mint);margin-bottom:5px}
+.dk-s{font-size:16px;font-weight:800;margin-bottom:3px;line-height:1.2}
+.dk-d{font-size:10px;color:rgba(255,255,255,.55);line-height:1.45}
+.pb{margin-bottom:12px}
+.pb-row{display:flex;justify-content:space-between;font-size:11px;font-weight:600;margin-bottom:5px;align-items:center}
+.pbt{height:16px;background:#e2e8f0;border-radius:5px;overflow:hidden}
+.pbf{height:100%;border-radius:5px;display:flex;align-items:center;justify-content:flex-end;padding-right:6px;font-size:8.5px;font-weight:700;color:#fff;transition:width .5s}
+.pf-g{background:linear-gradient(90deg,#059669,#34d399)}.pf-r{background:linear-gradient(90deg,#dc2626,#f87171)}.pf-ok{background:linear-gradient(90deg,#16a34a,#4ade80)}.pf-w{background:linear-gradient(90deg,#d97706,#fbbf24)}.pf-bad{background:linear-gradient(90deg,#dc2626,#f87171)}
+.dp-big{text-align:center;padding:12px 0 10px}
+.dp-n{font-family:var(--mono);font-size:60px;font-weight:700;line-height:1;transition:color .3s}
+.dp-ok{color:var(--eco)}.dp-warn{color:var(--amber)}.dp-bad{color:var(--rose)}
+.dp-u{font-size:15px;color:var(--txm)}
+.dp-b{display:inline-block;padding:3px 11px;border-radius:20px;font-size:10.5px;font-weight:700;margin-top:5px}
+.dpb-ok{background:#dcfce7;color:#166534}.dpb-warn{background:#fef3c7;color:#92400e}.dpb-bad{background:#ffe4e6;color:#9f1239}
+.rt{background:linear-gradient(135deg,var(--eco3),var(--eco4),#1e6640);border-radius:11px;padding:16px;color:#fff;text-align:center;position:relative;overflow:hidden}
+.rt::before{content:'';position:absolute;top:-30px;right:-30px;width:100px;height:100px;background:rgba(134,239,172,.06);border-radius:50%}
+.rt-l{font-size:8.5px;font-weight:700;letter-spacing:1.8px;text-transform:uppercase;color:var(--mint);margin-bottom:6px}
+.rt-v{font-family:var(--mono);font-size:40px;font-weight:700;letter-spacing:2px;line-height:1}
+.rt-s{font-size:10px;color:rgba(255,255,255,.5);margin-top:5px}
+.gdc{position:relative;display:flex;align-items:center;justify-content:center}
+.gdt{position:absolute;text-align:center;pointer-events:none}
+.gdt-v{font-family:var(--mono);font-size:24px;font-weight:700;color:var(--eco3);line-height:1}
+.gdt-l{font-size:9.5px;color:var(--txm);font-weight:600}
+.ndc{background:linear-gradient(135deg,var(--eco3),var(--eco2));border-radius:12px;padding:16px 18px;color:#fff;position:relative;overflow:hidden;margin-bottom:14px}
+.ndc::after{content:'31.89%';position:absolute;right:-6px;top:50%;transform:translateY(-50%);font-size:68px;font-weight:900;color:rgba(255,255,255,.04);font-family:var(--mono);pointer-events:none}
+.ndc-l{font-size:8.5px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--mint);margin-bottom:5px}
+.ndc-v{font-size:32px;font-weight:800;font-family:var(--mono);color:var(--mint);line-height:1;margin-bottom:4px}
+.ndc-d{font-size:10.5px;color:rgba(255,255,255,.6);line-height:1.5}
+.pcd{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px}
+.pcd-ico{font-size:28px;margin-bottom:9px}
+.pcd-nm{font-size:13.5px;font-weight:800;color:var(--eco3);margin-bottom:2px}
+.pcd-sb{font-size:10px;color:var(--txm);margin-bottom:10px}
+.pcd-stat{display:flex;align-items:baseline;gap:3px;margin-bottom:4px}
+.pcd-v{font-family:var(--mono);font-size:20px;font-weight:700;color:var(--eco)}
+.pcd-u{font-size:10.5px;color:var(--txm)}
+.pcd-div{height:1px;background:var(--border);margin:9px 0}
+.pcd-f{display:flex;align-items:flex-start;gap:6px;font-size:11px;color:var(--tx);margin-bottom:5px;line-height:1.4}
+.pcd-f i{color:var(--eco);margin-top:2px;font-size:10px;flex-shrink:0}
+.sbs{display:grid;gap:8px;margin-top:10px}
+.sb2{grid-template-columns:1fr 1fr}.sb3{grid-template-columns:repeat(3,1fr)}.sb4{grid-template-columns:repeat(4,1fr)}
+.sbx{text-align:center;padding:9px 6px;background:#f8fafc;border-radius:9px;border:1px solid var(--border2)}
+.sbx-v{font-family:var(--mono);font-size:17px;font-weight:700;line-height:1}
+.sbx-l{font-size:9px;color:var(--txm);font-weight:600;margin-top:3px;line-height:1.3}
+.tbl{width:100%;border-collapse:collapse;font-size:11.5px}
+.tbl thead th{background:#f8fafc;padding:8px 11px;text-align:left;font-size:9.5px;font-weight:700;color:var(--txm);text-transform:uppercase;letter-spacing:.5px;border-bottom:2px solid var(--border);white-space:nowrap}
+.tbl tbody td{padding:9px 11px;border-bottom:1px solid var(--border2);vertical-align:middle}
+.tbl tbody tr:last-child td{border-bottom:none}
+.tbl tbody tr:hover td{background:#f8fafc}
+.badge{display:inline-block;padding:2px 7px;border-radius:20px;font-size:9.5px;font-weight:700}
+.bg-g{background:#dcfce7;color:#166534}.bg-a{background:#fef3c7;color:#92400e}.bg-r{background:#ffe4e6;color:#9f1239}.bg-b{background:#dbeafe;color:#1e40af}
+.sr{display:flex;align-items:center;padding:11px 0;border-bottom:1px solid var(--border2)}
+.sr:last-child{border-bottom:none}
+.sr-i{flex:1;min-width:0}.sr-n{font-size:12px;font-weight:600;color:var(--tx)}.sr-d{font-size:10px;color:var(--txm);margin-top:1px}
+.sr-inp{display:flex;align-items:center;gap:6px;flex-shrink:0;margin-left:14px}
+.si{width:78px;padding:6px 9px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;font-weight:600;font-family:var(--mono);color:var(--tx);background:#f8fafc;text-align:center;outline:none}
+.si:focus{border-color:var(--eco);background:#fff}
+.su{font-size:10px;color:var(--txm);font-weight:600}
+.btn{display:inline-flex;align-items:center;gap:7px;padding:8px 15px;border-radius:9px;font-size:12px;font-weight:600;cursor:pointer;border:none;font-family:var(--sans);transition:all .15s}
+.btn-p{background:var(--eco);color:#fff}.btn-p:hover{background:var(--eco2)}
+.btn-o{background:transparent;border:1.5px solid var(--border);color:var(--tx)}.btn-o:hover{background:#f8fafc}
+.btn-sm{padding:5px 11px;font-size:11px}
+.ai-card{background:linear-gradient(135deg,#0f1b2d,#0d2137,#0a2a1a);border-radius:12px;padding:15px;color:#fff;border:1px solid rgba(96,165,250,.15)}
+.ai-head{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.ai-dot{width:8px;height:8px;background:#60a5fa;border-radius:50%;animation:pu 2s infinite}
+.ai-title{font-size:12px;font-weight:700;color:#93c5fd}
+.ai-item{display:flex;align-items:flex-start;gap:8px;margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid rgba(255,255,255,.06)}
+.ai-item:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+.ai-icon{font-size:14px;flex-shrink:0;margin-top:1px}
+.ai-text{flex:1;font-size:10.5px;color:rgba(255,255,255,.65);line-height:1.55}
+.ai-text strong{color:#fff;font-size:11px;display:block;margin-bottom:2px}
+.ai-conf{font-size:9px;color:#4ade80;font-weight:600;font-family:var(--mono);margin-top:3px}
+.hm-grid{display:grid;grid-template-columns:repeat(21,1fr);gap:3px;margin-top:6px}
+.hm-cell{height:26px;border-radius:4px;cursor:default;transition:transform .15s;display:flex;align-items:center;justify-content:center;font-size:7.5px;font-weight:700;color:rgba(0,0,0,.4)}
+.hm-cell:hover{transform:scaleY(1.2);z-index:5}
+.eco-row{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--border2);font-size:11.5px}
+.eco-row:last-child{border-bottom:none}
+.eco-row .lbl{color:var(--txm)}
+.eco-total{background:linear-gradient(90deg,rgba(26,92,56,.08),rgba(26,92,56,.04));border-radius:8px;padding:10px 12px;margin-top:8px;display:flex;justify-content:space-between;align-items:center}
+.eco-total .lbl{font-size:12px;font-weight:700;color:var(--eco3)}
+.eco-total .val{font-family:var(--mono);font-size:18px;font-weight:800;color:var(--eco)}
+.timeline{position:relative;padding-left:24px}
+.timeline::before{content:'';position:absolute;left:7px;top:6px;bottom:6px;width:2px;background:linear-gradient(180deg,var(--eco),rgba(26,92,56,.1))}
+.tl-item{position:relative;padding-bottom:14px}
+.tl-item:last-child{padding-bottom:0}
+.tl-dot{position:absolute;left:-21px;top:3px;width:12px;height:12px;border-radius:50%;border:2px solid var(--eco);background:var(--surface)}
+.tl-dot.done{background:var(--eco)}.tl-dot.active{background:var(--mint);border-color:var(--mintd);animation:pu 1.5s infinite}.tl-dot.future{border-color:var(--border);background:var(--border2)}
+.tl-h{font-size:11.5px;font-weight:700;color:var(--tx)}.tl-s{font-size:10px;color:var(--txm);margin-top:1px}
+.sg-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.sg-item{background:#f8fafc;border:1px solid var(--border2);border-radius:9px;padding:9px;display:flex;align-items:center;gap:8px}
+.sg-ico{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0}
+.sg-nm{font-size:10.5px;font-weight:700;color:var(--tx)}.sg-vl{font-family:var(--mono);font-size:13px;font-weight:700;line-height:1.1}.sg-st{font-size:9px;font-weight:600;margin-top:1px}
+.kpi-bar{display:flex;gap:0;background:var(--surface);border:1px solid var(--border);border-radius:11px;overflow:hidden;margin-bottom:14px;box-shadow:var(--sh)}
+.kpi-item{flex:1;padding:10px 12px;border-right:1px solid var(--border2);display:flex;align-items:center;gap:8px}
+.kpi-item:last-child{border-right:none}
+.kpi-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.k-l{font-size:9px;color:var(--txm);font-weight:600;text-transform:uppercase;letter-spacing:.4px}
+.k-v{font-family:var(--mono);font-size:14px;font-weight:700;color:var(--tx);line-height:1.1}
+.tscroll{overflow-x:auto}
+.tscroll::-webkit-scrollbar{height:4px}
+.tscroll::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+.igrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;font-size:11px}
+.igrid>div span{color:var(--txm);display:block;font-size:9.5px;margin-bottom:1px}
+.sdg-row{display:flex;gap:10px;margin-top:10px;flex-wrap:wrap;align-items:center}
+.sdg{width:38px;height:38px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#fff;flex-shrink:0}
+#toast{position:fixed;bottom:18px;right:18px;background:var(--eco3);color:#fff;padding:11px 16px;border-radius:10px;font-size:12px;font-weight:600;display:flex;align-items:center;gap:8px;box-shadow:var(--sh2);opacity:0;transform:translateY(14px);transition:all .3s;z-index:999;pointer-events:none;max-width:380px}
+#toast.show{opacity:1;transform:translateY(0)}
 </style>
 </head>
 <body>
-
-<div class="sidebar-overlay" id="overlay" onclick="closeSidebar()"></div>
-
-<!-- ── SIDEBAR ── -->
-<aside class="sidebar" id="sidebar">
-  <div class="sidebar-logo">
-    <div class="logo-mark"><span class="dot"></span>SIRKUL</div>
-    <div class="logo-sub">Sistem Integrasi Resource,<br>Karbon, Uap &amp; Limbah</div>
+<!-- SIDEBAR -->
+<aside id="sb">
+  <div class="sb-brand">
+    <div class="sb-logo">
+      <div class="sb-icon"><i class="fa-solid fa-leaf"></i></div>
+      <div><div class="sb-name">SIRKUL AI</div><div class="sb-tagline">Mini Refinery v1.0</div></div>
+    </div>
+    <div class="sb-authors"><p><strong>Farid Nadir Amrulloh</strong> &middot; STT Wastukancana<br><strong>Muhamad Daffa Amrulloh</strong> &middot; Politeknik Bhakti Asih<br>Purwakarta &amp; Bandung, Jawa Barat 2026</p></div>
+    <div class="sb-live"><div class="sb-live-dot"></div><span>Biogas hari ini:&nbsp;</span><strong id="sb-bio">1,124 L</strong></div>
   </div>
-  <nav class="nav">
-    <div class="nav-section">Utama</div>
-    <div class="nav-item active" onclick="showPage('dashboard',this)"><span class="nav-icon">📊</span>Dashboard</div>
-    <div class="nav-section">Tabung</div>
-    <div class="nav-item" onclick="showPage('bioreaktor',this)"><span class="nav-icon">🧪</span>Tabung 1 — Bioreaktor</div>
-    <div class="nav-item" onclick="showPage('scrubber',this)"><span class="nav-icon">🔬</span>Tabung 2 — Scrubber</div>
-    <div class="nav-item" onclick="showPage('storage',this)"><span class="nav-icon">🛢️</span>Tabung 3 — Penyimpanan</div>
-    <div class="nav-section">Produksi</div>
-    <div class="nav-item" onclick="showPage('produk',this)"><span class="nav-icon">🌱</span>Produk Turunan</div>
-    <div class="nav-item" onclick="showPage('riwayat',this)"><span class="nav-icon">📋</span>Riwayat &amp; Laporan</div>
-    <div class="nav-item" onclick="showPage('pengaturan',this)"><span class="nav-icon">⚙️</span>Pengaturan</div>
-  </nav>
-  <div class="sidebar-footer">
-    <div class="live-row"><div class="live-dot"></div>Sistem Aktif — LIVE</div>
-    <div class="cycle-info">Siklus Hari ke-<span id="sbDay">12</span> / 21</div>
-  </div>
+  <div class="sb-sec">Monitoring Utama</div>
+  <div class="nav on" onclick="go('dash',this)"><i class="fa-solid fa-gauge-high"></i> Dashboard Utama</div>
+  <div class="nav" onclick="go('t1',this)"><i class="fa-solid fa-flask"></i> Tabung 1 &middot; Bioreaktor</div>
+  <div class="nav" onclick="go('t2',this)"><i class="fa-solid fa-wind"></i> Tabung 2 &middot; Scrubber</div>
+  <div class="nav" onclick="go('t3',this)"><i class="fa-solid fa-gas-pump"></i> Tabung 3 &middot; Storage Gas</div>
+  <div class="sb-sec">Analisis &amp; AI</div>
+  <div class="nav" onclick="go('ai',this)"><i class="fa-solid fa-brain"></i> AI Prediksi &amp; Analisis</div>
+  <div class="nav" onclick="go('eco',this)"><i class="fa-solid fa-coins"></i> Kalkulator Ekonomi</div>
+  <div class="nav" onclick="go('sensor',this)"><i class="fa-solid fa-microchip"></i> Status Semua Sensor</div>
+  <div class="sb-sec">Produk &amp; Laporan</div>
+  <div class="nav" onclick="go('produk',this)"><i class="fa-solid fa-recycle"></i> Produk Turunan</div>
+  <div class="nav" onclick="go('log',this)"><i class="fa-solid fa-file-lines"></i> Log &amp; Laporan AI <span class="nb" id="nb">0</span></div>
+  <div class="sb-sec">Konfigurasi</div>
+  <div class="nav" onclick="go('cfg',this)"><i class="fa-solid fa-sliders"></i> Pengaturan Threshold</div>
+  <div class="sb-foot"><p>SIRKUL AI v1.0.0 &middot; Polling 3s real-time<br>Sistem Integrasi Resource, Karbon,<br>Uap &amp; Limbah &middot; Jawa Barat 2026</p></div>
 </aside>
 
-<!-- ── MAIN ── -->
-<div class="main">
-  <div class="topbar">
-    <div class="topbar-left">
-      <button class="hamburger" onclick="toggleSidebar()">☰</button>
-      <div class="page-title" id="pageTitle">Dashboard Utama</div>
+<!-- TOPBAR -->
+<header id="tb">
+  <div class="tb-title">
+    <h2 id="ptitle">Dashboard Utama Analytics</h2>
+    <p>Pemantauan Real-Time &middot; Siklus Fermentasi 21 Hari &middot; AI-Powered IoT</p>
+  </div>
+  <div class="pill pill-eco"><i class="fa-solid fa-clock" style="font-size:10px"></i> Inkubasi: Hari <strong style="margin:0 2px">12</strong>/21
+    <div class="pb-wrap" style="margin-left:4px"><div class="pb-track"><div class="pb-fill"></div></div></div>
+    <span style="font-size:9px;color:var(--txm)">57%</span>
+  </div>
+  <div class="pill pill-green"><div class="pill-dot"></div>AI Optimal Mode</div>
+  <div class="pill pill-rose" id="alert-pill" style="display:none"><i class="fa-solid fa-triangle-exclamation"></i> <span id="apill">0 Alert</span></div>
+  <div class="clk" id="clk">--:--:--</div>
+</header>
+
+<main id="main">
+
+<!-- DASHBOARD -->
+<div id="pg-dash" class="pg on">
+  <div class="ph"><div class="ph-l"><h1><i class="fa-solid fa-gauge-high"></i> Dashboard Utama Analytics</h1><p>Ringkasan metrik real-time semua pilar sistem SIRKUL &middot; Inkubasi hari ke-12</p></div></div>
+  <div class="kpi-bar">
+    <div class="kpi-item"><div class="kpi-dot" style="background:#22c55e"></div><div><div class="k-l">Biogas Total</div><div class="k-v" id="kpi-bio">1,124 L</div></div></div>
+    <div class="kpi-item"><div class="kpi-dot" style="background:#2563eb"></div><div><div class="k-l">Kemurnian CH&#8324;</div><div class="k-v" id="kpi-ch4">87.4%</div></div></div>
+    <div class="kpi-item"><div class="kpi-dot" style="background:#d97706"></div><div><div class="k-l">Suhu Reaktor</div><div class="k-v" id="kpi-tmp">35.2&deg;C</div></div></div>
+    <div class="kpi-item"><div class="kpi-dot" style="background:#7c3aed"></div><div><div class="k-l">Scrubber &#916;P</div><div class="k-v" id="kpi-dp">12.4 kPa</div></div></div>
+    <div class="kpi-item"><div class="kpi-dot" style="background:#0369a1"></div><div><div class="k-l">Storage Gas</div><div class="k-v" id="kpi-vol">73%</div></div></div>
+  </div>
+  <div class="g4">
+    <div class="c mc" id="crd-bio"><div class="mic mg"><i class="fa-solid fa-fire-flame-curved"></i></div><div class="mlb">Total Biogas Yield</div><div class="mv"><span id="mv-bio">1,124</span><span> L</span></div><div class="mst ok" id="ms-bio"><i class="fa-solid fa-arrow-up"></i> +2.4 L/jam</div></div>
+    <div class="c mc" id="crd-ch4"><div class="mic mb2"><i class="fa-solid fa-atom"></i></div><div class="mlb">Kemurnian CH&#8324;</div><div class="mv"><span id="mv-ch4">87.4</span><span> %</span></div><div class="mst ok" id="ms-ch4"><i class="fa-solid fa-check"></i> Melampaui 85%</div></div>
+    <div class="c mc" id="crd-tmp"><div class="mic ma"><i class="fa-solid fa-temperature-half"></i></div><div class="mlb">Suhu Reaktor</div><div class="mv"><span id="mv-tmp">35.2</span><span> &deg;C</span></div><div class="mst ok" id="ms-tmp"><i class="fa-solid fa-check"></i> Mesofilik optimal</div></div>
+    <div class="c mc" id="crd-dp"><div class="mic mr"><i class="fa-solid fa-gauge"></i></div><div class="mlb">Differential Pressure</div><div class="mv"><span id="mv-dp">12.4</span><span> kPa</span></div><div class="mst neu" id="ms-dp"><i class="fa-solid fa-circle-dot"></i> Normal &lt;25 kPa</div></div>
+  </div>
+  <div class="g2">
+    <div class="c"><div class="ct"><i class="fa-solid fa-chart-line"></i> Akumulasi Biogas 21 Hari <span class="ct-r">+ Proyeksi AI</span></div><div class="cw lg"><canvas id="ch-bio"></canvas></div></div>
+    <div class="c"><div class="ct"><i class="fa-solid fa-chart-area"></i> Tren Suhu &amp; pH Real-Time <span class="ct-r">Live Rolling</span></div><div class="cw lg"><canvas id="ch-trend"></canvas></div></div>
+  </div>
+  <div class="g2">
+    <div class="c">
+      <div class="ct"><i class="fa-solid fa-diagram-project"></i> Alur Proses &amp; Status Node</div>
+      <div class="flow">
+        <div class="fn"><div class="fc fc-g" id="nd1"><i class="fa-solid fa-flask"></i></div><div class="fl">Tabung 1</div><div class="fs">Bioreaktor</div></div>
+        <div class="fa"><div class="fal"></div><div class="fah"></div></div>
+        <div class="fn"><div class="fc fc-a" id="nd2"><i class="fa-solid fa-wind"></i></div><div class="fl">Tabung 2</div><div class="fs">Scrubber</div></div>
+        <div class="fa"><div class="fal"></div><div class="fah"></div></div>
+        <div class="fn"><div class="fc fc-b" id="nd3"><i class="fa-solid fa-gas-pump"></i></div><div class="fl">Tabung 3</div><div class="fs">Storage</div></div>
+        <div class="fa" style="max-width:36px"><div class="fal"></div><div class="fah"></div></div>
+        <div class="fn"><div class="fc fc-g" style="background:#fef3c7;border-color:#b45309;color:#b45309"><i class="fa-solid fa-bolt"></i></div><div class="fl">Generator</div><div class="fs">Aerator PLN</div></div>
+      </div>
+      <div class="dk"><div class="dk-l">Status Sistem Keseluruhan</div><div class="dk-s" id="sys-s">Inisialisasi...</div><div class="dk-d" id="sys-d">Memuat data sensor...</div></div>
     </div>
-    <div class="topbar-right">
-      <div class="clock" id="clock">00:00:00</div>
-      <button class="bell-btn" onclick="showPage('riwayat',document.querySelectorAll('.nav-item')[6])">
-        🔔<div class="bell-count" id="bellCount">3</div>
-      </button>
+    <div class="c">
+      <div class="ct"><i class="fa-solid fa-terminal"></i> AI Alert Console <span class="ct-r" id="con-cnt">0 event</span></div>
+      <div class="con" id="con" style="height:210px">
+        <div class="ll info"><span class="lt">[BOOT]</span> SIRKUL AI v1.0.0 dimulai...</div>
+        <div class="ll ok"><span class="lt">[BOOT]</span> Semua sensor online &#10003;</div>
+        <div class="ll sys"><span class="lt">[BOOT]</span> Polling IoT 3000ms aktif</div>
+        <div class="ll sys"><span class="lt">[BOOT]</span> Model prediksi AI dimuat &#10003;</div>
+      </div>
     </div>
   </div>
-
-  <div class="content">
-
-  <!-- ════════════════════════════
-       PAGE: DASHBOARD
-  ════════════════════════════ -->
-  <div class="page active" id="page-dashboard">
-    <div class="stats-grid">
-      <div class="stat-card"><div class="stat-icon">🔥</div><div class="stat-label">Total Biogas</div><div class="stat-value"><span id="d-biogas">1,847</span><span class="stat-unit"> L</span></div><div class="stat-sub">↑ +124 L hari ini</div></div>
-      <div class="stat-card c-blue"><div class="stat-icon">⚗️</div><div class="stat-label">Kemurnian CH₄</div><div class="stat-value"><span id="d-ch4">85.3</span><span class="stat-unit">%</span></div><div class="stat-sub" style="color:var(--blue)">Target ≥85% ✓</div></div>
-      <div class="stat-card"><div class="stat-icon">🌡️</div><div class="stat-label">Suhu Reaktor</div><div class="stat-value"><span id="d-temp">34.8</span><span class="stat-unit">°C</span></div><div class="stat-sub">Mesofilik optimal</div></div>
-      <div class="stat-card c-warn"><div class="stat-icon">📊</div><div class="stat-label">Tekanan Gas</div><div class="stat-value"><span id="d-pres">142</span><span class="stat-unit"> kPa</span></div><div class="stat-sub warn">Normal operasi</div></div>
-      <div class="stat-card c-accent"><div class="stat-icon">✅</div><div class="stat-label">Status Sistem</div><div class="stat-value" style="font-size:16px;padding-top:6px;"><span class="badge ok" id="d-status">● AKTIF</span></div><div class="stat-sub muted">Hari ke-<span id="d-day">12</span>/21</div></div>
-    </div>
-
-    <div class="grid-2 section-mb">
-      <div class="card">
-        <div class="card-title">Produksi Biogas Harian — Siklus 21 Hari <span class="ct-sub" id="cycleDay">Hari 12</span></div>
-        <div class="chart-wrap"><canvas id="chartDashMain"></canvas></div>
+  <!-- HEATMAP -->
+  <div class="c mb">
+    <div class="ct"><i class="fa-solid fa-fire"></i> Heatmap Intensitas Produksi Biogas &mdash; 21 Hari</div>
+    <div style="font-size:10px;color:var(--txm);margin-bottom:8px">Intensitas warna menunjukkan volume produksi. Abu-abu = data belum tersedia (hari 13&ndash;21)</div>
+    <div class="hm-grid" id="hm-grid"></div>
+    <div style="display:flex;align-items:center;gap:8px;margin-top:10px;font-size:9.5px;color:var(--txm)">
+      <span>Rendah</span>
+      <div style="display:flex;gap:2px">
+        <div style="width:14px;height:8px;border-radius:2px;background:#dcfce7"></div>
+        <div style="width:14px;height:8px;border-radius:2px;background:#86efac"></div>
+        <div style="width:14px;height:8px;border-radius:2px;background:#4ade80"></div>
+        <div style="width:14px;height:8px;border-radius:2px;background:#22c55e"></div>
+        <div style="width:14px;height:8px;border-radius:2px;background:#16a34a"></div>
+        <div style="width:14px;height:8px;border-radius:2px;background:#166534"></div>
       </div>
-      <div class="card">
-        <div class="card-title">Distribusi Penggunaan Gas <span class="ct-sub">Liter/Hari</span></div>
-        <div class="chart-wrap"><canvas id="chartGasDist"></canvas></div>
-      </div>
+      <span>Tinggi</span>
     </div>
-
-    <div class="section-header">
-      <div class="section-title">Status 3 Tabung Utama</div>
-      <span class="badge ok">Semua Normal</span>
-    </div>
-    <div class="tank-grid">
-      <div class="tank-card ok" onclick="showPage('bioreaktor',document.querySelectorAll('.nav-item')[1])">
-        <div class="tank-badge">TABUNG 1</div>
-        <span class="tank-icon">🧪</span>
-        <div class="tank-name">Bioreaktor</div>
-        <div><span class="tank-status ok" id="t1-status">● OPTIMAL</span></div>
-        <div class="tank-metrics">
-          <div><div class="tm-val" id="t1-temp">34.8°C</div><div class="tm-label">Suhu</div></div>
-          <div><div class="tm-val" id="t1-ph">7.10</div><div class="tm-label">pH</div></div>
-        </div>
-      </div>
-      <div class="tank-card ok" onclick="showPage('scrubber',document.querySelectorAll('.nav-item')[2])">
-        <div class="tank-badge">TABUNG 2</div>
-        <span class="tank-icon">🔬</span>
-        <div class="tank-name">Scrubber</div>
-        <div><span class="tank-status ok" id="t2-status">● BAIK</span></div>
-        <div class="tank-metrics">
-          <div><div class="tm-val" id="t2-ch4">85.3%</div><div class="tm-label">CH₄</div></div>
-          <div><div class="tm-val" id="t2-h2s">3.2 ppm</div><div class="tm-label">H₂S</div></div>
-        </div>
-      </div>
-      <div class="tank-card warn" onclick="showPage('storage',document.querySelectorAll('.nav-item')[3])">
-        <div class="tank-badge">TABUNG 3</div>
-        <span class="tank-icon">🛢️</span>
-        <div class="tank-name">Penyimpanan Gas</div>
-        <div><span class="tank-status warn" id="t3-status">● 68% PENUH</span></div>
-        <div class="tank-metrics">
-          <div><div class="tm-val" id="t3-vol">1,256 L</div><div class="tm-label">Volume</div></div>
-          <div><div class="tm-val" id="t3-pres">142 kPa</div><div class="tm-label">Tekanan</div></div>
-        </div>
-      </div>
-    </div>
-
-    <div class="section-header">
-      <div class="section-title">Notifikasi AI Terbaru</div>
-      <button class="btn btn-outline" style="padding:7px 14px;font-size:12px;" onclick="showPage('riwayat',document.querySelectorAll('.nav-item')[6])">Lihat Semua →</button>
-    </div>
-    <div class="card"><div class="alert-list" id="dashAlerts"></div></div>
   </div>
+</div>
 
-  <!-- ════════════════════════════
-       PAGE: BIOREAKTOR
-  ════════════════════════════ -->
-  <div class="page" id="page-bioreaktor">
-    <div class="stats-grid" style="grid-template-columns:repeat(4,1fr)">
-      <div class="stat-card"><div class="stat-icon">🌡️</div><div class="stat-label">Suhu</div><div class="stat-value"><span id="b-temp">34.8</span><span class="stat-unit">°C</span></div><div class="stat-sub">Target: 30–40°C</div></div>
-      <div class="stat-card c-blue"><div class="stat-icon">⚗️</div><div class="stat-label">pH</div><div class="stat-value"><span id="b-ph">7.10</span></div><div class="stat-sub" style="color:var(--blue)">Target: 6.8–7.2</div></div>
-      <div class="stat-card c-warn"><div class="stat-icon">📊</div><div class="stat-label">Tekanan</div><div class="stat-value"><span id="b-pres">142</span><span class="stat-unit"> kPa</span></div><div class="stat-sub warn">Normal</div></div>
-      <div class="stat-card c-accent"><div class="stat-icon">🦠</div><div class="stat-label">Status Bakteri</div><div class="stat-value" style="font-size:15px;padding-top:7px;"><span class="badge ok" id="b-bacteria">AKTIF</span></div><div class="stat-sub muted">Metanogen</div></div>
-    </div>
-
-    <div class="grid-2 section-mb">
-      <div class="card">
-        <div class="card-title">Suhu Reaktor (°C) <span class="ct-sub">Target mesofilik 35°C</span></div>
-        <div class="chart-wrap"><canvas id="chartBioTemp"></canvas></div>
-      </div>
-      <div class="card">
-        <div class="card-title">pH Reaktor <span class="ct-sub">Target 6.8–7.2</span></div>
-        <div class="chart-wrap"><canvas id="chartBioPH"></canvas></div>
-      </div>
-    </div>
-
-    <div class="grid-2 section-mb">
-      <div class="card">
-        <div class="card-title">Tekanan dalam Reaktor (kPa)</div>
-        <div class="chart-wrap"><canvas id="chartBioPres"></canvas></div>
-      </div>
-      <div class="card">
-        <div class="card-title">Indikator Fase Pemisahan</div>
-        <div style="display:flex;gap:20px;align-items:flex-start;margin-top:6px;">
-          <div style="flex-shrink:0;">
-            <div class="phase-col" style="width:80px;">
-              <div class="phase-gas">💨 Gas</div>
-              <div class="phase-liquid">💧 Cair</div>
-              <div class="phase-solid">🪨 Padat</div>
-            </div>
-          </div>
-          <div class="info-rows" style="flex:1;">
-            <div class="info-row"><span class="info-label">💨 Fase Gas</span><span class="info-val" style="color:#1d4ed8;font-size:12px;">CH₄ + CO₂ + H₂S → Scrubber</span></div>
-            <div class="info-row"><span class="info-label">💧 Fase Cair</span><span class="info-val" style="color:#15803d;font-size:12px;">POC (N, P, K)</span></div>
-            <div class="info-row"><span class="info-label">🪨 Fase Padat</span><span class="info-val" style="color:#b45309;font-size:12px;">Media Maggot BSF</span></div>
-            <div class="info-row"><span class="info-label">Hari Fermentasi</span><span class="info-val">12 / 21 hari</span></div>
-            <div class="info-row"><span class="info-label">Status Bakteri</span><span class="badge ok" id="b-bacteria2">AKTIF</span></div>
+<!-- TABUNG 1 -->
+<div id="pg-t1" class="pg">
+  <div class="ph"><div class="ph-l"><h1><i class="fa-solid fa-flask"></i> Tabung 1 &middot; Bioreaktor Anaerobik</h1><p>Pilar S &middot; Volume &gt;200 L &middot; Fermentasi mesofilik ~35.2&deg;C &middot; Pemisahan 3 fase gravitasi</p></div></div>
+  <div class="g4 mb">
+    <div class="c mc" id="t1-c-tmp"><div class="mic ma"><i class="fa-solid fa-thermometer-half"></i></div><div class="mlb">Suhu Reaktor</div><div class="mv"><span id="t1-tv">35.2</span><span> &deg;C</span></div><div class="mst ok" id="t1-tst"><i class="fa-solid fa-check"></i> Target ~35.2&deg;C</div></div>
+    <div class="c mc" id="t1-c-ph"><div class="mic mb2"><i class="fa-solid fa-flask"></i></div><div class="mlb">pH Reaktor</div><div class="mv"><span id="t1-pv">7.02</span></div><div class="mst ok" id="t1-pst"><i class="fa-solid fa-check"></i> Rentang 6.8&ndash;7.2</div></div>
+    <div class="c mc"><div class="mic mp"><i class="fa-solid fa-compress"></i></div><div class="mlb">Tekanan Internal</div><div class="mv"><span id="t1-kv">1.2</span><span> kPa</span></div><div class="mst ok"><i class="fa-solid fa-check"></i> Normal</div></div>
+    <div class="c mc"><div class="mic mg"><i class="fa-solid fa-bacteria"></i></div><div class="mlb">Viabilitas Bakteri</div><div class="mv" style="font-size:16px"><span id="t1-bact-pct">98</span><span> %</span></div><div class="mst ok" id="t1-bst"><i class="fa-solid fa-check"></i> Aktif optimal</div></div>
+  </div>
+  <div class="g2">
+    <div class="c"><div class="ct"><i class="fa-solid fa-chart-line"></i> Tren Multi-Sensor Real-Time (7 Jam)</div><div class="cw xl"><canvas id="ch-t1"></canvas></div></div>
+    <div>
+      <div class="c mb">
+        <div class="ct"><i class="fa-solid fa-layer-group"></i> Pemisahan Fase Fluida</div>
+        <div style="display:flex;gap:16px;align-items:flex-start">
+          <div class="vwrap"><div class="vcap">TABUNG 1</div><div class="vessel"><div class="vg">&#8679; GAS CH&#8324;/CO&#8322;</div><div class="vl">&#128167; CALON POC</div><div class="vs">&#9632; SLUDGE BSF</div></div></div>
+          <div style="flex:1;font-size:11px;line-height:1.6">
+            <div style="margin-bottom:9px"><span style="background:#fef3c7;color:#78350f;font-weight:700;padding:2px 7px;border-radius:5px;font-size:10px">Fase Gas (~25%)</span><br><span style="color:var(--txm);margin-top:4px;display:block">CH&#8324;, CO&#8322;, H&#8322;S &rarr; mengalir ke Tabung 2</span></div>
+            <div style="margin-bottom:9px"><span style="background:#dbeafe;color:#1e40af;font-weight:700;padding:2px 7px;border-radius:5px;font-size:10px">Fase Cair (~50%)</span><br><span style="color:var(--txm);margin-top:4px;display:block">Nutrisi NPK tinggi &rarr; Pupuk Organik Cair (POC)</span></div>
+            <div><span style="background:#fde68a;color:#92400e;font-weight:700;padding:2px 7px;border-radius:5px;font-size:10px">Fase Padat (~25%)</span><br><span style="color:var(--txm);margin-top:4px;display:block">Sludge kaya serat &rarr; media maggot BSF</span></div>
           </div>
         </div>
       </div>
-    </div>
-
-    <div class="card section-mb">
-      <div class="card-title">Notifikasi AI — Bioreaktor</div>
-      <div class="alert-list" id="bioAlerts"></div>
+      <div class="c">
+        <div class="ct"><i class="fa-solid fa-bacteria"></i> Kinetik Metabolik Bakteri</div>
+        <div class="dk" style="margin-bottom:10px"><div class="dk-l">Metanogen &middot; Acetogen &middot; Hidrolisis</div><div class="dk-s" id="t1-bs">&#10003; AKTIF OPTIMAL</div><div class="dk-d" id="t1-bd">pH 7.02 &middot; Suhu 35.2&deg;C mesofilik &middot; Produksi metana maksimal</div></div>
+        <div class="sbs sb3"><div class="sbx"><div class="sbx-v" id="t1-bact-tmp" style="color:var(--eco)">35.2</div><div class="sbx-l">&deg;C Suhu</div></div><div class="sbx"><div class="sbx-v" id="t1-bact-ph" style="color:var(--blue)">7.02</div><div class="sbx-l">pH</div></div><div class="sbx"><div class="sbx-v" id="t1-bact-kpa" style="color:var(--purple)">1.2</div><div class="sbx-l">kPa Tekanan</div></div></div>
+      </div>
     </div>
   </div>
-
-  <!-- ════════════════════════════
-       PAGE: SCRUBBER
-  ════════════════════════════ -->
-  <div class="page" id="page-scrubber">
-    <div class="stats-grid" style="grid-template-columns:repeat(4,1fr)">
-      <div class="stat-card c-blue"><div class="stat-icon">✨</div><div class="stat-label">Kemurnian CH₄</div><div class="stat-value"><span id="s-ch4">85.3</span><span class="stat-unit">%</span></div><div class="stat-sub" style="color:var(--blue)">Target ≥85%</div></div>
-      <div class="stat-card"><div class="stat-icon">☣️</div><div class="stat-label">Kadar H₂S</div><div class="stat-value"><span id="s-h2s">3.2</span><span class="stat-unit"> ppm</span></div><div class="stat-sub">Target &lt;5 ppm</div></div>
-      <div class="stat-card c-warn"><div class="stat-icon">↕️</div><div class="stat-label">ΔP Scrubber</div><div class="stat-value"><span id="s-dp">8.4</span><span class="stat-unit"> kPa</span></div><div class="stat-sub warn">Masuk–Keluar</div></div>
-      <div class="stat-card"><div class="stat-icon">🧊</div><div class="stat-label">Status Adsorben</div><div class="stat-value" style="font-size:15px;padding-top:7px;"><span class="badge ok" id="s-adsorben">BAIK</span></div><div class="stat-sub muted">Ca(OH)₂</div></div>
-    </div>
-
-    <div class="grid-2 section-mb">
-      <div class="card">
-        <div class="card-title">ΔP Masuk vs Keluar (kPa) <span class="ct-sub">Real-time</span></div>
-        <div class="chart-wrap"><canvas id="chartScrDP"></canvas></div>
-      </div>
-      <div class="card">
-        <div class="card-title">Kemurnian CH₄ Output (%) <span class="ct-sub">Target ≥85%</span></div>
-        <div class="chart-wrap"><canvas id="chartScrCH4"></canvas></div>
-      </div>
-    </div>
-
-    <div class="grid-2 section-mb">
-      <div class="card">
-        <div class="card-title">Parameter Scrubber Detail</div>
-        <div class="info-rows">
-          <div class="info-row"><span class="info-label">Tekanan Masuk</span><span class="info-val" id="s-pin">150.4 kPa</span></div>
-          <div class="info-row"><span class="info-label">Tekanan Keluar</span><span class="info-val" id="s-pout">142.0 kPa</span></div>
-          <div class="info-row"><span class="info-label">ΔP Aktual</span><span class="info-val" id="s-dp2">8.4 kPa</span></div>
-          <div class="info-row"><span class="info-label">CO₂ Tersisa</span><span class="info-val" id="s-co2">14.2%</span></div>
-          <div class="info-row"><span class="info-label">Efisiensi Scrubber</span><span class="info-val" id="s-eff">96.1%</span></div>
-          <div class="info-row"><span class="info-label">Umur Adsorben</span><span class="info-val">7 / 14 hari</span></div>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-title">Kapasitas Adsorben Ca(OH)₂</div>
-        <div class="prog-wrap" style="margin-bottom:14px;">
-          <div class="prog-label-row"><span>Kapasitas Tersisa</span><span id="s-ads-pct">52%</span></div>
-          <div class="prog-bar"><div class="prog-fill" id="s-ads-bar" style="width:52%;background:var(--accent);"></div></div>
-        </div>
-        <div style="margin-top:12px;">
-          <div class="info-row"><span class="info-label">Reaksi CO₂</span><span class="info-val" style="font-size:11px;">CO₂ + Ca(OH)₂ → CaCO₃ + H₂O</span></div>
-          <div class="info-row"><span class="info-label">Reaksi H₂S</span><span class="info-val" style="font-size:11px;">H₂S + Ca(OH)₂ → CaS + 2H₂O</span></div>
-          <div class="info-row"><span class="info-label">Est. Penggantian</span><span class="info-val" style="color:var(--yellow);">7 hari lagi</span></div>
-        </div>
-      </div>
-    </div>
-
-    <div class="card section-mb">
-      <div class="card-title">Notifikasi AI — Scrubber</div>
-      <div class="alert-list" id="scrAlerts"></div>
+  <div class="c mb">
+    <div class="ct"><i class="fa-solid fa-timeline"></i> Timeline Fermentasi 21 Hari</div>
+    <div class="timeline">
+      <div class="tl-item"><div class="tl-dot done"></div><div class="tl-h">Hari 1&ndash;3: Inisiasi Hidrolisis</div><div class="tl-s">Penambahan EM4 + molase &middot; Bakteri hidrolisis mengurai polimer organik kompleks</div></div>
+      <div class="tl-item"><div class="tl-dot done"></div><div class="tl-h">Hari 4&ndash;7: Asidogenesis &amp; Asetogenesis</div><div class="tl-s">Asam organik terbentuk &middot; Produksi H&#8322; dan CO&#8322; mulai meningkat signifikan</div></div>
+      <div class="tl-item"><div class="tl-dot done"></div><div class="tl-h">Hari 8&ndash;11: Metanogenesis Awal</div><div class="tl-s">Bakteri metanogen aktif &middot; Produksi CH&#8324; mulai terukur secara konsisten</div></div>
+      <div class="tl-item"><div class="tl-dot active"></div><div class="tl-h">Hari 12 (SEKARANG): Puncak Produksi</div><div class="tl-s">Komunitas metanogen stabil &middot; Volume biogas maksimal harian &middot; Total: 1,124 L kumulatif</div></div>
+      <div class="tl-item"><div class="tl-dot future"></div><div class="tl-h">Hari 13&ndash;21: Pematangan &amp; Panen</div><div class="tl-s">Laju produksi melambat &middot; POC siap panen &middot; Sludge matang untuk media BSF</div></div>
     </div>
   </div>
+</div>
 
-  <!-- ════════════════════════════
-       PAGE: PENYIMPANAN
-  ════════════════════════════ -->
-  <div class="page" id="page-storage">
-    <div class="stats-grid" style="grid-template-columns:repeat(4,1fr)">
-      <div class="stat-card"><div class="stat-icon">🛢️</div><div class="stat-label">Volume Tersimpan</div><div class="stat-value"><span id="st-vol">1,256</span><span class="stat-unit"> L</span></div><div class="stat-sub">68% kapasitas</div></div>
-      <div class="stat-card c-warn"><div class="stat-icon">📊</div><div class="stat-label">Tekanan Tangki</div><div class="stat-value"><span id="st-pres">142</span><span class="stat-unit"> kPa</span></div><div class="stat-sub warn">Batas: 200 kPa</div></div>
-      <div class="stat-card c-blue"><div class="stat-icon">⏱️</div><div class="stat-label">Est. Sisa Pasokan</div><div class="stat-value"><span id="st-eta">18.4</span><span class="stat-unit"> jam</span></div><div class="stat-sub" style="color:var(--blue)">Pola normal</div></div>
-      <div class="stat-card"><div class="stat-icon">📉</div><div class="stat-label">Konsumsi Hari Ini</div><div class="stat-value"><span id="st-use">68</span><span class="stat-unit"> L</span></div><div class="stat-sub muted">Aerator + Masak</div></div>
+<!-- TABUNG 2 -->
+<div id="pg-t2" class="pg">
+  <div class="ph"><div class="ph-l"><h1><i class="fa-solid fa-wind"></i> Tabung 2 &middot; Packed Bed Scrubber</h1><p>Pilar K &middot; Adsorben Ca(OH)&#8322; &middot; Target CH&#8324; &gt;85% &middot; H&#8322;S &lt;5.0 ppm</p></div></div>
+  <div class="g4 mb">
+    <div class="c mc" id="crd-dp2"><div class="mic mr"><i class="fa-solid fa-gauge"></i></div><div class="mlb">Differential Pressure &#916;P</div><div class="mv"><span id="mv-dp2">12.4</span><span> kPa</span></div><div class="mst neu" id="ms-dp2"><i class="fa-solid fa-circle-dot"></i> Maks 25 kPa</div></div>
+    <div class="c mc"><div class="mic mb2"><i class="fa-solid fa-atom"></i></div><div class="mlb">Kemurnian CH&#8324; Output</div><div class="mv"><span id="mv-ch4t2">87.4</span><span> %</span></div><div class="mst ok" id="ms-ch4t2"><i class="fa-solid fa-check"></i> Target &gt;85%</div></div>
+    <div class="c mc"><div class="mic mr"><i class="fa-solid fa-skull-crossbones"></i></div><div class="mlb">Kadar H&#8322;S</div><div class="mv"><span id="mv-h2s">2.8</span><span> ppm</span></div><div class="mst ok" id="ms-h2s"><i class="fa-solid fa-check"></i> &lt;5.0 ppm aman</div></div>
+    <div class="c mc"><div class="mic ma"><i class="fa-solid fa-filter"></i></div><div class="mlb">Kejenuhan Adsorben</div><div class="mv"><span id="mv-ads">48</span><span> %</span></div><div class="mst neu" id="ms-ads"><i class="fa-solid fa-circle-dot"></i> Ca(OH)&#8322; aktif</div></div>
+  </div>
+  <div class="g13">
+    <div class="c">
+      <div class="ct"><i class="fa-solid fa-gauge"></i> Readout &#916;P</div>
+      <div class="dp-big"><div class="dp-n dp-ok" id="dp2-n">12.4</div><div class="dp-u">kPa</div><div style="margin-top:6px"><span class="dp-b dpb-ok" id="dp2-b">&#10003; NORMAL</span></div><div style="font-size:10px;color:var(--txm);margin-top:8px">Batas: <strong id="dp2-max">25.0</strong> kPa</div></div>
+      <div style="margin-top:4px"><div style="font-size:10px;color:var(--txm);margin-bottom:5px;font-weight:600">Saturasi Ca(OH)&#8322; &rarr; CaCO&#8323;</div><div class="pbt" style="height:14px"><div class="pbf pf-ok" id="ads-bar" style="width:48%">48%</div></div></div>
     </div>
-
-    <div class="grid-2 section-mb">
-      <div class="card">
-        <div class="card-title">Volume Gas Tersimpan</div>
-        <div style="text-align:center;padding:10px 0;">
-          <svg class="gauge-svg" viewBox="0 0 220 150" width="260">
-            <defs>
-              <linearGradient id="gGrad" x1="0" y1="0" x2="1" y2="0">
-                <stop offset="0%" stop-color="#22c55e"/>
-                <stop offset="60%" stop-color="#1a5c38"/>
-                <stop offset="100%" stop-color="#ef4444"/>
-              </linearGradient>
-            </defs>
-            <path d="M 25 130 A 90 90 0 0 1 195 130" fill="none" stroke="#e5e7eb" stroke-width="20" stroke-linecap="round"/>
-            <path id="gArc" d="M 25 130 A 90 90 0 0 1 195 130" fill="none" stroke="url(#gGrad)" stroke-width="20" stroke-linecap="round" stroke-dasharray="283 283" stroke-dashoffset="90"/>
-            <text id="gTxt" x="110" y="118" text-anchor="middle" font-size="32" font-weight="800" fill="#1a5c38">68%</text>
-            <text x="110" y="140" text-anchor="middle" font-size="12" fill="#5a7a68">Volume Tersimpan</text>
-            <text x="25" y="148" text-anchor="middle" font-size="10" fill="#9ca3af">0 L</text>
-            <text x="195" y="148" text-anchor="middle" font-size="10" fill="#9ca3af">1.850 L</text>
-          </svg>
-          <div style="font-size:22px;font-weight:800;color:var(--green);margin-top:-4px;" id="st-vol2">1,256 L</div>
-          <div style="font-size:12px;color:var(--muted);">dari kapasitas 1.850 L</div>
-        </div>
+    <div>
+      <div class="c mb">
+        <div class="ct"><i class="fa-solid fa-atom"></i> Konsentrasi Gas Output</div>
+        <div class="pb"><div class="pb-row"><span><i class="fa-solid fa-fire" style="color:#059669;margin-right:3px"></i> Kemurnian CH&#8324;</span><span id="ch4-lv" style="color:var(--eco);font-weight:700">87.4%</span></div><div class="pbt" style="height:20px"><div class="pbf pf-g" id="bar-ch4" style="width:87.4%">87.4%</div></div><div style="font-size:9.5px;color:var(--txm);margin-top:3px">Target &gt;85% &middot; Minimum akseptabel &gt;80%</div></div>
+        <div class="pb" style="margin-bottom:0"><div class="pb-row"><span><i class="fa-solid fa-skull-crossbones" style="color:#dc2626;margin-right:3px"></i> Kadar H&#8322;S</span><span id="h2s-lv" style="color:var(--rose);font-weight:700">2.8 ppm</span></div><div class="pbt" style="height:20px"><div class="pbf pf-r" id="bar-h2s" style="width:56%">2.8 ppm</div></div><div style="font-size:9.5px;color:var(--txm);margin-top:3px">Batas kritis &lt;5.0 ppm &middot; Mencegah oksidasi generator</div></div>
       </div>
-      <div class="card">
-        <div class="card-title">Penggunaan Gas (L/jam) <span class="ct-sub">Hari ini</span></div>
-        <div class="chart-wrap"><canvas id="chartStorUse"></canvas></div>
-      </div>
-    </div>
-
-    <div class="grid-2 section-mb">
-      <div class="card">
-        <div class="card-title">Tekanan Tangki (kPa) <span class="ct-sub">24 jam terakhir</span></div>
-        <div class="chart-wrap"><canvas id="chartStorPres"></canvas></div>
-      </div>
-      <div class="card">
-        <div class="card-title">Riwayat Penggunaan Gas</div>
-        <div class="info-rows">
-          <div class="info-row"><span class="info-label">🔌 Aerator/Generator</span><span class="info-val" id="use-aer">42 L</span></div>
-          <div class="info-row"><span class="info-label">🍳 Memasak</span><span class="info-val" id="use-cook">26 L</span></div>
-          <div class="info-row"><span class="info-label">Total digunakan</span><span class="info-val">68 L</span></div>
-          <div class="info-row"><span class="info-label">Rata-rata/hari</span><span class="info-val">72 L/hari</span></div>
-          <div class="info-row"><span class="info-label">Tekanan maks aman</span><span class="info-val" style="color:var(--red);">200 kPa</span></div>
-          <div class="info-row"><span class="info-label">Status Valve</span><span class="badge ok">TERBUKA</span></div>
-        </div>
-      </div>
-    </div>
-
-    <div class="card section-mb">
-      <div class="card-title">Notifikasi AI — Penyimpanan Gas</div>
-      <div class="alert-list" id="storAlerts"></div>
+      <div class="c"><div class="ct"><i class="fa-solid fa-chart-line"></i> Tren &#916;P &amp; CH&#8324; &mdash; 60 Menit</div><div class="cw sm"><canvas id="ch-t2"></canvas></div></div>
     </div>
   </div>
+  <div class="c mb">
+    <div class="ct"><i class="fa-solid fa-flask-vial"></i> Reaksi Kimia Aktif dalam Packed Bed Scrubber</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">
+      <div style="background:#f0fdf4;border-radius:9px;padding:13px;border:1px solid #bbf7d0"><div style="font-size:9px;font-weight:700;color:var(--eco);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px">Reaksi H&#8322;S &rarr; Inert</div><div style="font-size:12px;font-weight:700;margin-bottom:4px">H&#8322;S + Ca(OH)&#8322; &rarr; CaS + 2H&#8322;O</div><div style="font-size:10px;color:var(--txm)">H&#8322;S korosif dikonversi menjadi CaS padat inert</div></div>
+      <div style="background:#eff6ff;border-radius:9px;padding:13px;border:1px solid #bfdbfe"><div style="font-size:9px;font-weight:700;color:var(--blue);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px">Reaksi CO&#8322; &rarr; Deposit</div><div style="font-size:12px;font-weight:700;margin-bottom:4px">CO&#8322; + Ca(OH)&#8322; &rarr; CaCO&#8323; + H&#8322;O</div><div style="font-size:10px;color:var(--txm)">CO&#8322; ditangkap membentuk CaCO&#8323; padat (kapur)</div></div>
+      <div style="background:#fefce8;border-radius:9px;padding:13px;border:1px solid #fde68a"><div style="font-size:9px;font-weight:700;color:#a16207;margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px">Indikator Saturasi</div><div style="font-size:12px;font-weight:700;margin-bottom:4px">&#916;P &gt; <span id="dp2-thr">25.0</span> kPa &rarr; Ganti Media</div><div style="font-size:10px;color:var(--txm)">CaCO&#8323; sumbat pori packed bed &rarr; backpressure berbahaya</div></div>
+    </div>
+  </div>
+</div>
 
-  <!-- ════════════════════════════
-       PAGE: PRODUK TURUNAN
-  ════════════════════════════ -->
-  <div class="page" id="page-produk">
-    <div class="product-grid">
-      <div class="product-card">
-        <span class="product-icon">🌿</span>
-        <div class="product-name">Pupuk Organik Cair (POC)</div>
-        <div class="product-sub">Fase cair bioreaktor — kaya N, P, K · Purba (2025)</div>
-        <div class="info-rows">
-          <div class="info-row"><span class="info-label">Volume Tersedia</span><span class="info-val" style="color:var(--green);" id="poc-vol">48.5 L</span></div>
-          <div class="info-row"><span class="info-label">Kandungan N</span><span class="info-val">2.15%</span></div>
-          <div class="info-row"><span class="info-label">Kandungan P</span><span class="info-val">1.83%</span></div>
-          <div class="info-row"><span class="info-label">Kandungan K</span><span class="info-val">1.92%</span></div>
-          <div class="info-row"><span class="info-label">Standar SNI</span><span class="badge ok">✓ MEMENUHI</span></div>
-          <div class="info-row"><span class="info-label">Status</span><span class="badge ok">SIAP PAKAI</span></div>
-        </div>
-        <div class="prog-wrap" style="margin-top:14px;">
-          <div class="prog-label-row"><span>Progress panen (target 75 L)</span><span>65%</span></div>
-          <div class="prog-bar"><div class="prog-fill" style="width:65%;background:var(--green);"></div></div>
-        </div>
-      </div>
-
-      <div class="product-card">
-        <span class="product-icon">🪲</span>
-        <div class="product-name">Maggot BSF (Black Soldier Fly)</div>
-        <div class="product-sub">Fase padat bioreaktor — media larva BSF</div>
-        <div class="info-rows">
-          <div class="info-row"><span class="info-label">Est. Berat Panen</span><span class="info-val" style="color:var(--green);" id="mag-w">1,240 gram</span></div>
-          <div class="info-row"><span class="info-label">Usia Kultur</span><span class="info-val">12 hari</span></div>
-          <div class="info-row"><span class="info-label">Kandungan Protein</span><span class="info-val">40–50%</span></div>
-          <div class="info-row"><span class="info-label">Kandungan Lemak</span><span class="info-val">28%</span></div>
-          <div class="info-row"><span class="info-label">Pengganti Pakan</span><span class="info-val">25–30%</span></div>
-          <div class="info-row"><span class="info-label">Status</span><span class="badge warn">DALAM KULTUR</span></div>
-        </div>
-        <div class="prog-wrap" style="margin-top:14px;">
-          <div class="prog-label-row"><span>Menuju panen (hari ke-21)</span><span>57%</span></div>
-          <div class="prog-bar"><div class="prog-fill" style="width:57%;background:var(--yellow);"></div></div>
-        </div>
+<!-- TABUNG 3 -->
+<div id="pg-t3" class="pg">
+  <div class="ph"><div class="ph-l"><h1><i class="fa-solid fa-gas-pump"></i> Tabung 3 &middot; Penyimpanan Gas Metana</h1><p>Pilar U &middot; Tabung baja bertekanan rendah &middot; Metana murni &gt;85% &middot; Aerator &amp; dapur</p></div></div>
+  <div class="g4 mb">
+    <div class="c mc"><div class="mic mg"><i class="fa-solid fa-circle-dot"></i></div><div class="mlb">Kapasitas Terisi</div><div class="mv"><span id="t3-pct-mc">73</span><span> %</span></div><div class="mst ok"><i class="fa-solid fa-check"></i> Cukup 18+ jam</div></div>
+    <div class="c mc"><div class="mic mb2"><i class="fa-solid fa-cubes"></i></div><div class="mlb">Volume Tersimpan</div><div class="mv"><span id="t3-vol-mc">146</span><span> L</span></div><div class="mst neu"><i class="fa-solid fa-circle-dot"></i> Kapasitas 200 L</div></div>
+    <div class="c mc"><div class="mic ma"><i class="fa-solid fa-compress-arrows-alt"></i></div><div class="mlb">Tekanan Tangki</div><div class="mv"><span id="t3-kpa-mc">0.8</span><span> kPa</span></div><div class="mst ok"><i class="fa-solid fa-check"></i> Tekanan rendah aman</div></div>
+    <div class="c mc"><div class="mic mp"><i class="fa-solid fa-clock"></i></div><div class="mlb">Laju Konsumsi</div><div class="mv" style="font-size:16px"><span id="t3-rate">3.2</span><span> L/jam</span></div><div class="mst neu"><i class="fa-solid fa-circle-dot"></i> Pemakaian normal</div></div>
+  </div>
+  <div class="g3">
+    <div class="c">
+      <div class="ct"><i class="fa-solid fa-circle-dot"></i> Gauge Kapasitas</div>
+      <div class="gdc" style="height:175px"><canvas id="ch-gauge" width="175" height="175"></canvas><div class="gdt"><div class="gdt-v" id="t3-pct">73%</div><div class="gdt-l">kapasitas</div></div></div>
+      <div class="sbs sb2" style="margin-top:8px"><div class="sbx"><div class="sbx-v" id="t3-vol" style="color:var(--eco)">146</div><div class="sbx-l">Liter tersimpan</div></div><div class="sbx"><div class="sbx-v" id="t3-prs" style="color:var(--blue)">0.8</div><div class="sbx-l">kPa tekanan</div></div></div>
+    </div>
+    <div style="grid-column:span 2;display:flex;flex-direction:column;gap:14px">
+      <div class="rt"><div class="rt-l"><i class="fa-solid fa-hourglass-half"></i>&nbsp; Estimasi Sisa Pasokan Gas</div><div class="rt-v" id="rtclk">18:32:00</div><div class="rt-s">Jam : Menit : Detik &middot; Generator aerator kolam lele 24 jam</div></div>
+      <div class="g2" style="margin-bottom:0">
+        <div class="c"><div class="ct"><i class="fa-solid fa-chart-pie"></i> Alokasi Gas Metana</div><div style="display:flex;gap:12px;align-items:center"><div style="width:140px;height:140px;flex-shrink:0"><canvas id="ch-alloc" width="140" height="140"></canvas></div><div style="flex:1;font-size:11px"><div style="margin-bottom:10px"><div style="display:flex;align-items:center;gap:7px;margin-bottom:3px"><div style="width:10px;height:10px;background:var(--eco);border-radius:3px;flex-shrink:0"></div><span style="font-weight:700">75% Generator Aerator</span></div><div style="color:var(--txm)">Aerasi 24 jam &middot; Substitusi PLN 100%</div></div><div><div style="display:flex;align-items:center;gap:7px;margin-bottom:3px"><div style="width:10px;height:10px;background:#60a5fa;border-radius:3px;flex-shrink:0"></div><span style="font-weight:700">25% Gas Masak</span></div><div style="color:var(--txm)">Pengganti LPG rumah tangga</div></div></div></div></div>
+        <div class="c"><div class="ct"><i class="fa-solid fa-chart-line"></i> Histori Volume (24 Jam)</div><div class="cw sm"><canvas id="ch-t3h"></canvas></div></div>
       </div>
     </div>
-
-    <div class="section-header">
-      <div class="section-title">Riwayat Panen</div>
+  </div>
+</div>
+<!-- AI PREDIKSI -->
+<div id="pg-ai" class="pg">
+  <div class="ph"><div class="ph-l"><h1><i class="fa-solid fa-brain"></i> AI Prediksi &amp; Analisis Cerdas</h1><p>Model prediktif berbasis data historis sensor &middot; Deteksi anomali dini &middot; Rekomendasi preventif otomatis</p></div></div>
+  <div class="g2">
+    <div>
+      <div class="ai-card mb">
+        <div class="ai-head"><div class="ai-dot"></div><div class="ai-title">Prediksi AI &mdash; 24 Jam ke Depan</div></div>
+        <div class="ai-item"><div class="ai-icon">&#128293;</div><div class="ai-text"><strong>Puncak Produksi Biogas: Hari 13&ndash;15</strong>Berdasarkan tren hari 8&ndash;12, model memprediksi puncak 140&ndash;160 L/hari. Kondisi suhu dan pH saat ini mendukung prediksi ini dengan baik.<div class="ai-conf">Confidence: 87.3%</div></div></div>
+        <div class="ai-item"><div class="ai-icon">&#9879;&#65039;</div><div class="ai-text"><strong>Penggantian Adsorben: ~Hari 16</strong>Berdasarkan laju kenaikan &#916;P (+0.4 kPa/hari), Ca(OH)&#8322; akan mencapai saturasi 80% sekitar hari ke-16. Siapkan penggantian media packed bed segera.<div class="ai-conf">Confidence: 92.1%</div></div></div>
+        <div class="ai-item"><div class="ai-icon">&#127777;&#65039;</div><div class="ai-text"><strong>Risiko Penurunan Suhu: Rendah</strong>Suhu reaktor stabil di 35.0&ndash;35.5&deg;C. Tidak ada tanda anomali termal dalam 6 jam ke depan berdasarkan pola historis sensor.<div class="ai-conf">Confidence: 78.6%</div></div></div>
+        <div class="ai-item"><div class="ai-icon">&#128167;</div><div class="ai-text"><strong>Estimasi Panen POC: Hari 21</strong>Volume POC diproyeksikan 180&ndash;195 L dengan kandungan NPK optimal setelah 21 hari fermentasi penuh. Siapkan wadah 200 L.<div class="ai-conf">Confidence: 84.5%</div></div></div>
+      </div>
+      <div class="ai-card">
+        <div class="ai-head"><div class="ai-dot" style="background:#4ade80"></div><div class="ai-title">Rekomendasi Tindakan Preventif</div></div>
+        <div class="ai-item"><div class="ai-icon">&#128203;</div><div class="ai-text"><strong>Segera (0&ndash;24 jam)</strong>Pantau kadar H&#8322;S tiap 6 jam. Jika mendekati 4.0 ppm, lakukan penambahan Ca(OH)&#8322; sebagai tindakan preventif sebelum &#916;P naik signifikan.<div class="ai-conf">Prioritas: SEDANG</div></div></div>
+        <div class="ai-item"><div class="ai-icon">&#128295;</div><div class="ai-text"><strong>3&ndash;5 Hari ke Depan</strong>Pesan media Ca(OH)&#8322; pengganti untuk packed bed. Estimasi kebutuhan: 5&ndash;8 kg untuk satu kali penggantian penuh sistem scrubber.<div class="ai-conf">Prioritas: RENCANA</div></div></div>
+        <div class="ai-item"><div class="ai-icon">&#128202;</div><div class="ai-text"><strong>Hari 20&ndash;21: Panen &amp; Dokumentasi</strong>Siapkan wadah panen POC dan timbangan untuk BSF maggot. Dokumentasi output lengkap untuk analisis ROI siklus ke-4.<div class="ai-conf">Prioritas: TERJADWAL</div></div></div>
+      </div>
     </div>
-    <div class="card">
-      <table class="data-table">
-        <thead><tr><th>Siklus</th><th>Tanggal</th><th>POC (L)</th><th>Maggot (g)</th><th>NPK Terbaik</th><th>Status</th></tr></thead>
+    <div>
+      <div class="c mb"><div class="ct"><i class="fa-solid fa-chart-line"></i> Proyeksi Produksi Biogas Hari 1&ndash;21 + Confidence Band</div><div class="cw xl"><canvas id="ch-proj"></canvas></div></div>
+      <div class="c"><div class="ct"><i class="fa-solid fa-chart-bar"></i> Distribusi Frekuensi Suhu 7 Hari (Histogram)</div><div class="cw md"><canvas id="ch-hist"></canvas></div></div>
+    </div>
+  </div>
+  <div class="c mb"><div class="ct"><i class="fa-solid fa-circle-nodes"></i> Korelasi Suhu&ndash;pH&ndash;Produksi Biogas (Scatter Plot)</div><div class="cw md"><canvas id="ch-scatter"></canvas></div></div>
+</div>
+
+<!-- EKONOMI -->
+<div id="pg-eco" class="pg">
+  <div class="ph"><div class="ph-l"><h1><i class="fa-solid fa-coins"></i> Kalkulator Ekonomi SIRKUL</h1><p>Estimasi penghematan &amp; pendapatan &middot; Analisis ROI &middot; Per siklus 21 hari operasional</p></div></div>
+  <div class="g4 mb">
+    <div class="c mc"><div class="mic mg"><i class="fa-solid fa-bolt"></i></div><div class="mlb">Hemat Listrik / Siklus</div><div class="mv" style="font-size:17px"><span id="eco-listrik">Rp 468.000</span></div><div class="mst ok"><i class="fa-solid fa-check"></i> Substitusi PLN 100%</div></div>
+    <div class="c mc"><div class="mic mb2"><i class="fa-solid fa-seedling"></i></div><div class="mlb">Nilai POC / Siklus</div><div class="mv" style="font-size:17px"><span id="eco-poc">Rp 270.000</span></div><div class="mst ok"><i class="fa-solid fa-check"></i> ~180 L &times; Rp 1.500</div></div>
+    <div class="c mc"><div class="mic ma"><i class="fa-solid fa-bugs"></i></div><div class="mlb">Nilai Maggot BSF</div><div class="mv" style="font-size:17px"><span id="eco-maggot">Rp 175.000</span></div><div class="mst ok"><i class="fa-solid fa-check"></i> ~3.5 kg &times; Rp 50.000</div></div>
+    <div class="c mc" style="background:var(--ok);border-color:var(--okb)"><div class="mic mg"><i class="fa-solid fa-hand-holding-dollar"></i></div><div class="mlb">Total Manfaat Ekonomi</div><div class="mv" style="font-size:17px;color:var(--eco)"><span id="eco-total">Rp 913.000</span></div><div class="mst ok"><i class="fa-solid fa-arrow-trend-up"></i> Per siklus 21 hari</div></div>
+  </div>
+  <div class="g2">
+    <div class="c">
+      <div class="ct"><i class="fa-solid fa-sliders"></i> Input Parameter Kalkulasi</div>
+      <div class="eco-row"><span class="lbl">Tarif listrik PLN</span><div style="display:flex;align-items:center;gap:5px"><span style="font-size:10px;color:var(--txm)">Rp</span><input type="number" id="eco-tarif" value="1500" class="si" style="width:72px" oninput="calcEco()"><span class="su">/kWh</span></div></div>
+      <div class="eco-row"><span class="lbl">Konsumsi aerator</span><div style="display:flex;align-items:center;gap:5px"><input type="number" id="eco-watt" value="250" class="si" style="width:72px" oninput="calcEco()"><span class="su">Watt</span></div></div>
+      <div class="eco-row"><span class="lbl">Jam operasi aerator</span><div style="display:flex;align-items:center;gap:5px"><input type="number" id="eco-jam" value="24" class="si" style="width:72px" oninput="calcEco()"><span class="su">jam/hari</span></div></div>
+      <div class="eco-row"><span class="lbl">Volume POC panen</span><div style="display:flex;align-items:center;gap:5px"><input type="number" id="eco-pocvol" value="180" class="si" style="width:72px" oninput="calcEco()"><span class="su">Liter</span></div></div>
+      <div class="eco-row"><span class="lbl">Harga POC pasar</span><div style="display:flex;align-items:center;gap:5px"><span style="font-size:10px;color:var(--txm)">Rp</span><input type="number" id="eco-pocprice" value="1500" class="si" style="width:72px" oninput="calcEco()"><span class="su">/L</span></div></div>
+      <div class="eco-row"><span class="lbl">Berat maggot BSF</span><div style="display:flex;align-items:center;gap:5px"><input type="number" id="eco-maggwt" value="3.5" class="si" style="width:72px" step="0.1" oninput="calcEco()"><span class="su">kg</span></div></div>
+      <div class="eco-row"><span class="lbl">Harga maggot pasar</span><div style="display:flex;align-items:center;gap:5px"><span style="font-size:10px;color:var(--txm)">Rp</span><input type="number" id="eco-maggprice" value="50000" class="si" style="width:72px" oninput="calcEco()"><span class="su">/kg</span></div></div>
+      <div class="eco-total"><span class="lbl">Total Manfaat / Siklus (21 hari)</span><span class="val" id="eco-ttl">Rp 913.000</span></div>
+    </div>
+    <div class="c"><div class="ct"><i class="fa-solid fa-chart-bar"></i> Breakdown Manfaat Ekonomi per Siklus</div><div class="cw xl"><canvas id="ch-eco"></canvas></div></div>
+  </div>
+  <div class="c mb"><div class="ct"><i class="fa-solid fa-chart-line"></i> Proyeksi ROI Kumulatif &mdash; 12 Siklus (1 Tahun)</div><div class="cw md"><canvas id="ch-roi"></canvas></div></div>
+</div>
+
+<!-- SENSOR STATUS -->
+<div id="pg-sensor" class="pg">
+  <div class="ph"><div class="ph-l"><h1><i class="fa-solid fa-microchip"></i> Status Semua Sensor</h1><p>Matriks kondisi real-time seluruh sensor IoT &middot; Update setiap 3 detik otomatis</p></div></div>
+  <div class="g3 mb">
+    <div class="c"><div class="ct" style="color:var(--eco)"><i class="fa-solid fa-flask"></i> Tabung 1 &middot; Bioreaktor</div><div class="sg-grid" id="sg-t1"></div></div>
+    <div class="c"><div class="ct"><i class="fa-solid fa-wind"></i> Tabung 2 &middot; Scrubber</div><div class="sg-grid" id="sg-t2"></div></div>
+    <div class="c"><div class="ct"><i class="fa-solid fa-gas-pump"></i> Tabung 3 &middot; Storage</div><div class="sg-grid" id="sg-t3"></div></div>
+  </div>
+  <div class="g2">
+    <div class="c"><div class="ct"><i class="fa-solid fa-chart-bar"></i> Nilai Sensor vs Target (Radar)</div><div class="cw lg"><canvas id="ch-radar"></canvas></div></div>
+    <div class="c">
+      <div class="ct"><i class="fa-solid fa-history"></i> Log Pembacaan Sensor (20 Terakhir)</div>
+      <div class="tscroll">
+        <table class="tbl"><thead><tr><th>Waktu</th><th>Suhu &deg;C</th><th>pH</th><th>&#916;P kPa</th><th>CH&#8324; %</th><th>H&#8322;S ppm</th><th>Status</th></tr></thead><tbody id="sensor-log-body"></tbody></table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PRODUK -->
+<div id="pg-produk" class="pg">
+  <div class="ph"><div class="ph-l"><h1><i class="fa-solid fa-recycle"></i> Produk Turunan &amp; Resource Recovery</h1><p>Pilar I &amp; R &amp; L &middot; Ekonomi Sirkular &middot; Zero Waste 100% &middot; Hukum Termodinamika I terbukti</p></div></div>
+  <div class="ndc">
+    <div class="ndc-l"><i class="fa-solid fa-earth-asia"></i>&nbsp; Kontribusi SIRKUL terhadap Target NDC Indonesia 2030</div>
+    <div class="ndc-v">31.89%</div>
+    <div class="ndc-d">Reduksi emisi gas rumah kaca nasional &middot; SIRKUL menangkap CH&#8324; yang sebelumnya terlepas bebas ke atmosfer dari pembuangan limbah kolam terbuka &middot; Setiap siklus 21 hari = aksi mitigasi iklim nyata skala UMKM perikanan</div>
+    <div class="sdg-row">
+      <div class="sdg" style="background:#FCC30B">7</div><div style="font-size:10px;color:rgba(255,255,255,.6)">SDG 7<br>Energi Bersih</div>
+      <div class="sdg" style="background:#BF8B2E" style="margin-left:8px">12</div><div style="font-size:10px;color:rgba(255,255,255,.6)">SDG 12<br>Produksi Berkelanjutan</div>
+      <div class="sdg" style="background:#3F7E44">13</div><div style="font-size:10px;color:rgba(255,255,255,.6)">SDG 13<br>Aksi Iklim</div>
+    </div>
+  </div>
+  <div class="g2">
+    <div class="pcd">
+      <div class="pcd-ico">&#127807;</div>
+      <div class="pcd-nm">Pupuk Organik Cair (POC)</div>
+      <div class="pcd-sb">Fase Cair Tabung 1 &middot; Pilar I &middot; Biofertilizer NPK Alami</div>
+      <div class="pcd-stat"><div class="pcd-v">~180</div><div class="pcd-u">Liter/siklus</div></div>
+      <div class="pcd-div"></div>
+      <div class="pcd-f"><i class="fa-solid fa-check"></i> Kandungan NPK (Nitrogen, Fosfor, Kalium) tinggi alami</div>
+      <div class="pcd-f"><i class="fa-solid fa-check"></i> Substitusi penuh pupuk kimia sintetis (Purba, 2025)</div>
+      <div class="pcd-f"><i class="fa-solid fa-check"></i> Terbukti meningkatkan pertumbuhan tanaman (Bhuimbar et al., 2023)</div>
+      <div class="pcd-f"><i class="fa-solid fa-check"></i> COD limbah berkurang hingga 82.6% (Darwin et al., 2017)</div>
+      <div class="pcd-f"><i class="fa-solid fa-check"></i> Eliminasi biaya pupuk kimia = 100% penghematan</div>
+      <div style="margin-top:11px;display:flex;gap:6px;flex-wrap:wrap"><span class="badge bg-g" style="font-size:10px;padding:3px 9px">&#10003; Zero Waste</span><span class="badge bg-b" style="font-size:10px;padding:3px 9px">NPK Terverifikasi</span></div>
+    </div>
+    <div class="pcd">
+      <div class="pcd-ico">&#129426;</div>
+      <div class="pcd-nm">Maggot Black Soldier Fly (BSF)</div>
+      <div class="pcd-sb">Fase Padat (Sludge) Tabung 1 &middot; Pilar R &middot; Pakan Ikan Protein Tinggi</div>
+      <div class="pcd-stat"><div class="pcd-v">42.5</div><div class="pcd-u">% protein baseline terverifikasi</div></div>
+      <div class="pcd-div"></div>
+      <div class="pcd-f"><i class="fa-solid fa-check"></i> Kandungan protein 40&ndash;48% (Munguti et al., 2025)</div>
+      <div class="pcd-f"><i class="fa-solid fa-check"></i> Hemat biaya pakan komersial hingga <strong>25%</strong></div>
+      <div class="pcd-f"><i class="fa-solid fa-check"></i> Media tumbuh optimal: sludge kaya serat &amp; nutrisi terdegradasi</div>
+      <div class="pcd-f"><i class="fa-solid fa-check"></i> Cocok untuk lele ukuran sedang (benih &gt;5 cm) sampai panen</div>
+      <div class="pcd-f"><i class="fa-solid fa-check"></i> Hermetia illucens &mdash; food conversion ratio terbaik industri</div>
+      <div style="margin-top:11px;display:flex;gap:6px;flex-wrap:wrap"><span class="badge bg-g" style="font-size:10px;padding:3px 9px">&#10003; Zero Waste</span><span class="badge bg-a" style="font-size:10px;padding:3px 9px">Protein 42.5%</span></div>
+    </div>
+  </div>
+  <div class="c mb"><div class="ct"><i class="fa-solid fa-chart-bar"></i> Perbandingan Output Lintas Siklus</div><div class="cw md"><canvas id="ch-produk"></canvas></div></div>
+  <div class="c">
+    <div class="ct"><i class="fa-solid fa-table"></i> Riwayat Lengkap Output Per Siklus</div>
+    <div class="tscroll">
+      <table class="tbl">
+        <thead><tr><th>Siklus</th><th>Tanggal</th><th>Biogas (L)</th><th>CH&#8324;</th><th>POC (L)</th><th>Maggot (kg)</th><th>Protein %</th><th>Hemat Listrik</th><th>Nilai POC</th><th>Status</th></tr></thead>
         <tbody>
-          <tr><td>Siklus 3</td><td>15 Apr 2026</td><td>71.3</td><td>1,420</td><td>N2.15% P1.83% K1.92%</td><td><span class="badge ok">✓ Selesai</span></td></tr>
-          <tr><td>Siklus 2</td><td>25 Mar 2026</td><td>68.7</td><td>1,180</td><td>N1.98% P1.67% K2.05%</td><td><span class="badge ok">✓ Selesai</span></td></tr>
-          <tr><td>Siklus 1</td><td>4 Mar 2026</td><td>62.1</td><td>980</td><td>N1.72% P1.45% K1.68%</td><td><span class="badge ok">✓ Selesai</span></td></tr>
+          <tr><td><strong>#001</strong></td><td>15 Jan&ndash;05 Feb 2026</td><td style="font-family:var(--mono);font-weight:700">1,847</td><td><span class="badge bg-g">88.2%</span></td><td>165</td><td>3.4</td><td>42.3%</td><td>Rp 420.000</td><td>Rp 247.500</td><td><span class="badge bg-g">Zero Waste &#10003;</span></td></tr>
+          <tr><td><strong>#002</strong></td><td>10 Feb&ndash;02 Mar 2026</td><td style="font-family:var(--mono);font-weight:700">2,104</td><td><span class="badge bg-g">86.7%</span></td><td>172</td><td>3.8</td><td>43.1%</td><td>Rp 485.000</td><td>Rp 258.000</td><td><span class="badge bg-g">Zero Waste &#10003;</span></td></tr>
+          <tr><td><strong>#003</strong></td><td>07 Mar&ndash;28 Mar 2026</td><td style="font-family:var(--mono);font-weight:700">1,992</td><td><span class="badge bg-a">83.1%</span></td><td>158</td><td>3.1</td><td>41.8%</td><td>Rp 451.000</td><td>Rp 237.000</td><td><span class="badge bg-g">Zero Waste &#10003;</span></td></tr>
+          <tr><td><strong>#004 (aktif)</strong></td><td>01 Apr&ndash;Sekarang</td><td style="font-family:var(--mono);font-weight:700" id="cy-bio">1,124</td><td><span class="badge bg-g" id="cy-ch4">87.4%</span></td><td id="cy-poc">~180</td><td>&mdash;</td><td>42.5% (est.)</td><td>&mdash;</td><td>&mdash;</td><td><span class="badge bg-b">&#128260; Hari 12/21</span></td></tr>
         </tbody>
       </table>
     </div>
   </div>
+</div>
 
-  <!-- ════════════════════════════
-       PAGE: RIWAYAT
-  ════════════════════════════ -->
-  <div class="page" id="page-riwayat">
-    <div class="section-header">
-      <div class="section-title">Rekap Produksi</div>
-      <button class="btn btn-primary" onclick="exportReport()">📄 Export Laporan</button>
-    </div>
-
-    <div class="stats-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:24px;">
-      <div class="stat-card"><div class="stat-label">Total Biogas (Siklus ini)</div><div class="stat-value">1,847<span class="stat-unit"> L</span></div><div class="stat-sub">Siklus ke-4</div></div>
-      <div class="stat-card c-blue"><div class="stat-label">Total Biogas (3 Siklus)</div><div class="stat-value">4,210<span class="stat-unit"> L</span></div><div class="stat-sub" style="color:var(--blue)">Kumulatif</div></div>
-      <div class="stat-card c-accent"><div class="stat-label">POC Dipanen</div><div class="stat-value">202<span class="stat-unit"> L</span></div><div class="stat-sub">3 siklus lalu</div></div>
-      <div class="stat-card"><div class="stat-label">Maggot Dipanen</div><div class="stat-value">3,580<span class="stat-unit"> g</span></div><div class="stat-sub muted">3 siklus lalu</div></div>
-    </div>
-
-    <div class="section-header">
-      <div class="section-title">Log Alert AI</div>
-      <span style="font-size:12px;color:var(--muted);" id="alertTotal">8 alert tercatat</span>
-    </div>
-    <div class="card">
-      <table class="data-table">
-        <thead><tr><th>Waktu</th><th>Sumber</th><th>Level</th><th>Pesan</th><th>Status</th></tr></thead>
-        <tbody id="alertTable"></tbody>
-      </table>
+<!-- LOG -->
+<div id="pg-log" class="pg">
+  <div class="ph">
+    <div class="ph-l"><h1><i class="fa-solid fa-file-lines"></i> Log &amp; Laporan AI</h1><p>Audit trail anomali &middot; Rekomendasi mitigasi otomatis &middot; Riwayat sesi IoT aktif</p></div>
+    <div class="ph-r"><button class="btn btn-p" onclick="exportPDF()"><i class="fa-solid fa-file-pdf"></i> Export PDF</button><button class="btn btn-o" onclick="clearLogs()"><i class="fa-solid fa-trash"></i> Hapus</button><span style="font-size:11px;color:var(--txm)" id="lcount">0 entri</span></div>
+  </div>
+  <div class="g4 mb">
+    <div class="c mc"><div class="mic mr"><i class="fa-solid fa-triangle-exclamation"></i></div><div class="mlb">Total DANGER</div><div class="mv"><span id="cnt-danger" style="color:var(--rose)">0</span></div><div class="mst neu">Anomali kritis</div></div>
+    <div class="c mc"><div class="mic ma"><i class="fa-solid fa-circle-exclamation"></i></div><div class="mlb">Total WARNING</div><div class="mv"><span id="cnt-warn" style="color:var(--amber)">0</span></div><div class="mst neu">Peringatan</div></div>
+    <div class="c mc"><div class="mic mb2"><i class="fa-solid fa-circle-info"></i></div><div class="mlb">Total INFO</div><div class="mv"><span id="cnt-info">0</span></div><div class="mst neu">Informasi</div></div>
+    <div class="c mc"><div class="mic mg"><i class="fa-solid fa-clock"></i></div><div class="mlb">Uptime Sesi</div><div class="mv"><span id="cnt-up" style="font-size:16px">00:00</span></div><div class="mst ok">Jam aktif</div></div>
+  </div>
+  <div class="c">
+    <div class="tscroll">
+      <table class="tbl"><thead><tr><th>Timestamp</th><th>Sensor</th><th>Konteks Bahaya</th><th>Rekomendasi Mitigasi AI</th><th>Level</th></tr></thead><tbody id="ltbody"><tr><td colspan="5" style="text-align:center;color:var(--txm);padding:28px">Belum ada anomali. Sistem berjalan normal.</td></tr></tbody></table>
     </div>
   </div>
+</div>
 
-  <!-- ════════════════════════════
-       PAGE: PENGATURAN
-  ════════════════════════════ -->
-  <div class="page" id="page-pengaturan">
-    <div class="grid-2">
-      <div class="card">
-        <div class="setting-group">
-          <div class="setting-group-title">🧪 Threshold Bioreaktor</div>
-          <div class="setting-row"><div><div class="setting-label">Suhu Minimum</div><div class="setting-sub">Alert jika di bawah nilai ini</div></div><div style="display:flex;align-items:center;gap:6px;"><input class="setting-input" type="number" value="30" id="th-tMin"> °C</div></div>
-          <div class="setting-row"><div><div class="setting-label">Suhu Maksimum</div></div><div style="display:flex;align-items:center;gap:6px;"><input class="setting-input" type="number" value="40" id="th-tMax"> °C</div></div>
-          <div class="setting-row"><div><div class="setting-label">pH Minimum</div></div><div style="display:flex;align-items:center;gap:6px;"><input class="setting-input" type="number" step="0.1" value="6.8" id="th-phMin"></div></div>
-          <div class="setting-row"><div><div class="setting-label">pH Maksimum</div></div><div style="display:flex;align-items:center;gap:6px;"><input class="setting-input" type="number" step="0.1" value="7.2" id="th-phMax"></div></div>
-        </div>
-        <div class="setting-group">
-          <div class="setting-group-title">🔬 Threshold Scrubber</div>
-          <div class="setting-row"><div><div class="setting-label">CH₄ Minimum</div><div class="setting-sub">Alert jika di bawah ini</div></div><div style="display:flex;align-items:center;gap:6px;"><input class="setting-input" type="number" value="85"> %</div></div>
-          <div class="setting-row"><div><div class="setting-label">H₂S Maksimum</div></div><div style="display:flex;align-items:center;gap:6px;"><input class="setting-input" type="number" value="5"> ppm</div></div>
-        </div>
-        <div class="setting-group">
-          <div class="setting-group-title">🛢️ Threshold Penyimpanan</div>
-          <div class="setting-row"><div><div class="setting-label">Tekanan Maks Aman</div></div><div style="display:flex;align-items:center;gap:6px;"><input class="setting-input" type="number" value="200"> kPa</div></div>
-          <div class="setting-row"><div><div class="setting-label">Volume Minimum Alert</div></div><div style="display:flex;align-items:center;gap:6px;"><input class="setting-input" type="number" value="100"> L</div></div>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="setting-group">
-          <div class="setting-group-title">🔔 Pengaturan Notifikasi</div>
-          <div class="setting-row"><div><div class="setting-label">Alert Suhu Bioreaktor</div></div><button class="toggle on" onclick="this.classList.toggle('on')"></button></div>
-          <div class="setting-row"><div><div class="setting-label">Alert pH Bioreaktor</div></div><button class="toggle on" onclick="this.classList.toggle('on')"></button></div>
-          <div class="setting-row"><div><div class="setting-label">Alert Tekanan Reaktor</div></div><button class="toggle on" onclick="this.classList.toggle('on')"></button></div>
-          <div class="setting-row"><div><div class="setting-label">Alert Adsorben Jenuh</div></div><button class="toggle on" onclick="this.classList.toggle('on')"></button></div>
-          <div class="setting-row"><div><div class="setting-label">Alert Tekanan Tangki</div></div><button class="toggle" onclick="this.classList.toggle('on')"></button></div>
-          <div class="setting-row"><div><div class="setting-label">Alert Volume Gas Rendah</div></div><button class="toggle on" onclick="this.classList.toggle('on')"></button></div>
-          <div class="setting-row"><div><div class="setting-label">Laporan Harian Otomatis</div></div><button class="toggle" onclick="this.classList.toggle('on')"></button></div>
-        </div>
-
-        <div class="setting-group">
-          <div class="setting-group-title">ℹ️ Informasi Sistem</div>
-          <div class="info-rows">
-            <div class="info-row"><span class="info-label">Versi Software</span><span class="info-val">SIRKUL v2.1.0</span></div>
-            <div class="info-row"><span class="info-label">Siklus Aktif</span><span class="info-val">Siklus ke-4</span></div>
-            <div class="info-row"><span class="info-label">Hari Fermentasi</span><span class="info-val">12 / 21</span></div>
-            <div class="info-row"><span class="info-label">Status Koneksi IoT</span><span class="badge ok">● TERHUBUNG</span></div>
-          </div>
-        </div>
-
-        <div style="display:flex;gap:10px;margin-top:10px;">
-          <button class="btn btn-primary" onclick="alert('✅ Pengaturan disimpan!')">💾 Simpan</button>
-          <button class="btn btn-outline" onclick="location.reload()">🔄 Reset</button>
-        </div>
-      </div>
+<!-- CONFIG -->
+<div id="pg-cfg" class="pg">
+  <div class="ph">
+    <div class="ph-l"><h1><i class="fa-solid fa-sliders"></i> Pengaturan Threshold Parameter</h1><p>Konfigurasi batas sensor aktif &middot; Perubahan langsung mengubah logika alarm real-time</p></div>
+    <div class="ph-r"><button class="btn btn-p btn-sm" onclick="saveCfg()"><i class="fa-solid fa-floppy-disk"></i> Simpan</button><button class="btn btn-o btn-sm" onclick="resetCfg()"><i class="fa-solid fa-rotate-left"></i> Reset</button></div>
+  </div>
+  <div class="g2">
+    <div class="c">
+      <div class="ct"><i class="fa-solid fa-flask"></i> Tabung 1 &middot; Bioreaktor</div>
+      <div class="sr"><div class="sr-i"><div class="sr-n">Suhu Maksimum</div><div class="sr-d">Batas atas mesofilik &middot; Default 40&deg;C &middot; Kritis pada +3&deg;C</div></div><div class="sr-inp"><input class="si" type="number" id="set-tmax" value="40" step="0.5"><span class="su">&deg;C</span></div></div>
+      <div class="sr"><div class="sr-i"><div class="sr-n">Suhu Minimum</div><div class="sr-d">Batas bawah mesofilik &middot; Default 30&deg;C</div></div><div class="sr-inp"><input class="si" type="number" id="set-tmin" value="30" step="0.5"><span class="su">&deg;C</span></div></div>
+      <div class="sr"><div class="sr-i"><div class="sr-n">pH Minimum</div><div class="sr-d">Asiditas kritis metanogen &middot; Default 6.8</div></div><div class="sr-inp"><input class="si" type="number" id="set-phmin" value="6.8" step="0.1"><span class="su">pH</span></div></div>
+      <div class="sr"><div class="sr-i"><div class="sr-n">pH Maksimum</div><div class="sr-d">Alkalinitas berlebih &middot; Default 7.2</div></div><div class="sr-inp"><input class="si" type="number" id="set-phmax" value="7.2" step="0.1"><span class="su">pH</span></div></div>
+    </div>
+    <div class="c">
+      <div class="ct"><i class="fa-solid fa-wind"></i> Tabung 2 &amp; 3</div>
+      <div class="sr"><div class="sr-i"><div class="sr-n">&#916;P Maksimum Scrubber</div><div class="sr-d">Saturasi Ca(OH)&#8322; kritis &middot; Default 25.0 kPa</div></div><div class="sr-inp"><input class="si" type="number" id="set-dpmax" value="25.0" step="0.5"><span class="su">kPa</span></div></div>
+      <div class="sr"><div class="sr-i"><div class="sr-n">H&#8322;S Maksimum</div><div class="sr-d">Korosivitas generator &middot; Default 5.0 ppm</div></div><div class="sr-inp"><input class="si" type="number" id="set-h2smax" value="5.0" step="0.1"><span class="su">ppm</span></div></div>
+      <div class="sr"><div class="sr-i"><div class="sr-n">CH&#8324; Minimum Akseptabel</div><div class="sr-d">Batas layak bakar &middot; Default 80%</div></div><div class="sr-inp"><input class="si" type="number" id="set-ch4min" value="80" step="1"><span class="su">%</span></div></div>
+      <div class="sr"><div class="sr-i"><div class="sr-n">Volume Tangki Minimum</div><div class="sr-d">Peringatan kritis &middot; Default 10%</div></div><div class="sr-inp"><input class="si" type="number" id="set-vmin" value="10" step="1"><span class="su">%</span></div></div>
     </div>
   </div>
+  <div class="c">
+    <div class="ct"><i class="fa-solid fa-circle-info"></i> Informasi Sistem</div>
+    <div class="igrid">
+      <div><span>Versi Firmware</span><strong>SIRKUL-AI v1.0.0</strong></div>
+      <div><span>Polling Interval</span><strong>3000 ms real-time</strong></div>
+      <div><span>Hari Inkubasi</span><strong>12 / 21 hari aktif</strong></div>
+      <div><span>Penulis</span><strong>Farid Nadir &amp; M. Daffa Amrulloh</strong></div>
+      <div><span>Institusi</span><strong>STT Wastukancana &amp; Poltek Bhakti Asih</strong></div>
+      <div><span>Target NDC</span><strong>31.89% reduksi CH&#8324; 2030</strong></div>
+    </div>
+  </div>
+</div>
 
-  </div><!-- end content -->
-</div><!-- end main -->
-
+</main>
+<div id="toast"><i class="fa-solid fa-circle-check"></i> <span id="tmsg"></span></div>
 <script>
-// ═══════════════════════════════════════
-//  NAVIGATION
-// ═══════════════════════════════════════
-const PAGE_TITLES = {
-  dashboard:'Dashboard Utama', bioreaktor:'Tabung 1 — Bioreaktor',
-  scrubber:'Tabung 2 — Scrubber', storage:'Tabung 3 — Penyimpanan Gas',
-  produk:'Produk Turunan', riwayat:'Riwayat & Laporan', pengaturan:'Pengaturan'
-};
+Chart.defaults.font.family="'Plus Jakarta Sans',sans-serif";
+Chart.defaults.color='#64748b';
+let T={tmax:40,tmin:30,phmax:7.2,phmin:6.8,dpmax:25,h2smax:5,ch4min:80,vmin:10};
+let S={bio:1124,ch4:87.4,tmp:35.2,ph:7.02,dp:12.4,h2s:2.8,kpa:1.2,pct:73,vol:146,rt:66720,ads:48.4,rate:3.2};
+let logs=[],dCnt=0,wCnt=0,iCnt=0,tick=0,sessSec=0,conCnt=0,sensorHist=[];
+const titles={dash:'Dashboard Utama Analytics',t1:'Tabung 1 · Bioreaktor Anaerobik',t2:'Tabung 2 · Packed Bed Scrubber',t3:'Tabung 3 · Penyimpanan Gas',ai:'AI Prediksi & Analisis',eco:'Kalkulator Ekonomi SIRKUL',sensor:'Status Semua Sensor',produk:'Produk Turunan & Resource Recovery',log:'Log & Laporan AI',cfg:'Pengaturan Threshold'};
 
-let chartsReady = {};
+function go(id,el){document.querySelectorAll('.pg').forEach(p=>p.classList.remove('on'));document.querySelectorAll('.nav').forEach(n=>n.classList.remove('on'));document.getElementById('pg-'+id).classList.add('on');el.classList.add('on');document.getElementById('ptitle').textContent=titles[id];}
 
-function showPage(id, navEl) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  document.getElementById('page-' + id).classList.add('active');
-  document.getElementById('pageTitle').textContent = PAGE_TITLES[id];
-  if (navEl) navEl.classList.add('active');
-  closeSidebar();
-  if (!chartsReady[id]) { setTimeout(() => { initCharts(id); chartsReady[id] = true; }, 80); }
-}
-
-function toggleSidebar() {
-  document.getElementById('sidebar').classList.toggle('open');
-  document.getElementById('overlay').classList.toggle('show');
-}
-function closeSidebar() {
-  document.getElementById('sidebar').classList.remove('open');
-  document.getElementById('overlay').classList.remove('show');
-}
-
-// ═══════════════════════════════════════
-//  CLOCK
-// ═══════════════════════════════════════
-function tick() { document.getElementById('clock').textContent = new Date().toLocaleTimeString('id-ID') + ' WIB'; }
-setInterval(tick, 1000); tick();
-
-// ═══════════════════════════════════════
-//  CHART FACTORY
-// ═══════════════════════════════════════
-const CI = {};
-const CHART_OPT = {
-  responsive: true, maintainAspectRatio: false,
-  plugins: { legend: { display: false }, tooltip: { mode: 'index', intersect: false } },
-  scales: {
-    x: { grid: { color: '#f3f4f6' }, ticks: { color: '#9ca3af', font: { size: 10 }, maxTicksLimit: 8 } },
-    y: { grid: { color: '#f3f4f6' }, ticks: { color: '#9ca3af', font: { size: 10 } } }
-  },
-  animation: { duration: 200 },
-  elements: { line: { tension: 0.4 }, point: { radius: 0, hoverRadius: 4 } }
-};
-
-function mkLine(canvasId, datasets, yOpts = {}) {
-  const ctx = document.getElementById(canvasId);
-  if (!ctx) return null;
-  return new Chart(ctx, {
-    type: 'line',
-    data: { labels: genLabels(30), datasets },
-    options: { ...CHART_OPT, scales: { ...CHART_OPT.scales, y: { ...CHART_OPT.scales.y, ...yOpts } } }
-  });
-}
-
-function mkBar(canvasId, datasets, xStacked=false, yStacked=false, legendDisplay=false) {
-  const ctx = document.getElementById(canvasId);
-  if (!ctx) return null;
-  return new Chart(ctx, {
-    type: 'bar',
-    data: { labels: genLabels(21, true), datasets },
-    options: {
-      ...CHART_OPT,
-      plugins: { legend: { display: legendDisplay, labels: { font:{size:11}, color:'#6b7280' } }, tooltip: { mode: 'index', intersect: false } },
-      scales: {
-        x: { stacked: xStacked, grid:{display:false}, ticks:{color:'#9ca3af',font:{size:10},maxTicksLimit:10} },
-        y: { stacked: yStacked, grid:{color:'#f3f4f6'}, ticks:{color:'#9ca3af',font:{size:10}} }
-      }
-    }
-  });
-}
-
-function ds(data, color, label='', fill=true) {
-  return { label, data, borderColor: color, backgroundColor: color + '18', borderWidth: 2, fill };
-}
-function dsDash(data, color, label) {
-  return { label, data, borderColor: color, backgroundColor:'transparent', borderWidth:1.5, borderDash:[6,4], fill:false, pointRadius:0 };
-}
-function rnd(b, d) { return parseFloat((b + (Math.random()-.5)*d*2).toFixed(2)); }
-function gen(b, d, n=30) { return Array.from({length:n}, () => rnd(b, d)); }
-function genLabels(n, isDay=false) {
-  if (isDay) return Array.from({length:n}, (_,i) => `H${i+1}`);
-  return Array.from({length:n}, (_,i) => `${i}:00`);
-}
-
-function initCharts(page) {
-  const CYCLE_DAY = 12;
-
-  if (page === 'dashboard') {
-    const prodData = Array.from({length:21}, (_,i) => i < CYCLE_DAY ? parseFloat((80+i*8+rnd(0,8)).toFixed(1)) : null);
-    const predData = Array.from({length:21}, (_,i) => i >= CYCLE_DAY ? parseFloat((80+i*8+rnd(0,6)).toFixed(1)) : null);
-    CI.dashMain = mkBar('chartDashMain', [
-      { label:'Aktual', data:prodData, backgroundColor:'#1a5c3890', borderColor:'#1a5c38', borderWidth:1.5, borderRadius:4 },
-      { label:'Prediksi', data:predData, backgroundColor:'#22c55e40', borderColor:'#22c55e', borderWidth:1.5, borderDash:[4,4], borderRadius:4 }
-    ], false, false, true);
-
-    const ctx2 = document.getElementById('chartGasDist');
-    if (ctx2) CI.gasDist = new Chart(ctx2, {
-      type: 'doughnut',
-      data: { labels:['Aerator/Generator','Memasak','Cadangan'], datasets:[{ data:[42,26,56], backgroundColor:['#1a5c38','#22c55e','#86efac'], borderWidth:3, borderColor:'#fff' }] },
-      options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{position:'bottom',labels:{font:{size:11},color:'#6b7280',padding:12}} }, cutout:'60%' }
-    });
-  }
-
-  if (page === 'bioreaktor') {
-    const tl = Array.from({length:30}, (_,i) => `${i}:00`);
-    CI.bTemp = new Chart(document.getElementById('chartBioTemp'), {
-      type:'line', data:{ labels:tl, datasets:[ds(gen(34.8,1.2),'#1a5c38','Suhu (°C)'), dsDash(Array(30).fill(35),'#22c55e','Target 35°C'), dsDash(Array(30).fill(30),'#f59e0b','Min 30°C'), dsDash(Array(30).fill(40),'#ef4444','Max 40°C')] },
-      options:{ ...CHART_OPT, plugins:{legend:{display:true,labels:{font:{size:10},color:'#6b7280'}},tooltip:{mode:'index',intersect:false}}, scales:{...CHART_OPT.scales,y:{...CHART_OPT.scales.y,min:26,max:44}} }
-    });
-    CI.bPH = new Chart(document.getElementById('chartBioPH'), {
-      type:'line', data:{ labels:tl, datasets:[ds(gen(7.0,0.25),'#3b82f6','pH'), dsDash(Array(30).fill(6.8),'#f59e0b','Min 6.8'), dsDash(Array(30).fill(7.2),'#ef4444','Max 7.2')] },
-      options:{ ...CHART_OPT, plugins:{legend:{display:true,labels:{font:{size:10},color:'#6b7280'}},tooltip:{mode:'index',intersect:false}}, scales:{...CHART_OPT.scales,y:{...CHART_OPT.scales.y,min:6.2,max:7.8}} }
-    });
-    CI.bPres = mkLine('chartBioPres', [ds(gen(142,8),'#8b5cf6','Tekanan (kPa)')]);
-  }
-
-  if (page === 'scrubber') {
-    const tl = Array.from({length:30}, (_,i) => `${i}:00`);
-    const inData = gen(150,4), outData = inData.map(v => parseFloat((v - rnd(8.4,1)).toFixed(2)));
-    CI.sDP = new Chart(document.getElementById('chartScrDP'), {
-      type:'line', data:{ labels:tl, datasets:[ds(inData,'#1a5c38','Tekanan Masuk'), ds(outData,'#22c55e','Tekanan Keluar')] },
-      options:{ ...CHART_OPT, plugins:{legend:{display:true,labels:{font:{size:10},color:'#6b7280'}},tooltip:{mode:'index',intersect:false}} }
-    });
-    CI.sCH4 = new Chart(document.getElementById('chartScrCH4'), {
-      type:'line', data:{ labels:tl, datasets:[ds(gen(85.3,0.7),'#3b82f6','CH₄ (%)'), dsDash(Array(30).fill(85),'#22c55e','Target 85%')] },
-      options:{ ...CHART_OPT, plugins:{legend:{display:true,labels:{font:{size:10},color:'#6b7280'}},tooltip:{mode:'index',intersect:false}}, scales:{...CHART_OPT.scales,y:{min:80,max:92}} }
-    });
-  }
-
-  if (page === 'storage') {
-    const hrs = Array.from({length:24}, (_,i) => `${i}:00`);
-    CI.stUse = new Chart(document.getElementById('chartStorUse'), {
-      type:'bar', data:{ labels:hrs, datasets:[
-        { label:'Aerator', data:gen(2.5,1.5,24).map(v=>Math.max(0,v)), backgroundColor:'#1a5c3888', borderRadius:3 },
-        { label:'Memasak', data:gen(1.2,1,24).map(v=>Math.max(0,v)), backgroundColor:'#22c55e88', borderRadius:3 }
-      ]},
-      options:{ ...CHART_OPT, plugins:{legend:{display:true,labels:{font:{size:10},color:'#6b7280'}},tooltip:{mode:'index',intersect:false}},
-        scales:{ x:{stacked:true,grid:{display:false},ticks:{color:'#9ca3af',font:{size:9},maxTicksLimit:8}}, y:{stacked:true,grid:{color:'#f3f4f6'},ticks:{color:'#9ca3af',font:{size:10}}} } }
-    });
-    CI.stPres = new Chart(document.getElementById('chartStorPres'), {
-      type:'line', data:{ labels:hrs, datasets:[ds(gen(142,7,24),'#f59e0b','Tekanan (kPa)'), dsDash(Array(24).fill(200),'#ef4444','Batas 200 kPa')] },
-      options:{ ...CHART_OPT, plugins:{legend:{display:true,labels:{font:{size:10},color:'#6b7280'}},tooltip:{mode:'index',intersect:false}}, scales:{...CHART_OPT.scales,y:{min:100,max:220}} }
-    });
+// HEATMAP
+function buildHM(){
+  const vals=[54,112,178,251,338,429,534,645,762,884,1004,1124];
+  const mx=Math.max(...vals);
+  const cols=['#dcfce7','#86efac','#4ade80','#22c55e','#16a34a','#166534'];
+  const g=document.getElementById('hm-grid');g.innerHTML='';
+  for(let i=0;i<21;i++){
+    const wrap=document.createElement('div');wrap.style.cssText='display:flex;flex-direction:column;align-items:center;gap:2px';
+    const lbl=document.createElement('div');lbl.style.cssText='font-size:7.5px;color:var(--txm);text-align:center;font-weight:600';lbl.textContent='H'+(i+1);
+    const cell=document.createElement('div');cell.className='hm-cell';
+    if(i<vals.length){const v=vals[i];const ci=Math.floor((v/mx)*5);cell.style.background=cols[ci];cell.textContent=i===11?'NOW':'';cell.style.color='rgba(0,0,0,.35)';cell.title='Hari '+(i+1)+': '+v.toLocaleString('id-ID')+' L';}
+    else{cell.style.background='#e2e8f0';cell.title='Hari '+(i+1)+': Belum diproduksi';}
+    wrap.appendChild(lbl);wrap.appendChild(cell);g.appendChild(wrap);
   }
 }
+buildHM();
 
-// ═══════════════════════════════════════
-//  SIMULATION
-// ═══════════════════════════════════════
-let S = {
-  temp:34.8, ph:7.1, bPres:142, ch4:85.3, h2s:3.2,
-  dp:8.4, vol:1256, stPres:142, biogas:1847,
-};
+// CHARTS
+function ra(b,v,n=14){return Array.from({length:n},()=>+(b+(Math.random()-.5)*v*2).toFixed(2));}
+const bioDat=[54,112,178,251,338,429,534,645,762,884,1004,1124,null,null,null,null,null,null,null,null,null];
+const bioPrj=[null,null,null,null,null,null,null,null,null,null,null,1124,1210,1320,1440,1540,1610,1665,1705,1735,1755];
+const cBio=new Chart(document.getElementById('ch-bio').getContext('2d'),{type:'line',data:{labels:Array.from({length:21},(_,i)=>'H-'+(i+1)),datasets:[{label:'Aktual (L)',data:bioDat,borderColor:'#1a5c38',backgroundColor:'rgba(26,92,56,0.07)',fill:true,tension:0.4,pointBackgroundColor:'#1a5c38',pointRadius:4,borderWidth:2.5,spanGaps:false},{label:'Proyeksi AI',data:bioPrj,borderColor:'rgba(26,92,56,.35)',backgroundColor:'transparent',borderDash:[5,4],tension:0.4,pointRadius:3,borderWidth:1.5,spanGaps:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{usePointStyle:true,font:{size:11}}}},scales:{x:{grid:{color:'#f1f5f9'},ticks:{font:{size:10}}},y:{beginAtZero:true,grid:{color:'#f1f5f9'},ticks:{callback:v=>v+' L',font:{size:10}}}}}});
 
-function simulate() {
-  S.temp = rnd(34.8, 1.2);
-  S.ph   = rnd(7.0, 0.22);
-  S.bPres = rnd(142, 7);
-  S.ch4  = rnd(85.3, 0.65);
-  S.h2s  = Math.max(0.5, rnd(3.2, 0.6));
-  S.dp   = rnd(8.4, 0.9);
-  S.vol  = rnd(1256, 18);
-  S.stPres = rnd(142, 6);
-  S.biogas += Math.random() * 2.8;
+const trendBuf={tmp:Array.from({length:40},()=>+(35.2+(Math.random()-.5)*1).toFixed(2)),ph:Array.from({length:40},()=>+(7.02+(Math.random()-.5)*.1).toFixed(3))};
+const cTrend=new Chart(document.getElementById('ch-trend').getContext('2d'),{type:'line',data:{labels:Array.from({length:40},(_,i)=>i%8===0?i*3+'s':''),datasets:[{label:'Suhu °C',data:[...trendBuf.tmp],borderColor:'#d97706',backgroundColor:'rgba(217,119,6,.07)',fill:true,tension:0.4,borderWidth:2,pointRadius:0,yAxisID:'yT'},{label:'pH',data:[...trendBuf.ph],borderColor:'#2563eb',backgroundColor:'transparent',tension:0.4,borderWidth:2,pointRadius:0,yAxisID:'yP'}]},options:{responsive:true,maintainAspectRatio:false,animation:{duration:200},plugins:{legend:{position:'top',labels:{usePointStyle:true,font:{size:11}}}},scales:{x:{grid:{display:false},ticks:{font:{size:9},maxTicksLimit:6}},yT:{type:'linear',position:'left',grid:{color:'#f1f5f9'},min:30,max:42,ticks:{callback:v=>v+'°',font:{size:10}}},yP:{type:'linear',position:'right',grid:{display:false},min:6.5,max:7.5,ticks:{callback:v=>v,font:{size:10}}}}}});
 
-  updateDOM();
-  pushCharts();
-  checkAlerts();
+const lbs14=[];for(let i=0;i<14;i++)lbs14.push(String(Math.floor(i/2)).padStart(2,'0')+':'+(i%2===0?'00':'30'));
+const cT1=new Chart(document.getElementById('ch-t1').getContext('2d'),{type:'line',data:{labels:lbs14,datasets:[{label:'Suhu °C',data:ra(35.2,.8),borderColor:'#d97706',backgroundColor:'transparent',yAxisID:'yT',tension:0.4,borderWidth:2,pointRadius:2},{label:'pH',data:ra(7.02,.12),borderColor:'#2563eb',backgroundColor:'transparent',yAxisID:'yP',tension:0.4,borderWidth:2,pointRadius:2},{label:'Tekanan kPa',data:ra(1.2,.15),borderColor:'#7c3aed',backgroundColor:'transparent',yAxisID:'yK',tension:0.4,borderWidth:2,pointRadius:2}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{usePointStyle:true,font:{size:11}}}},scales:{x:{grid:{color:'#f1f5f9'},ticks:{font:{size:10}}},yT:{type:'linear',position:'left',title:{display:true,text:'°C',font:{size:9}},grid:{color:'#f1f5f9'},min:28,max:42},yP:{type:'linear',position:'right',title:{display:true,text:'pH',font:{size:9}},grid:{display:false},min:6.4,max:7.6},yK:{type:'linear',position:'right',display:false}}}});
+
+const cT2=new Chart(document.getElementById('ch-t2').getContext('2d'),{type:'line',data:{labels:Array.from({length:20},(_,i)=>i*3+'m'),datasets:[{label:'ΔP kPa',data:Array.from({length:20},()=>+(12.4+(Math.random()-.5)*2).toFixed(1)),borderColor:'#1a5c38',backgroundColor:'rgba(26,92,56,.07)',fill:true,tension:0.4,borderWidth:2,pointRadius:2,yAxisID:'yD'},{label:'CH₄ %',data:Array.from({length:20},()=>+(87.4+(Math.random()-.5)*3).toFixed(1)),borderColor:'#2563eb',backgroundColor:'transparent',tension:0.4,borderWidth:2,pointRadius:2,yAxisID:'yC'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{usePointStyle:true,font:{size:11}}}},scales:{x:{grid:{color:'#f1f5f9'},ticks:{font:{size:9},maxTicksLimit:10}},yD:{type:'linear',position:'left',grid:{color:'#f1f5f9'},min:0,max:30,ticks:{font:{size:9}}},yC:{type:'linear',position:'right',grid:{display:false},min:70,max:100,ticks:{font:{size:9}}}}}});
+
+const cGauge=new Chart(document.getElementById('ch-gauge').getContext('2d'),{type:'doughnut',data:{datasets:[{data:[73,27],backgroundColor:['#1a5c38','#e2e8f0'],borderWidth:0}]},options:{responsive:false,maintainAspectRatio:false,cutout:'72%',plugins:{legend:{display:false}}}});
+new Chart(document.getElementById('ch-alloc').getContext('2d'),{type:'doughnut',data:{labels:['Generator','Gas Masak'],datasets:[{data:[75,25],backgroundColor:['#1a5c38','#60a5fa'],borderWidth:0}]},options:{responsive:false,maintainAspectRatio:false,cutout:'55%',plugins:{legend:{display:false}}}});
+const cT3h=new Chart(document.getElementById('ch-t3h').getContext('2d'),{type:'line',data:{labels:Array.from({length:24},(_,i)=>i+'h'),datasets:[{label:'Volume (L)',data:Array.from({length:24},(_,i)=>+(Math.max(10,146+(i-12)*(-.4)+(Math.random()-.5)*3)).toFixed(1)),borderColor:'#2563eb',backgroundColor:'rgba(37,99,235,.07)',fill:true,tension:0.4,borderWidth:2,pointRadius:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{font:{size:9},maxTicksLimit:8}},y:{grid:{color:'#f1f5f9'},ticks:{font:{size:9}}}}}});
+
+const cProj=new Chart(document.getElementById('ch-proj').getContext('2d'),{type:'line',data:{labels:Array.from({length:21},(_,i)=>'H-'+(i+1)),datasets:[{label:'Aktual (L)',data:[...bioDat],borderColor:'#1a5c38',backgroundColor:'rgba(26,92,56,.08)',fill:true,tension:0.4,borderWidth:2.5,pointRadius:4},{label:'Proyeksi AI',data:bioPrj,borderColor:'rgba(37,99,235,.5)',backgroundColor:'rgba(37,99,235,.04)',fill:true,borderDash:[5,4],tension:0.4,borderWidth:2,pointRadius:3},{label:'Batas Bawah',data:[null,null,null,null,null,null,null,null,null,null,null,null,1100,1200,1310,1400,1465,1510,1545,1565,1580],borderColor:'rgba(37,99,235,.15)',backgroundColor:'transparent',borderDash:[2,4],tension:0.4,borderWidth:1,pointRadius:0},{label:'Batas Atas',data:[null,null,null,null,null,null,null,null,null,null,null,null,1320,1440,1570,1680,1755,1820,1865,1905,1930],borderColor:'rgba(37,99,235,.15)',backgroundColor:'transparent',borderDash:[2,4],tension:0.4,borderWidth:1,pointRadius:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{usePointStyle:true,font:{size:11}}}},scales:{x:{grid:{color:'#f1f5f9'},ticks:{font:{size:10}}},y:{grid:{color:'#f1f5f9'},beginAtZero:true,ticks:{font:{size:10},callback:v=>v+' L'}}}}});
+
+const cHist=new Chart(document.getElementById('ch-hist').getContext('2d'),{type:'bar',data:{labels:['<30','30-31','31-32','32-33','33-34','34-35','35-36','36-37','37-38','>38'],datasets:[{label:'Frekuensi (%)',data:[1,2,4,8,12,28,35,20,8,2],backgroundColor:[1,2,4,8,12,28,35,20,8,2].map(v=>v>20?'#1a5c38':v>10?'#2a7d4f':v>5?'#4ade80':'#bbf7d0'),borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{font:{size:10}}},y:{grid:{color:'#f1f5f9'},ticks:{font:{size:10}}}}}});
+
+const scD=Array.from({length:60},()=>({x:+(32+(Math.random()*8)).toFixed(1),y:+(6.5+(Math.random()*.8)).toFixed(2),r:+(3+Math.random()*5).toFixed(1)}));
+const cScatter=new Chart(document.getElementById('ch-scatter').getContext('2d'),{type:'bubble',data:{datasets:[{label:'Suhu vs pH (ukuran = produksi)',data:scD,backgroundColor:scD.map(d=>d.x>=32&&d.x<=38&&d.y>=6.8&&d.y<=7.2?'rgba(26,92,56,.5)':'rgba(225,29,72,.25)'),borderColor:'transparent'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{font:{size:11}}}},scales:{x:{title:{display:true,text:'Suhu (°C)',font:{size:10}},grid:{color:'#f1f5f9'},min:28,max:42},y:{title:{display:true,text:'pH',font:{size:10}},grid:{color:'#f1f5f9'},min:6,max:8}}}});
+
+const cEco=new Chart(document.getElementById('ch-eco').getContext('2d'),{type:'bar',data:{labels:['Hemat Listrik','Nilai POC','Nilai Maggot BSF'],datasets:[{label:'Siklus #001',data:[420000,247500,170000],backgroundColor:'rgba(26,92,56,.45)',borderRadius:4},{label:'Siklus #002',data:[485000,258000,190000],backgroundColor:'rgba(26,92,56,.65)',borderRadius:4},{label:'Siklus #003',data:[451000,237000,155000],backgroundColor:'rgba(26,92,56,.35)',borderRadius:4},{label:'Siklus #004 (est.)',data:[468000,270000,175000],backgroundColor:'rgba(42,125,79,.9)',borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{font:{size:10}}}},scales:{x:{grid:{display:false},ticks:{font:{size:10}}},y:{grid:{color:'#f1f5f9'},ticks:{callback:v=>'Rp '+(v/1000).toFixed(0)+'rb',font:{size:9}}}}}});
+
+let acc=0;const cumB=[];for(let i=0;i<12;i++){acc+=913000;cumB.push(acc);}
+const cRoi=new Chart(document.getElementById('ch-roi').getContext('2d'),{type:'line',data:{labels:Array.from({length:12},(_,i)=>'Siklus '+(i+1)),datasets:[{label:'Investasi Awal',data:Array(12).fill(5000000),borderColor:'rgba(225,29,72,.5)',borderDash:[5,4],backgroundColor:'transparent',borderWidth:2,pointRadius:0},{label:'Manfaat Kumulatif',data:cumB,borderColor:'#1a5c38',backgroundColor:'rgba(26,92,56,.08)',fill:true,borderWidth:2.5,tension:0.3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{font:{size:11}}}},scales:{x:{grid:{display:false},ticks:{font:{size:10}}},y:{grid:{color:'#f1f5f9'},ticks:{callback:v=>'Rp '+(v/1000000).toFixed(1)+'jt',font:{size:9}}}}}});
+
+const cProduk=new Chart(document.getElementById('ch-produk').getContext('2d'),{type:'bar',data:{labels:['#001','#002','#003','#004 (est.)'],datasets:[{label:'Biogas (L)',data:[1847,2104,1992,1700],backgroundColor:'rgba(26,92,56,.8)',borderRadius:4,yAxisID:'yB'},{label:'POC (L)',data:[165,172,158,180],backgroundColor:'rgba(37,99,235,.6)',borderRadius:4,yAxisID:'yP'},{label:'Maggot (kg×10)',data:[34,38,31,35],backgroundColor:'rgba(217,119,6,.6)',borderRadius:4,yAxisID:'yB'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{font:{size:11}}}},scales:{x:{grid:{display:false}},yB:{type:'linear',position:'left',grid:{color:'#f1f5f9'},ticks:{font:{size:9}}},yP:{type:'linear',position:'right',display:false}}}});
+
+const cRadar=new Chart(document.getElementById('ch-radar').getContext('2d'),{type:'radar',data:{labels:['Suhu (norm.)','pH (norm.)','CH₄ %','ΔP (inv.)','H₂S (inv.)','Volume %'],datasets:[{label:'Nilai Aktual',data:[87,88,87.4,75,76,73],backgroundColor:'rgba(26,92,56,.15)',borderColor:'#1a5c38',borderWidth:2,pointBackgroundColor:'#1a5c38',pointRadius:4},{label:'Target Optimal',data:[100,100,95,100,100,80],backgroundColor:'rgba(37,99,235,.05)',borderColor:'rgba(37,99,235,.4)',borderDash:[4,4],borderWidth:1.5,pointRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{font:{size:11}}}},scales:{r:{beginAtZero:true,max:100,ticks:{font:{size:9},stepSize:25},pointLabels:{font:{size:10}}}}}});
+
+// CLOCK
+function tickClock(){const n=new Date();document.getElementById('clk').textContent=String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0')+':'+String(n.getSeconds()).padStart(2,'0');}
+setInterval(tickClock,1000);tickClock();
+setInterval(()=>{sessSec++;const m=Math.floor(sessSec/60),s=sessSec%60;document.getElementById('cnt-up').textContent=String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');},1000);
+function tickRT(){if(S.rt>0)S.rt--;const h=Math.floor(S.rt/3600),m=Math.floor((S.rt%3600)/60),s=S.rt%60;document.getElementById('rtclk').textContent=String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');}
+setInterval(tickRT,1000);tickRT();
+
+function toast(msg,ok=true){const el=document.getElementById('toast');el.querySelector('i').className=ok?'fa-solid fa-circle-check':'fa-solid fa-triangle-exclamation';document.getElementById('tmsg').textContent=msg;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),3500);}
+
+function addLog(sensor,ctx,mit,lvl){
+  const n=new Date(),ts=n.toLocaleTimeString('id-ID')+' '+n.toLocaleDateString('id-ID');
+  const bc=lvl==='DANGER'?'bg-r':lvl==='WARNING'?'bg-a':'bg-b';
+  logs.unshift({ts,sensor,ctx,mit,lvl,bc});
+  if(lvl==='DANGER')dCnt++;else if(lvl==='WARNING')wCnt++;else iCnt++;
+  conCnt++;
+  const box=document.getElementById('con');
+  const cls=lvl==='DANGER'?'bad':lvl==='WARNING'?'warn':'info';
+  const line=document.createElement('div');line.className='ll '+cls;
+  line.innerHTML='<span class="lt">['+n.toLocaleTimeString('id-ID')+']</span>['+lvl+'] <strong>'+sensor+'</strong>: '+ctx;
+  box.insertBefore(line,box.firstChild);while(box.children.length>40)box.removeChild(box.lastChild);
+  document.getElementById('con-cnt').textContent=conCnt+' event';
+  renderLog();
+  const tot=dCnt+wCnt;
+  document.getElementById('nb').textContent=tot;
+  if(tot>0){document.getElementById('alert-pill').style.display='flex';document.getElementById('apill').textContent=tot+' Alert';}
+}
+function renderLog(){
+  const tb=document.getElementById('ltbody');
+  tb.innerHTML=logs.length===0?'<tr><td colspan="5" style="text-align:center;color:var(--txm);padding:28px">Belum ada anomali.</td></tr>':
+    logs.map(l=>'<tr><td style="font-family:var(--mono);font-size:9.5px;white-space:nowrap;color:var(--txm)">'+l.ts+'</td><td style="font-weight:700;font-size:11px">'+l.sensor+'</td><td style="font-size:11px">'+l.ctx+'</td><td style="font-size:10.5px;color:var(--eco);font-style:italic;line-height:1.4">'+l.mit+'</td><td><span class="badge '+l.bc+'">'+l.lvl+'</span></td></tr>').join('');
+  document.getElementById('lcount').textContent=logs.length+' entri';
+  document.getElementById('cnt-danger').textContent=dCnt;
+  document.getElementById('cnt-warn').textContent=wCnt;
+  document.getElementById('cnt-info').textContent=iCnt;
+}
+function clearLogs(){logs=[];dCnt=0;wCnt=0;iCnt=0;document.getElementById('nb').textContent='0';document.getElementById('alert-pill').style.display='none';renderLog();document.getElementById('con').innerHTML='<div class="ll sys"><span class="lt">[SYS]</span> Log dibersihkan operator.</div>';conCnt=0;document.getElementById('con-cnt').textContent='0 event';toast('Log berhasil dihapus.');}
+function exportPDF(){toast('Laporan PDF sedang disiapkan... (memerlukan backend server)');}
+
+function calcEco(){
+  const tarif=+document.getElementById('eco-tarif').value,watt=+document.getElementById('eco-watt').value,jam=+document.getElementById('eco-jam').value;
+  const pocvol=+document.getElementById('eco-pocvol').value,pocprice=+document.getElementById('eco-pocprice').value;
+  const maggwt=+document.getElementById('eco-maggwt').value,maggprice=+document.getElementById('eco-maggprice').value;
+  const listrik=Math.round((watt/1000)*jam*21*tarif),poc=Math.round(pocvol*pocprice),magg=Math.round(maggwt*maggprice),total=listrik+poc+magg;
+  const fmt=v=>'Rp '+v.toLocaleString('id-ID');
+  document.getElementById('eco-listrik').textContent=fmt(listrik);
+  document.getElementById('eco-poc').textContent=fmt(poc);
+  document.getElementById('eco-maggot').textContent=fmt(magg);
+  document.getElementById('eco-total').textContent=fmt(total);
+  document.getElementById('eco-ttl').textContent=fmt(total);
 }
 
-function set(id, val) { const el = document.getElementById(id); if (el) el.textContent = val; }
-
-function updateDOM() {
-  // Dashboard
-  set('d-biogas', Math.round(S.biogas).toLocaleString('id'));
-  set('d-ch4', S.ch4.toFixed(1));
-  set('d-temp', S.temp.toFixed(1));
-  set('d-pres', Math.round(S.stPres));
-
-  // Tanks
-  set('t1-temp', S.temp.toFixed(1) + '°C');
-  set('t1-ph', S.ph.toFixed(2));
-  set('t2-ch4', S.ch4.toFixed(1) + '%');
-  set('t2-h2s', S.h2s.toFixed(1) + ' ppm');
-  const vPct = Math.round((S.vol / 1850) * 100);
-  set('t3-vol', Math.round(S.vol).toLocaleString('id') + ' L');
-  set('t3-pres', Math.round(S.stPres) + ' kPa');
-  set('t3-status', `● ${vPct}% PENUH`);
-
-  const tc = document.getElementById('t3-status');
-  if (tc) { tc.className = 'tank-status ' + (vPct > 80 ? 'danger' : vPct > 60 ? 'warn' : 'ok'); }
-
-  // Bioreaktor
-  set('b-temp', S.temp.toFixed(1));
-  set('b-ph', S.ph.toFixed(2));
-  set('b-pres', Math.round(S.bPres));
-  const tempOk = S.temp >= 30 && S.temp <= 40;
-  const phOk   = S.ph >= 6.8 && S.ph <= 7.2;
-  ['b-bacteria','b-bacteria2'].forEach(id => {
-    const el = document.getElementById(id);
-    if (!el) return;
-    const ok = tempOk && phOk;
-    el.textContent = ok ? 'AKTIF' : 'TERHAMBAT';
-    el.className = 'badge ' + (ok ? 'ok' : 'warn');
-  });
-
-  // Scrubber
-  set('s-ch4', S.ch4.toFixed(1));
-  set('s-h2s', S.h2s.toFixed(1));
-  set('s-dp', S.dp.toFixed(1));
-  set('s-dp2', S.dp.toFixed(1) + ' kPa');
-  set('s-pin', (S.stPres + S.dp).toFixed(1) + ' kPa');
-  set('s-pout', S.stPres.toFixed(1) + ' kPa');
-  set('s-co2', Math.max(0, 100 - S.ch4 - S.h2s * 0.1).toFixed(1) + '%');
-  set('s-eff', (97 - S.h2s * 0.3).toFixed(1) + '%');
-
-  const adsPct = 52;
-  const adsBar = document.getElementById('s-ads-bar');
-  if (adsBar) adsBar.style.width = adsPct + '%';
-  const adsEl = document.getElementById('s-adsorben');
-  if (adsEl) { adsEl.textContent = 'BAIK'; adsEl.className = 'badge ok'; }
-
-  // Storage
-  set('st-vol', Math.round(S.vol).toLocaleString('id'));
-  set('st-vol2', Math.round(S.vol).toLocaleString('id') + ' L');
-  set('st-pres', Math.round(S.stPres));
-  set('st-eta', (S.vol / 68).toFixed(1));
-
-  // Gauge
-  const pct = S.vol / 1850;
-  const maxDash = 283;
-  const arc = document.getElementById('gArc');
-  const gtxt = document.getElementById('gTxt');
-  if (arc) arc.style.strokeDashoffset = maxDash - (pct * maxDash);
-  if (gtxt) gtxt.textContent = Math.round(pct * 100) + '%';
-  if (gtxt) gtxt.setAttribute('fill', pct > 0.85 ? '#ef4444' : '#1a5c38');
+function buildSG(){
+  const t1=[{nm:'Suhu Reaktor',ic:'fa-thermometer-half',val:S.tmp.toFixed(1),unit:'°C',ok:S.tmp>=T.tmin&&S.tmp<=T.tmax,clr:'#d97706'},{nm:'pH Reaktor',ic:'fa-flask',val:S.ph.toFixed(2),unit:'',ok:S.ph>=T.phmin&&S.ph<=T.phmax,clr:'#2563eb'},{nm:'Tekanan T1',ic:'fa-compress',val:S.kpa.toFixed(1),unit:'kPa',ok:true,clr:'#7c3aed'},{nm:'Viabilitas',ic:'fa-bacteria',val:(S.tmp>=T.tmin&&S.tmp<=T.tmax&&S.ph>=T.phmin&&S.ph<=T.phmax)?'Aktif':'Lemah',unit:'',ok:S.tmp>=T.tmin&&S.tmp<=T.tmax&&S.ph>=T.phmin&&S.ph<=T.phmax,clr:'#16a34a'}];
+  const t2=[{nm:'Diff Pressure',ic:'fa-gauge',val:S.dp.toFixed(1),unit:'kPa',ok:S.dp<T.dpmax,clr:'#e11d48'},{nm:'Kemurnian CH₄',ic:'fa-atom',val:S.ch4.toFixed(1),unit:'%',ok:S.ch4>=T.ch4min,clr:'#2563eb'},{nm:'Kadar H₂S',ic:'fa-skull-crossbones',val:S.h2s.toFixed(1),unit:'ppm',ok:S.h2s<T.h2smax,clr:'#dc2626'},{nm:'Saturasi Ads.',ic:'fa-filter',val:S.ads.toFixed(0),unit:'%',ok:S.ads<80,clr:'#d97706'}];
+  const t3=[{nm:'Kapasitas',ic:'fa-circle-dot',val:S.pct,unit:'%',ok:S.pct>=T.vmin,clr:'#1a5c38'},{nm:'Volume Gas',ic:'fa-cubes',val:Math.round(S.vol),unit:'L',ok:true,clr:'#1a5c38'},{nm:'Tekanan T3',ic:'fa-compress-arrows-alt',val:S.kpa.toFixed(2),unit:'kPa',ok:true,clr:'#2563eb'},{nm:'Laju Pakai',ic:'fa-gauge-high',val:S.rate.toFixed(1),unit:'L/h',ok:true,clr:'#7c3aed'}];
+  function rSG(id,items){const el=document.getElementById(id);if(!el)return;el.innerHTML=items.map(s=>`<div class="sg-item"><div class="sg-ico" style="background:${s.ok?'#dcfce7':'#fff1f2'}"><i class="fa-solid ${s.ic}" style="color:${s.ok?s.clr:'#e11d48'}"></i></div><div><div class="sg-nm">${s.nm}</div><div class="sg-vl" style="color:${s.ok?s.clr:'#e11d48'}">${s.val}${s.unit?' <span style="font-size:9px;color:var(--txm)">'+s.unit+'</span>':''}</div><div class="sg-st" style="color:${s.ok?'var(--mintd)':'var(--rose)'}">${s.ok?'● Normal':'● Anomali'}</div></div></div>`).join('');}
+  rSG('sg-t1',t1);rSG('sg-t2',t2);rSG('sg-t3',t3);
 }
 
-function pushCharts() {
-  const now = new Date().toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'});
-  function push(chart, ...vals) {
-    if (!chart) return;
-    vals.forEach((v,i) => { if(chart.data.datasets[i]){ chart.data.datasets[i].data.push(v); if(chart.data.datasets[i].data.length>40)chart.data.datasets[i].data.shift(); } });
-    chart.data.labels.push(now);
-    if (chart.data.labels.length > 40) chart.data.labels.shift();
-    chart.update('none');
-  }
-  push(CI.bTemp, S.temp, 35, 30, 40);
-  push(CI.bPH, S.ph, 6.8, 7.2);
-  push(CI.bPres, S.bPres);
-  push(CI.sDP, S.stPres + S.dp, S.stPres);
-  push(CI.sCH4, S.ch4, 85);
-  push(CI.stPres, S.stPres, 200);
+function addSR(){
+  const n=new Date(),ok=S.tmp>=T.tmin&&S.tmp<=T.tmax&&S.ph>=T.phmin&&S.ph<=T.phmax&&S.dp<T.dpmax&&S.ch4>=T.ch4min&&S.h2s<T.h2smax;
+  sensorHist.unshift({ts:n.toLocaleTimeString('id-ID'),tmp:S.tmp.toFixed(1),ph:S.ph.toFixed(2),dp:S.dp.toFixed(1),ch4:S.ch4.toFixed(1),h2s:S.h2s.toFixed(1),ok});
+  if(sensorHist.length>20)sensorHist.pop();
+  const tb=document.getElementById('sensor-log-body');if(!tb)return;
+  tb.innerHTML=sensorHist.map(r=>`<tr><td style="font-family:var(--mono);font-size:10px">${r.ts}</td><td>${r.tmp}</td><td>${r.ph}</td><td>${r.dp}</td><td>${r.ch4}</td><td>${r.h2s}</td><td><span class="badge ${r.ok?'bg-g':'bg-r'}">${r.ok?'OK':'Anomali'}</span></td></tr>`).join('');
 }
 
-// ═══════════════════════════════════════
-//  ALERTS
-// ═══════════════════════════════════════
-let alertLog = [];
-
-const STATIC_ALERTS = [
-  { level:'info',  src:'Bioreaktor', msg:'Suhu stabil 34.8°C — kondisi mesofilik terjaga dengan baik.', resolved:true },
-  { level:'info',  src:'Scrubber',   msg:'Kemurnian CH₄ 85.3% — target produksi tercapai.', resolved:true },
-  { level:'warn',  src:'Scrubber',   msg:'Adsorben Ca(OH)₂ 52% tersisa — estimasi penggantian 7 hari lagi.', resolved:false },
-  { level:'info',  src:'Sistem',     msg:'Siklus fermentasi hari ke-12 dari 21 berjalan normal.', resolved:true },
-  { level:'warn',  src:'Penyimpanan',msg:'Volume gas 68% — disarankan distribusikan ke aerator.', resolved:false },
-  { level:'info',  src:'POC',        msg:'Volume POC mencapai 48.5 L — siap dipanen sebagian.', resolved:true },
-  { level:'info',  src:'Maggot BSF', msg:'Usia kultur 12 hari, pertumbuhan larva berjalan optimal.', resolved:true },
-  { level:'info',  src:'Bioreaktor', msg:'pH 7.1 dalam rentang optimal untuk metanogenesis.', resolved:true },
-];
-
-function initAlerts() {
-  const now = new Date();
-  alertLog = STATIC_ALERTS.map((a, i) => ({ ...a, time: new Date(now - i * 22 * 60000), id: i }));
-  renderAllAlerts();
-  document.getElementById('bellCount').textContent = alertLog.filter(a=>!a.resolved).length;
-  document.getElementById('alertTotal').textContent = alertLog.length + ' alert tercatat';
+function saveCfg(){
+  T.tmax=+document.getElementById('set-tmax').value;T.tmin=+document.getElementById('set-tmin').value;
+  T.phmax=+document.getElementById('set-phmax').value;T.phmin=+document.getElementById('set-phmin').value;
+  T.dpmax=+document.getElementById('set-dpmax').value;T.h2smax=+document.getElementById('set-h2smax').value;
+  T.ch4min=+document.getElementById('set-ch4min').value;T.vmin=+document.getElementById('set-vmin').value;
+  ['dp2-max','dp2-thr'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=T.dpmax.toFixed(1);});
+  toast('Threshold disimpan. Logika alarm diperbarui.');
 }
+function resetCfg(){document.getElementById('set-tmax').value=40;document.getElementById('set-tmin').value=30;document.getElementById('set-phmax').value=7.2;document.getElementById('set-phmin').value=6.8;document.getElementById('set-dpmax').value=25;document.getElementById('set-h2smax').value=5;document.getElementById('set-ch4min').value=80;document.getElementById('set-vmin').value=10;saveCfg();toast('Threshold direset ke nilai default penelitian.');}
 
-function renderAllAlerts() {
-  renderAlerts('dashAlerts', null, 4);
-  renderAlerts('bioAlerts', ['Bioreaktor']);
-  renderAlerts('scrAlerts', ['Scrubber']);
-  renderAlerts('storAlerts', ['Penyimpanan']);
-  renderTable();
-}
+function cs(id,st){const el=document.getElementById(id);if(!el)return;el.classList.remove('cdanger','cwarn','cok');if(st!=='n')el.classList.add(st);}
+function sel(id,v){const el=document.getElementById(id);if(el)el.textContent=v;}
 
-function renderAlerts(id, sources, limit) {
-  const el = document.getElementById(id);
-  if (!el) return;
-  let list = sources ? alertLog.filter(a => sources.some(s => a.src.includes(s))) : alertLog;
-  if (!list.length) list = alertLog.slice(0, 3);
-  if (limit) list = list.slice(0, limit);
-  el.innerHTML = list.map(a => `
-    <div class="alert-item ${a.level}">
-      <span class="alert-icon">${a.level==='warn'?'⚠️':a.level==='danger'?'🚨':'ℹ️'}</span>
-      <div class="alert-text"><strong>${a.src}:</strong> ${a.msg}</div>
-      <span class="alert-time">${a.time.toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'})}</span>
-    </div>`).join('');
-}
+// IoT LOOP
+setInterval(()=>{
+  tick++;
+  let td=(Math.random()-.5)*.6;if(tick%7===0)td+=(Math.random()>.5?1.8:-1.8);S.tmp=Math.max(24,Math.min(46,S.tmp+td));
+  let pd=(Math.random()-.5)*.05;if(tick%11===0)pd+=(Math.random()>.5?.15:-.15);S.ph=Math.max(5.5,Math.min(8.5,S.ph+pd));
+  let dd=(Math.random()-.38)*.5;if(tick%13===0)dd+=Math.random()*1.2;S.dp=Math.max(4,Math.min(36,S.dp+dd));
+  S.ads=Math.min(100,S.ads+.025*(S.dp/12));
+  let cd=(Math.random()-.5)*.6;if(S.dp>T.dpmax*.8)cd-=.3;S.ch4=Math.max(68,Math.min(97,S.ch4+cd));
+  let hd=(Math.random()-.5)*.3;if(S.dp>T.dpmax*.7)hd+=.15;S.h2s=Math.max(.4,Math.min(8.5,S.h2s+hd));
+  if(tick%2===0)S.bio=+(S.bio+2+Math.random()*4).toFixed(1);
+  if(tick%5===0){S.vol=Math.max(8,S.vol-.4);S.pct=Math.round(S.vol/200*100);}
+  S.kpa=+(1+Math.random()*.45).toFixed(2);S.rate=+(3+Math.random()*.5).toFixed(1);
 
-function renderTable() {
-  const tbody = document.getElementById('alertTable');
-  if (!tbody) return;
-  tbody.innerHTML = alertLog.map(a => `
-    <tr>
-      <td>${a.time.toLocaleString('id-ID',{hour:'2-digit',minute:'2-digit',day:'2-digit',month:'short'})}</td>
-      <td>${a.src}</td>
-      <td><span class="badge ${a.level==='info'?'ok':a.level==='warn'?'warn':'bad'}">${a.level.toUpperCase()}</span></td>
-      <td style="max-width:300px;">${a.msg}</td>
-      <td><span class="badge ${a.resolved?'ok':'warn'}">${a.resolved?'✓ Selesai':'Aktif'}</span></td>
-    </tr>`).join('');
-}
+  const tOk=S.tmp>=T.tmin&&S.tmp<=T.tmax,tCrit=S.tmp<T.tmin-3||S.tmp>T.tmax+3;
+  const phOk=S.ph>=T.phmin&&S.ph<=T.phmax,phCrit=S.ph<T.phmin-.3||S.ph>T.phmax+.3;
+  const dpOk=S.dp<T.dpmax*.7,dpW=S.dp>=T.dpmax*.7&&S.dp<T.dpmax,dpD=S.dp>=T.dpmax;
+  const c4Ok=S.ch4>=85,c4W=S.ch4>=T.ch4min&&S.ch4<85,c4D=S.ch4<T.ch4min;
+  const h2W=S.h2s>=T.h2smax*.7&&S.h2s<T.h2smax,h2D=S.h2s>=T.h2smax;
 
-function checkAlerts() {
-  if (S.temp < 30 || S.temp > 40) pushAlert('danger','Bioreaktor',`Suhu ${S.temp.toFixed(1)}°C di luar rentang aman 30–40°C!`);
-  if (S.ph < 6.8 || S.ph > 7.2)   pushAlert('warn','Bioreaktor',`pH ${S.ph.toFixed(2)} di luar rentang optimal 6.8–7.2`);
-  if (S.ch4 < 85)                   pushAlert('warn','Scrubber',`CH₄ ${S.ch4.toFixed(1)}% di bawah target 85%`);
-  if (S.stPres > 190)               pushAlert('danger','Penyimpanan',`Tekanan ${S.stPres.toFixed(0)} kPa mendekati batas aman 200 kPa!`);
-}
+  const bStr=Math.round(S.bio).toLocaleString('id-ID');
+  sel('mv-bio',bStr);sel('mv-ch4',S.ch4.toFixed(1));sel('mv-tmp',S.tmp.toFixed(1));sel('mv-dp',S.dp.toFixed(1));
+  sel('kpi-bio',bStr+' L');sel('kpi-ch4',S.ch4.toFixed(1)+'%');sel('kpi-tmp',S.tmp.toFixed(1)+'°C');sel('kpi-dp',S.dp.toFixed(1)+' kPa');sel('kpi-vol',S.pct+'%');
+  sel('sb-bio',bStr+' L');
 
-function pushAlert(level, src, msg) {
-  alertLog.unshift({ level, src, msg, time: new Date(), id: Date.now(), resolved: false });
-  if (alertLog.length > 25) alertLog.pop();
-  renderAllAlerts();
-  document.getElementById('bellCount').textContent = Math.min(alertLog.filter(a=>!a.resolved).length, 9);
-  document.getElementById('alertTotal').textContent = alertLog.length + ' alert tercatat';
-}
+  function updCard(id,crit,warn,lblId,okTxt,warnTxt,critTxt){cs(id,crit?'cdanger':warn?'cwarn':'cok');const el=document.getElementById(lblId);if(el){el.className='mst '+(crit?'bad':warn?'warn':'ok');el.innerHTML=crit?'<i class="fa-solid fa-triangle-exclamation"></i> '+critTxt:warn?'<i class="fa-solid fa-circle-exclamation"></i> '+warnTxt:'<i class="fa-solid fa-check"></i> '+okTxt;}}
+  updCard('crd-tmp',tCrit,!tOk,'ms-tmp','Mesofilik optimal','Suhu menyimpang','KRITIS di luar batas');
+  updCard('crd-dp',dpD,dpW,'ms-dp','Normal <25 kPa','ΔP meningkat','BAHAYA kritis!');
+  updCard('crd-ch4',c4D,c4W,'ms-ch4','Melampaui 85%','Mendekati batas','DI BAWAH BATAS!');
+  
+  document.getElementById('nd1').className='fc '+(tCrit||phCrit?'fc-r':!tOk||!phOk?'fc-a':'fc-g');
+  document.getElementById('nd2').className='fc '+(dpD||h2D?'fc-r':dpW||h2W?'fc-a':'fc-g');
+  document.getElementById('nd3').className='fc '+(S.pct<T.vmin?'fc-r':S.pct<20?'fc-a':'fc-b');
 
-function exportReport() {
-  const txt = `LAPORAN SIRKUL — Siklus ke-4
-Tanggal: ${new Date().toLocaleDateString('id-ID',{weekday:'long',year:'numeric',month:'long',day:'numeric'})}
+  const anyD=tCrit||phCrit||dpD||h2D||c4D,anyW=!tOk||!phOk||dpW||h2W||c4W;
+  if(anyD){sel('sys-s','🚨 ANOMALI KRITIS TERDETEKSI');sel('sys-d','Segera periksa sensor merah. Intervensi manual diperlukan!');}
+  else if(anyW){sel('sys-s','⚠️ PERINGATAN AKTIF');sel('sys-d','Satu atau lebih parameter mendekati batas. Pantau ketat.');}
+  else{sel('sys-s','✅ SISTEM BERJALAN OPTIMAL');sel('sys-d','Semua parameter normal · Inkubasi hari 12/21 · '+bStr+' L biogas');}
 
-=== RINGKASAN PRODUKSI ===
-Total Biogas      : ${Math.round(S.biogas).toLocaleString('id')} L
-Kemurnian CH₄     : ${S.ch4.toFixed(1)}%
-POC Tersedia      : 48.5 L
-Maggot BSF        : 1,240 gram (dalam kultur)
+  // T1
+  sel('t1-tv',S.tmp.toFixed(1));sel('t1-pv',S.ph.toFixed(2));sel('t1-kv',S.kpa);
+  sel('t1-bact-tmp',S.tmp.toFixed(1));sel('t1-bact-ph',S.ph.toFixed(2));sel('t1-bact-kpa',S.kpa);
+  const bpct=Math.min(100,Math.max(0,100-Math.abs(S.tmp-35.2)*5-Math.abs(S.ph-7.0)*20)).toFixed(0);
+  sel('t1-bact-pct',bpct);
+  cs('t1-c-tmp',tCrit?'cdanger':!tOk?'cwarn':'cok');cs('t1-c-ph',phCrit?'cdanger':!phOk?'cwarn':'cok');
+  const ts=document.getElementById('t1-tst');if(ts){ts.className='mst '+(tCrit?'bad':!tOk?'warn':'ok');ts.innerHTML=tCrit?'<i class="fa-solid fa-triangle-exclamation"></i> KRITIS':!tOk?'<i class="fa-solid fa-circle-exclamation"></i> Peringatan':'<i class="fa-solid fa-check"></i> Target ~35.2°C';}
+  const ps=document.getElementById('t1-pst');if(ps){ps.className='mst '+(phCrit?'bad':!phOk?'warn':'ok');ps.innerHTML=phCrit?'<i class="fa-solid fa-triangle-exclamation"></i> KRITIS':!phOk?'<i class="fa-solid fa-circle-exclamation"></i> Peringatan':'<i class="fa-solid fa-check"></i> Rentang 6.8–7.2';}
+  let bs,bd;
+  if(phOk&&tOk){bs='✅ AKTIF OPTIMAL';bd='pH '+S.ph.toFixed(2)+' · Suhu '+S.tmp.toFixed(1)+'°C mesofilik · Viabilitas '+bpct+'%';}
+  else if(phCrit||tCrit){bs='🚨 KRITIS! BAKTERI STRES';bd='Kondisi ekstrem hambat metanogen! Intervensi segera!';}
+  else{bs='⚠️ AKTIVITAS MENURUN';bd=(!phOk?'pH '+S.ph.toFixed(2)+' di luar 6.8–7.2 ':'')+(!tOk?'Suhu '+S.tmp.toFixed(1)+'°C menyimpang':'');}
+  sel('t1-bs',bs);sel('t1-bd',bd);
 
-=== STATUS SENSOR ===
-Suhu Reaktor      : ${S.temp.toFixed(1)}°C
-pH Reaktor        : ${S.ph.toFixed(2)}
-Tekanan Reaktor   : ${Math.round(S.bPres)} kPa
-H₂S (Scrubber)   : ${S.h2s.toFixed(1)} ppm
-Volume Tersimpan  : ${Math.round(S.vol).toLocaleString('id')} L
-Tekanan Tangki    : ${Math.round(S.stPres)} kPa
+  // T2
+  sel('mv-dp2',S.dp.toFixed(1));sel('mv-ch4t2',S.ch4.toFixed(1));sel('mv-h2s',S.h2s.toFixed(1));sel('mv-ads',S.ads.toFixed(0));
+  cs('crd-dp2',dpD?'cdanger':dpW?'cwarn':'cok');
+  const dpNEl=document.getElementById('dp2-n');if(dpNEl){dpNEl.textContent=S.dp.toFixed(1);dpNEl.className='dp-n '+(dpD?'dp-bad':dpW?'dp-warn':'dp-ok');}
+  const dpBEl=document.getElementById('dp2-b');if(dpBEl){dpBEl.textContent=dpD?'⚠ KRITIS — GANTI ADSORBEN':dpW?'⚠ PERINGATAN ΔP Tinggi':'✓ NORMAL';dpBEl.className='dp-b '+(dpD?'dpb-bad':dpW?'dpb-warn':'dpb-ok');}
+  const bch=document.getElementById('bar-ch4');if(bch){bch.style.width=Math.min(100,S.ch4)+'%';bch.textContent=S.ch4.toFixed(1)+'%';bch.className='pbf '+(c4D?'pf-bad':c4W?'pf-w':'pf-g');}
+  const ch4lv=document.getElementById('ch4-lv');if(ch4lv){ch4lv.textContent=S.ch4.toFixed(1)+'%';ch4lv.style.color=c4D?'var(--rose)':c4W?'var(--amber)':'var(--eco)';}
+  const bh2=document.getElementById('bar-h2s');if(bh2){const hw=Math.min(100,(S.h2s/T.h2smax)*100);bh2.style.width=hw+'%';bh2.textContent=S.h2s.toFixed(1)+' ppm';bh2.className='pbf '+(h2D?'pf-bad':h2W?'pf-w':'pf-r');}
+  const h2lv=document.getElementById('h2s-lv');if(h2lv){h2lv.textContent=S.h2s.toFixed(1)+' ppm';}
+  const ab=document.getElementById('ads-bar');if(ab){const aw=Math.min(100,S.ads);ab.style.width=aw.toFixed(0)+'%';ab.textContent=aw.toFixed(0)+'%';ab.className='pbf '+(aw>80?'pf-bad':aw>60?'pf-w':'pf-ok');}
+  const mads=document.getElementById('ms-ads');if(mads){mads.className='mst '+(S.ads>80?'bad':S.ads>60?'warn':'neu');mads.innerHTML=S.ads>80?'<i class="fa-solid fa-triangle-exclamation"></i> Segera ganti!':S.ads>60?'<i class="fa-solid fa-circle-exclamation"></i> Mulai jenuh':'<i class="fa-solid fa-circle-dot"></i> Ca(OH)₂ aktif';}
 
-=== ANALISIS EKONOMI ===
-Hemat LPG         : Rp300.000/bln
-Hemat Pakan       : Rp500.000/bln
-Hemat Pupuk       : Rp300.000/bln
-TOTAL HEMAT       : Rp1.100.000/bln
-Payback Period    : 2-3 bulan
+  // T3
+  sel('t3-pct',S.pct+'%');sel('t3-pct-mc',S.pct);sel('t3-vol',Math.round(S.vol));sel('t3-vol-mc',Math.round(S.vol));sel('t3-prs',S.kpa);sel('t3-kpa-mc',S.kpa);sel('t3-rate',S.rate);
+  cGauge.data.datasets[0].data=[S.pct,100-S.pct];cGauge.update('none');
 
-Diekspor oleh: SIRKUL v2.1.0`;
+  sel('cy-bio',Math.round(S.bio).toLocaleString('id-ID'));sel('cy-ch4',S.ch4.toFixed(1)+'%');sel('cy-poc','~'+Math.round(S.vol*1.2));
 
-  const blob = new Blob([txt], {type:'text/plain;charset=utf-8'});
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = `laporan-sirkul-${new Date().toISOString().slice(0,10)}.txt`;
-  a.click();
-}
+  // rolling charts
+  trendBuf.tmp.push(+S.tmp.toFixed(2));trendBuf.tmp.shift();
+  trendBuf.ph.push(+S.ph.toFixed(3));trendBuf.ph.shift();
+  cTrend.data.datasets[0].data=[...trendBuf.tmp];cTrend.data.datasets[1].data=[...trendBuf.ph];cTrend.update('none');
+  cT2.data.datasets[0].data.push(+S.dp.toFixed(1));cT2.data.datasets[0].data.shift();
+  cT2.data.datasets[1].data.push(+S.ch4.toFixed(1));cT2.data.datasets[1].data.shift();
+  cT2.update('none');
 
-// ═══════════════════════════════════════
-//  INIT
-// ═══════════════════════════════════════
-initAlerts();
-setTimeout(() => { initCharts('dashboard'); chartsReady['dashboard'] = true; }, 150);
-simulate();
-setInterval(simulate, 3000);
-['sbDay','d-day'].forEach(id => set(id,'12'));
-set('cycleDay','Hari 12');
+  if(tick%8===0){const box=document.getElementById('con'),n=new Date(),l=document.createElement('div');l.className='ll ok';l.innerHTML='<span class="lt">['+n.toLocaleTimeString('id-ID')+']</span> #'+tick+' T='+S.tmp.toFixed(1)+'°C pH='+S.ph.toFixed(2)+' CH₄='+S.ch4.toFixed(1)+'% ΔP='+S.dp.toFixed(1)+'kPa ✓';box.insertBefore(l,box.firstChild);while(box.children.length>40)box.removeChild(box.lastChild);conCnt++;sel('con-cnt',conCnt+' event');}
+
+  buildSG();if(tick%2===0)addSR();
+
+  if(tCrit)addLog('Sensor Suhu · Tabung 1','Suhu '+S.tmp.toFixed(1)+'°C — '+(S.tmp>T.tmax?'terlalu tinggi':'terlalu rendah')+' · Batas '+T.tmin+'–'+T.tmax+'°C',S.tmp>T.tmax?'ALERT: Aktifkan pendinginan reaktor. Kurangi paparan sinar matahari. Periksa insulasi.':'ALERT: Tambahkan insulasi termal. Pertimbangkan pemanas tercelup 12V DC. Target ~35.2°C.','DANGER');
+  else if(!tOk&&tick%3===0)addLog('Sensor Suhu · Tabung 1','Suhu '+S.tmp.toFixed(1)+'°C mendekati batas mesofilik','WARNING: Pantau tiap 15 menit. Siapkan tindakan korektif bila tren berlanjut keluar 30–40°C.','WARNING');
+  if(phCrit)addLog('Sensor pH · Tabung 1','pH '+S.ph.toFixed(2)+' kritis di luar 6.8–7.2',S.ph<T.phmin?'ALERT: Asidifikasi kritis! Tambahkan larutan buffer NaHCO₃ bertahap. Kurangi loading bahan organik.':'ALERT: pH terlalu basa. Periksa kelebihan aktivator. Tambahkan asam asetat encer.','DANGER');
+  if(dpD)addLog('Sensor ΔP · Tabung 2 Scrubber','ΔP = '+S.dp.toFixed(1)+' kPa — MELAMPAUI BATAS '+T.dpmax+' kPa','ALERT: Adsorben Ca(OH)₂ jenuh akibat pembentukan CaCO₃. Sistem menginstruksikan peternak untuk segera mengganti media filter Packed Bed guna menghindari kelayuan bakteri akibat backpressure!','DANGER');
+  else if(dpW&&tick%4===0)addLog('Sensor ΔP · Tabung 2 Scrubber','ΔP = '+S.dp.toFixed(1)+' kPa — mendekati batas ('+T.dpmax+' kPa)','WARNING: Jadwalkan penggantian Ca(OH)₂ dalam 24–48 jam. Periksa whitening visual pada packed bed.','WARNING');
+  if(h2D)addLog('Sensor H₂S · Tabung 2 Scrubber','H₂S = '+S.h2s.toFixed(1)+' ppm — MELEBIHI '+T.h2smax+' ppm','ALERT KRITIS: H₂S di atas ambang korosivitas! Hentikan aliran ke generator. Ganti Ca(OH)₂ segera. Cek fitting kebocoran. Ventilasi area kerja!','DANGER');
+  if(c4D)addLog('Sensor CH₄ · Output Scrubber','CH₄ = '+S.ch4.toFixed(1)+'% — DI BAWAH MINIMUM '+T.ch4min+'%','ALERT: Kemurnian metana tidak memadai untuk pembakaran aman. Periksa efisiensi scrubber. Ganti adsorben. Cek kebocoran udara masuk sistem.','DANGER');
+  if(S.pct<=T.vmin&&tick%8===0)addLog('Sensor Volume · Tabung 3 Storage','Volume = '+S.pct+'% — di bawah minimum '+T.vmin+'%','WARNING: Pasokan gas hampis habis. Siapkan cadangan PLN/genset solar. Tunggu akumulasi biogas siklus berikutnya.','WARNING');
+},3000);
+
+saveCfg();calcEco();buildSG();
 </script>
 </body>
 </html>
