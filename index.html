@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>SIRKUL AI — Mini Refinery Dashboard</title>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -19,216 +19,304 @@
   --ok:#f0fdf4;--okb:#bbf7d0;
   --bg:#eef2ee;--surface:#fff;--border:#e2e8f0;--border2:#f1f5f9;
   --tx:#1e293b;--txm:#64748b;--txs:#94a3b8;
-  --fw:268px;--fh:62px;
+  --fw:255px;--fh:58px;
   --mono:'IBM Plex Mono',monospace;
   --sans:'Plus Jakarta Sans',sans-serif;
   --sh:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
   --sh2:0 4px 12px rgba(0,0,0,.08);
 }
-html,body{height:100%;overflow:hidden;font-family:var(--sans)}
+html,body{height:100%;font-family:var(--sans);overflow:hidden}
 body{display:grid;grid-template-columns:var(--fw) 1fr;grid-template-rows:var(--fh) 1fr;background:var(--bg);color:var(--tx)}
-#sb{grid-row:1/3;grid-column:1;background:var(--eco3);display:flex;flex-direction:column;overflow-y:auto;overflow-x:hidden;box-shadow:2px 0 12px rgba(0,0,0,.18)}
+
+/* SIDEBAR */
+#sb{grid-row:1/3;grid-column:1;background:var(--eco3);display:flex;flex-direction:column;overflow-y:auto;overflow-x:hidden;box-shadow:2px 0 12px rgba(0,0,0,.18);z-index:200;transition:transform .25s}
 #sb::-webkit-scrollbar{width:3px}
 #sb::-webkit-scrollbar-thumb{background:rgba(255,255,255,.12);border-radius:2px}
-.sb-brand{padding:18px 16px 14px;border-bottom:1px solid rgba(255,255,255,.08)}
-.sb-logo{display:flex;align-items:center;gap:11px;margin-bottom:12px}
-.sb-icon{width:38px;height:38px;background:linear-gradient(135deg,var(--eco2),#3da060);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:17px;color:#fff;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,.3)}
-.sb-name{font-size:16.5px;font-weight:800;color:#fff;letter-spacing:-.4px;line-height:1.1}
-.sb-tagline{font-size:8.5px;color:var(--mint);font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-top:1px}
-.sb-authors{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.07);border-radius:9px;padding:9px 11px}
-.sb-authors p{font-size:10px;color:rgba(255,255,255,.4);line-height:1.65}
+.sb-brand{padding:14px 14px 12px;border-bottom:1px solid rgba(255,255,255,.08)}
+.sb-logo{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.sb-icon{width:34px;height:34px;background:linear-gradient(135deg,var(--eco2),#3da060);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:15px;color:#fff;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,.3)}
+.sb-name{font-size:15px;font-weight:800;color:#fff;letter-spacing:-.4px;line-height:1.1}
+.sb-tagline{font-size:8px;color:var(--mint);font-weight:700;letter-spacing:1.8px;text-transform:uppercase;margin-top:1px}
+.sb-authors{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.07);border-radius:8px;padding:8px 10px}
+.sb-authors p{font-size:9.5px;color:rgba(255,255,255,.4);line-height:1.6}
 .sb-authors strong{color:var(--mint);font-weight:600}
-.sb-live{display:flex;align-items:center;gap:6px;margin-top:10px;padding:6px 10px;background:rgba(34,197,94,.1);border-radius:8px;border:1px solid rgba(34,197,94,.2)}
+.sb-live{display:flex;align-items:center;gap:6px;margin-top:9px;padding:5px 9px;background:rgba(34,197,94,.1);border-radius:7px;border:1px solid rgba(34,197,94,.2)}
 .sb-live-dot{width:6px;height:6px;background:#22c55e;border-radius:50%;animation:pu 1.5s infinite;flex-shrink:0}
 @keyframes pu{0%,100%{box-shadow:0 0 0 0 rgba(34,197,94,.5)}50%{box-shadow:0 0 0 4px rgba(34,197,94,0)}}
-.sb-live span{font-size:9.5px;color:rgba(255,255,255,.5)}
-.sb-live strong{font-family:var(--mono);font-size:9.5px;color:#4ade80}
-.sb-sec{padding:14px 16px 3px;font-size:8.5px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.25)}
-.nav{display:flex;align-items:center;gap:9px;padding:9px 12px;margin:1px 8px;border-radius:9px;cursor:pointer;color:rgba(255,255,255,.5);font-size:12.5px;font-weight:500;transition:all .15s;user-select:none}
+.sb-live span{font-size:9px;color:rgba(255,255,255,.5)}
+.sb-live strong{font-family:var(--mono);font-size:9px;color:#4ade80}
+.sb-sec{padding:12px 14px 3px;font-size:8px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.25)}
+.nav{display:flex;align-items:center;gap:8px;padding:8px 11px;margin:1px 7px;border-radius:8px;cursor:pointer;color:rgba(255,255,255,.5);font-size:12px;font-weight:500;transition:all .15s;user-select:none}
 .nav:hover{background:rgba(255,255,255,.06);color:rgba(255,255,255,.85)}
 .nav.on{background:linear-gradient(90deg,var(--eco2),rgba(42,125,79,.6));color:#fff;font-weight:700;box-shadow:0 2px 8px rgba(0,0,0,.2)}
-.nav i{width:15px;text-align:center;font-size:13px;flex-shrink:0}
+.nav i{width:14px;text-align:center;font-size:12px;flex-shrink:0}
 .nb{margin-left:auto;background:var(--rose);color:#fff;font-size:8px;font-weight:700;padding:1px 5px;border-radius:20px;min-width:16px;text-align:center}
-.sb-foot{margin-top:auto;padding:12px 16px;border-top:1px solid rgba(255,255,255,.06)}
-.sb-foot p{font-size:9px;color:rgba(255,255,255,.2);line-height:1.6}
-#tb{grid-row:1;grid-column:2;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 22px;gap:10px;box-shadow:var(--sh)}
+.sb-foot{margin-top:auto;padding:10px 14px;border-top:1px solid rgba(255,255,255,.06)}
+.sb-foot p{font-size:8.5px;color:rgba(255,255,255,.2);line-height:1.6}
+
+/* TOPBAR */
+#tb{grid-row:1;grid-column:2;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 16px;gap:8px;box-shadow:var(--sh);min-width:0}
 .tb-title{flex:1;min-width:0}
-.tb-title h2{font-size:14px;font-weight:700;color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.tb-title p{font-size:10px;color:var(--txm);margin-top:1px}
-.pill{display:flex;align-items:center;gap:6px;padding:5px 11px;border-radius:20px;font-size:10.5px;font-weight:600;flex-shrink:0;white-space:nowrap}
+.tb-title h2{font-size:13px;font-weight:700;color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tb-title p{font-size:9.5px;color:var(--txm);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pill{display:flex;align-items:center;gap:5px;padding:4px 9px;border-radius:20px;font-size:10px;font-weight:600;flex-shrink:0;white-space:nowrap}
 .pill-eco{background:var(--ok);border:1px solid var(--okb);color:var(--eco)}
 .pill-green{background:var(--ok);border:1px solid var(--okb);color:var(--mintd)}
 .pill-blue{background:var(--blueb);border:1px solid #bfdbfe;color:var(--blue)}
 .pill-rose{background:var(--roseb);border:1px solid var(--roseb2);color:var(--rose)}
-.pill-dot{width:7px;height:7px;background:#22c55e;border-radius:50%;animation:pu 1.5s infinite}
-.pb-wrap{display:flex;align-items:center;gap:7px}
-.pb-track{width:90px;height:4px;background:rgba(26,92,56,.15);border-radius:9px;overflow:hidden}
+.pill-dot{width:6px;height:6px;background:#22c55e;border-radius:50%;animation:pu 1.5s infinite}
+.pb-wrap{display:flex;align-items:center;gap:6px}
+.pb-track{width:75px;height:4px;background:rgba(26,92,56,.15);border-radius:9px;overflow:hidden}
 .pb-fill{height:100%;background:var(--eco);border-radius:9px;width:57.1%}
-.clk{font-family:var(--mono);font-size:11.5px;color:var(--txm);font-weight:600;flex-shrink:0}
-#main{grid-row:2;grid-column:2;overflow-y:auto;overflow-x:hidden;padding:18px 20px 30px}
+.clk{font-family:var(--mono);font-size:11px;color:var(--txm);font-weight:600;flex-shrink:0}
+/* hamburger */
+#ham{display:none;width:34px;height:34px;align-items:center;justify-content:center;cursor:pointer;border:none;background:transparent;color:var(--tx);font-size:17px;flex-shrink:0}
+.sb-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:190}
+
+/* MAIN */
+#main{grid-row:2;grid-column:2;overflow-y:auto;overflow-x:hidden;padding:14px 14px 28px}
 #main::-webkit-scrollbar{width:4px}
 #main::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
 .pg{display:none}.pg.on{display:block}
-.ph{margin-bottom:16px;display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
-.ph-l h1{font-size:17px;font-weight:800;color:var(--eco3);display:flex;align-items:center;gap:8px}
-.ph-l h1 i{font-size:15px;color:var(--eco)}
-.ph-l p{font-size:11px;color:var(--txm);margin-top:3px}
-.ph-r{display:flex;align-items:center;gap:8px;flex-shrink:0}
-.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:14px}
-.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
-.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:14px}
-.g13{display:grid;grid-template-columns:1fr 2.2fr;gap:14px;margin-bottom:14px}
-.g5{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:14px}
-.mb{margin-bottom:14px}
-.c{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:15px;box-shadow:var(--sh);transition:border-color .25s,background .25s}
+.ph{margin-bottom:14px;display:flex;align-items:flex-start;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.ph-l h1{font-size:15px;font-weight:800;color:var(--eco3);display:flex;align-items:center;gap:7px}
+.ph-l h1 i{font-size:13px;color:var(--eco)}
+.ph-l p{font-size:10.5px;color:var(--txm);margin-top:3px}
+.ph-r{display:flex;align-items:center;gap:7px;flex-shrink:0;flex-wrap:wrap}
+
+/* GRID SYSTEM — responsive */
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:12px}
+.g13{display:grid;grid-template-columns:1fr 2.2fr;gap:12px;margin-bottom:12px}
+.g5{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:12px}
+.mb{margin-bottom:12px}
+
+/* CARDS */
+.c{background:var(--surface);border:1px solid var(--border);border-radius:11px;padding:13px;box-shadow:var(--sh);transition:border-color .25s,background .25s}
 .c.cdanger{background:#fff5f6;border-color:#fecdd3}
 .c.cwarn{background:#fffbf0;border-color:#fde68a}
 .c.cok{background:#f7fef9;border-color:#bbf7d0}
-.ct{font-size:11.5px;font-weight:700;color:var(--tx);margin-bottom:11px;display:flex;align-items:center;gap:7px}
-.ct i{color:var(--eco);font-size:12px}
-.ct-r{margin-left:auto;font-size:10px;font-weight:500;color:var(--txm)}
+.ct{font-size:11px;font-weight:700;color:var(--tx);margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.ct i{color:var(--eco);font-size:11px}
+.ct-r{margin-left:auto;font-size:9.5px;font-weight:500;color:var(--txm)}
 .mc{display:flex;flex-direction:column}
-.mic{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:15px;margin-bottom:9px}
+.mic{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;margin-bottom:8px}
 .mg{background:#dcfce7;color:var(--eco)}.mb2{background:#dbeafe;color:var(--blue)}.ma{background:#fef3c7;color:#b45309}.mr{background:#ffe4e6;color:#be123c}.mp{background:#f5f3ff;color:var(--purple)}.mt{background:#e0f2fe;color:#0369a1}
-.mlb{font-size:9.5px;font-weight:600;color:var(--txm);text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px}
-.mv{font-family:var(--mono);font-size:22px;font-weight:700;color:var(--tx);line-height:1.1}
-.mv span{font-size:11px;font-weight:400;color:var(--txm)}
-.mst{font-size:10px;font-weight:600;display:flex;align-items:center;gap:3px;margin-top:4px}
+.mlb{font-size:9px;font-weight:600;color:var(--txm);text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px}
+.mv{font-family:var(--mono);font-size:20px;font-weight:700;color:var(--tx);line-height:1.1}
+.mv span{font-size:10.5px;font-weight:400;color:var(--txm)}
+.mst{font-size:9.5px;font-weight:600;display:flex;align-items:center;gap:3px;margin-top:4px}
 .ok{color:var(--mintd)}.warn{color:var(--amber)}.bad{color:var(--rose)}.neu{color:var(--txm)}
-.cw{position:relative}.xl{height:280px}.lg{height:240px}.md{height:200px}.sm{height:155px}.xs{height:110px}
-.flow{display:flex;align-items:center;justify-content:space-between;padding:10px 0 14px}
-.fn{display:flex;flex-direction:column;align-items:center;gap:5px}
-.fc{width:54px;height:54px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:19px;border:2.5px solid;transition:all .3s}
+
+/* CHART SIZES */
+.cw{position:relative}.xl{height:240px}.lg{height:210px}.md{height:180px}.sm{height:140px}.xs{height:100px}
+
+/* FLOW */
+.flow{display:flex;align-items:center;justify-content:space-between;padding:8px 0 12px;flex-wrap:wrap;gap:4px}
+.fn{display:flex;flex-direction:column;align-items:center;gap:4px}
+.fc{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:17px;border:2.5px solid;transition:all .3s}
 .fc-g{background:#dcfce7;border-color:var(--eco);color:var(--eco)}
 .fc-a{background:#fef3c7;border-color:var(--amber);color:var(--amber)}
 .fc-b{background:#dbeafe;border-color:var(--blue);color:var(--blue)}
 .fc-r{background:#fff1f2;border-color:var(--rose);color:var(--rose);animation:jolt .3s infinite}
 @keyframes jolt{0%,100%{transform:translateX(0)}50%{transform:translateX(-2px)}}
-.fl{font-size:10px;font-weight:700;color:var(--tx)}.fs{font-size:9px;color:var(--txm)}
-.fa{flex:1;display:flex;align-items:center;padding:0 4px;max-width:55px}
+.fl{font-size:9.5px;font-weight:700;color:var(--tx)}.fs{font-size:8.5px;color:var(--txm)}
+.fa{flex:1;display:flex;align-items:center;padding:0 3px;max-width:44px;min-width:20px}
 .fal{height:2px;flex:1;background:linear-gradient(90deg,var(--eco),var(--mint));border-radius:2px;position:relative;overflow:hidden}
 .fal::after{content:'';position:absolute;top:0;left:-60%;width:50%;height:100%;background:rgba(255,255,255,.6);animation:flo 1.5s linear infinite}
 @keyframes flo{to{left:110%}}
-.fah{width:0;height:0;border-top:5px solid transparent;border-bottom:5px solid transparent;border-left:8px solid var(--mint)}
-.con{background:#0b1120;border-radius:9px;padding:11px 12px;overflow-y:auto;font-family:var(--mono);font-size:10px;line-height:1.75}
+.fah{width:0;height:0;border-top:4px solid transparent;border-bottom:4px solid transparent;border-left:7px solid var(--mint)}
+
+/* CONSOLE */
+.con{background:#0b1120;border-radius:8px;padding:10px 11px;overflow-y:auto;font-family:var(--mono);font-size:9.5px;line-height:1.7}
 .con::-webkit-scrollbar{width:3px}
 .con::-webkit-scrollbar-thumb{background:#1e293b;border-radius:2px}
 .ll{margin-bottom:1px}
 .ll.ok{color:#4ade80}.ll.warn{color:#fbbf24}.ll.bad{color:#f87171}.ll.info{color:#60a5fa}.ll.sys{color:#94a3b8}
-.lt{color:#334155;margin-right:6px}
+.lt{color:#334155;margin-right:5px}
+
+/* VESSEL */
 .vwrap{display:flex;flex-direction:column;align-items:center}
-.vcap{width:112px;height:13px;background:#94a3b8;border-radius:5px 5px 0 0;display:flex;align-items:center;justify-content:center;font-size:7.5px;color:#fff;font-weight:700;letter-spacing:1.5px}
-.vessel{width:112px;height:250px;border:2px solid #94a3b8;border-top:none;border-radius:0 0 34px 34px;overflow:hidden;position:relative}
-.vg{position:absolute;top:0;left:0;right:0;height:25%;background:linear-gradient(180deg,rgba(254,249,195,.9),rgba(253,224,71,.3));border-bottom:1px dashed rgba(148,163,184,.4);display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:#78350f}
-.vl{position:absolute;top:25%;left:0;right:0;height:50%;background:linear-gradient(180deg,rgba(147,197,253,.45),rgba(56,189,248,.3));border-bottom:1px dashed rgba(148,163,184,.4);display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:#1e40af}
-.vs{position:absolute;bottom:0;left:0;right:0;height:25%;background:linear-gradient(180deg,rgba(92,40,10,.5),rgba(69,26,3,.75));display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:#fde68a}
-.dk{background:linear-gradient(135deg,var(--eco3),var(--eco4));border-radius:11px;padding:14px;color:#fff}
-.dk-l{font-size:8.5px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--mint);margin-bottom:5px}
-.dk-s{font-size:16px;font-weight:800;margin-bottom:3px;line-height:1.2}
-.dk-d{font-size:10px;color:rgba(255,255,255,.55);line-height:1.45}
-.pb{margin-bottom:12px}
-.pb-row{display:flex;justify-content:space-between;font-size:11px;font-weight:600;margin-bottom:5px;align-items:center}
-.pbt{height:16px;background:#e2e8f0;border-radius:5px;overflow:hidden}
-.pbf{height:100%;border-radius:5px;display:flex;align-items:center;justify-content:flex-end;padding-right:6px;font-size:8.5px;font-weight:700;color:#fff;transition:width .5s}
+.vcap{width:100px;height:12px;background:#94a3b8;border-radius:5px 5px 0 0;display:flex;align-items:center;justify-content:center;font-size:7px;color:#fff;font-weight:700;letter-spacing:1.5px}
+.vessel{width:100px;height:220px;border:2px solid #94a3b8;border-top:none;border-radius:0 0 30px 30px;overflow:hidden;position:relative}
+.vg{position:absolute;top:0;left:0;right:0;height:25%;background:linear-gradient(180deg,rgba(254,249,195,.9),rgba(253,224,71,.3));border-bottom:1px dashed rgba(148,163,184,.4);display:flex;align-items:center;justify-content:center;font-size:7.5px;font-weight:700;color:#78350f}
+.vl{position:absolute;top:25%;left:0;right:0;height:50%;background:linear-gradient(180deg,rgba(147,197,253,.45),rgba(56,189,248,.3));border-bottom:1px dashed rgba(148,163,184,.4);display:flex;align-items:center;justify-content:center;font-size:7.5px;font-weight:700;color:#1e40af}
+.vs{position:absolute;bottom:0;left:0;right:0;height:25%;background:linear-gradient(180deg,rgba(92,40,10,.5),rgba(69,26,3,.75));display:flex;align-items:center;justify-content:center;font-size:7.5px;font-weight:700;color:#fde68a}
+
+/* DARK CARD */
+.dk{background:linear-gradient(135deg,var(--eco3),var(--eco4));border-radius:9px;padding:12px;color:#fff}
+.dk-l{font-size:8px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--mint);margin-bottom:4px}
+.dk-s{font-size:14px;font-weight:800;margin-bottom:3px;line-height:1.2}
+.dk-d{font-size:9.5px;color:rgba(255,255,255,.55);line-height:1.4}
+
+/* PROGRESS */
+.pb{margin-bottom:10px}
+.pb-row{display:flex;justify-content:space-between;font-size:10.5px;font-weight:600;margin-bottom:4px;align-items:center}
+.pbt{height:15px;background:#e2e8f0;border-radius:5px;overflow:hidden}
+.pbf{height:100%;border-radius:5px;display:flex;align-items:center;justify-content:flex-end;padding-right:5px;font-size:8px;font-weight:700;color:#fff;transition:width .5s}
 .pf-g{background:linear-gradient(90deg,#059669,#34d399)}.pf-r{background:linear-gradient(90deg,#dc2626,#f87171)}.pf-ok{background:linear-gradient(90deg,#16a34a,#4ade80)}.pf-w{background:linear-gradient(90deg,#d97706,#fbbf24)}.pf-bad{background:linear-gradient(90deg,#dc2626,#f87171)}
-.dp-big{text-align:center;padding:12px 0 10px}
-.dp-n{font-family:var(--mono);font-size:60px;font-weight:700;line-height:1;transition:color .3s}
+
+/* DP READOUT */
+.dp-big{text-align:center;padding:10px 0 8px}
+.dp-n{font-family:var(--mono);font-size:52px;font-weight:700;line-height:1;transition:color .3s}
 .dp-ok{color:var(--eco)}.dp-warn{color:var(--amber)}.dp-bad{color:var(--rose)}
-.dp-u{font-size:15px;color:var(--txm)}
-.dp-b{display:inline-block;padding:3px 11px;border-radius:20px;font-size:10.5px;font-weight:700;margin-top:5px}
+.dp-u{font-size:13px;color:var(--txm)}
+.dp-b{display:inline-block;padding:3px 10px;border-radius:20px;font-size:10px;font-weight:700;margin-top:5px}
 .dpb-ok{background:#dcfce7;color:#166534}.dpb-warn{background:#fef3c7;color:#92400e}.dpb-bad{background:#ffe4e6;color:#9f1239}
-.rt{background:linear-gradient(135deg,var(--eco3),var(--eco4),#1e6640);border-radius:11px;padding:16px;color:#fff;text-align:center;position:relative;overflow:hidden}
-.rt::before{content:'';position:absolute;top:-30px;right:-30px;width:100px;height:100px;background:rgba(134,239,172,.06);border-radius:50%}
-.rt-l{font-size:8.5px;font-weight:700;letter-spacing:1.8px;text-transform:uppercase;color:var(--mint);margin-bottom:6px}
-.rt-v{font-family:var(--mono);font-size:40px;font-weight:700;letter-spacing:2px;line-height:1}
-.rt-s{font-size:10px;color:rgba(255,255,255,.5);margin-top:5px}
+
+/* REALTIME CLOCK */
+.rt{background:linear-gradient(135deg,var(--eco3),var(--eco4),#1e6640);border-radius:10px;padding:14px;color:#fff;text-align:center;position:relative;overflow:hidden}
+.rt::before{content:'';position:absolute;top:-30px;right:-30px;width:90px;height:90px;background:rgba(134,239,172,.06);border-radius:50%}
+.rt-l{font-size:8px;font-weight:700;letter-spacing:1.8px;text-transform:uppercase;color:var(--mint);margin-bottom:5px}
+.rt-v{font-family:var(--mono);font-size:34px;font-weight:700;letter-spacing:2px;line-height:1}
+.rt-s{font-size:9.5px;color:rgba(255,255,255,.5);margin-top:5px}
+
+/* GAUGE */
 .gdc{position:relative;display:flex;align-items:center;justify-content:center}
 .gdt{position:absolute;text-align:center;pointer-events:none}
-.gdt-v{font-family:var(--mono);font-size:24px;font-weight:700;color:var(--eco3);line-height:1}
-.gdt-l{font-size:9.5px;color:var(--txm);font-weight:600}
-.ndc{background:linear-gradient(135deg,var(--eco3),var(--eco2));border-radius:12px;padding:16px 18px;color:#fff;position:relative;overflow:hidden;margin-bottom:14px}
-.ndc::after{content:'31.89%';position:absolute;right:-6px;top:50%;transform:translateY(-50%);font-size:68px;font-weight:900;color:rgba(255,255,255,.04);font-family:var(--mono);pointer-events:none}
-.ndc-l{font-size:8.5px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--mint);margin-bottom:5px}
-.ndc-v{font-size:32px;font-weight:800;font-family:var(--mono);color:var(--mint);line-height:1;margin-bottom:4px}
-.ndc-d{font-size:10.5px;color:rgba(255,255,255,.6);line-height:1.5}
-.pcd{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px}
-.pcd-ico{font-size:28px;margin-bottom:9px}
-.pcd-nm{font-size:13.5px;font-weight:800;color:var(--eco3);margin-bottom:2px}
-.pcd-sb{font-size:10px;color:var(--txm);margin-bottom:10px}
+.gdt-v{font-family:var(--mono);font-size:21px;font-weight:700;color:var(--eco3);line-height:1}
+.gdt-l{font-size:9px;color:var(--txm);font-weight:600}
+
+/* NDC */
+.ndc{background:linear-gradient(135deg,var(--eco3),var(--eco2));border-radius:11px;padding:14px 16px;color:#fff;position:relative;overflow:hidden;margin-bottom:12px}
+.ndc::after{content:'31.89%';position:absolute;right:-6px;top:50%;transform:translateY(-50%);font-size:56px;font-weight:900;color:rgba(255,255,255,.04);font-family:var(--mono);pointer-events:none}
+.ndc-l{font-size:8px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--mint);margin-bottom:4px}
+.ndc-v{font-size:28px;font-weight:800;font-family:var(--mono);color:var(--mint);line-height:1;margin-bottom:4px}
+.ndc-d{font-size:10px;color:rgba(255,255,255,.6);line-height:1.5}
+.pcd{background:var(--surface);border:1px solid var(--border);border-radius:11px;padding:14px}
+.pcd-ico{font-size:26px;margin-bottom:8px}
+.pcd-nm{font-size:13px;font-weight:800;color:var(--eco3);margin-bottom:2px}
+.pcd-sb{font-size:9.5px;color:var(--txm);margin-bottom:9px}
 .pcd-stat{display:flex;align-items:baseline;gap:3px;margin-bottom:4px}
-.pcd-v{font-family:var(--mono);font-size:20px;font-weight:700;color:var(--eco)}
-.pcd-u{font-size:10.5px;color:var(--txm)}
-.pcd-div{height:1px;background:var(--border);margin:9px 0}
-.pcd-f{display:flex;align-items:flex-start;gap:6px;font-size:11px;color:var(--tx);margin-bottom:5px;line-height:1.4}
-.pcd-f i{color:var(--eco);margin-top:2px;font-size:10px;flex-shrink:0}
-.sbs{display:grid;gap:8px;margin-top:10px}
+.pcd-v{font-family:var(--mono);font-size:18px;font-weight:700;color:var(--eco)}
+.pcd-u{font-size:10px;color:var(--txm)}
+.pcd-div{height:1px;background:var(--border);margin:8px 0}
+.pcd-f{display:flex;align-items:flex-start;gap:5px;font-size:10.5px;color:var(--tx);margin-bottom:4px;line-height:1.4}
+.pcd-f i{color:var(--eco);margin-top:2px;font-size:9.5px;flex-shrink:0}
+
+/* SUBBOX */
+.sbs{display:grid;gap:7px;margin-top:9px}
 .sb2{grid-template-columns:1fr 1fr}.sb3{grid-template-columns:repeat(3,1fr)}.sb4{grid-template-columns:repeat(4,1fr)}
-.sbx{text-align:center;padding:9px 6px;background:#f8fafc;border-radius:9px;border:1px solid var(--border2)}
-.sbx-v{font-family:var(--mono);font-size:17px;font-weight:700;line-height:1}
-.sbx-l{font-size:9px;color:var(--txm);font-weight:600;margin-top:3px;line-height:1.3}
-.tbl{width:100%;border-collapse:collapse;font-size:11.5px}
-.tbl thead th{background:#f8fafc;padding:8px 11px;text-align:left;font-size:9.5px;font-weight:700;color:var(--txm);text-transform:uppercase;letter-spacing:.5px;border-bottom:2px solid var(--border);white-space:nowrap}
-.tbl tbody td{padding:9px 11px;border-bottom:1px solid var(--border2);vertical-align:middle}
+.sbx{text-align:center;padding:8px 5px;background:#f8fafc;border-radius:8px;border:1px solid var(--border2)}
+.sbx-v{font-family:var(--mono);font-size:15px;font-weight:700;line-height:1}
+.sbx-l{font-size:8.5px;color:var(--txm);font-weight:600;margin-top:3px;line-height:1.3}
+
+/* TABLE */
+.tbl{width:100%;border-collapse:collapse;font-size:11px}
+.tbl thead th{background:#f8fafc;padding:7px 10px;text-align:left;font-size:9px;font-weight:700;color:var(--txm);text-transform:uppercase;letter-spacing:.5px;border-bottom:2px solid var(--border);white-space:nowrap}
+.tbl tbody td{padding:8px 10px;border-bottom:1px solid var(--border2);vertical-align:middle}
 .tbl tbody tr:last-child td{border-bottom:none}
 .tbl tbody tr:hover td{background:#f8fafc}
-.badge{display:inline-block;padding:2px 7px;border-radius:20px;font-size:9.5px;font-weight:700}
+.badge{display:inline-block;padding:2px 6px;border-radius:20px;font-size:9px;font-weight:700}
 .bg-g{background:#dcfce7;color:#166534}.bg-a{background:#fef3c7;color:#92400e}.bg-r{background:#ffe4e6;color:#9f1239}.bg-b{background:#dbeafe;color:#1e40af}
-.sr{display:flex;align-items:center;padding:11px 0;border-bottom:1px solid var(--border2)}
-.sr:last-child{border-bottom:none}
-.sr-i{flex:1;min-width:0}.sr-n{font-size:12px;font-weight:600;color:var(--tx)}.sr-d{font-size:10px;color:var(--txm);margin-top:1px}
-.sr-inp{display:flex;align-items:center;gap:6px;flex-shrink:0;margin-left:14px}
-.si{width:78px;padding:6px 9px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;font-weight:600;font-family:var(--mono);color:var(--tx);background:#f8fafc;text-align:center;outline:none}
-.si:focus{border-color:var(--eco);background:#fff}
-.su{font-size:10px;color:var(--txm);font-weight:600}
-.btn{display:inline-flex;align-items:center;gap:7px;padding:8px 15px;border-radius:9px;font-size:12px;font-weight:600;cursor:pointer;border:none;font-family:var(--sans);transition:all .15s}
-.btn-p{background:var(--eco);color:#fff}.btn-p:hover{background:var(--eco2)}
-.btn-o{background:transparent;border:1.5px solid var(--border);color:var(--tx)}.btn-o:hover{background:#f8fafc}
-.btn-sm{padding:5px 11px;font-size:11px}
-.ai-card{background:linear-gradient(135deg,#0f1b2d,#0d2137,#0a2a1a);border-radius:12px;padding:15px;color:#fff;border:1px solid rgba(96,165,250,.15)}
-.ai-head{display:flex;align-items:center;gap:8px;margin-bottom:12px}
-.ai-dot{width:8px;height:8px;background:#60a5fa;border-radius:50%;animation:pu 2s infinite}
-.ai-title{font-size:12px;font-weight:700;color:#93c5fd}
-.ai-item{display:flex;align-items:flex-start;gap:8px;margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid rgba(255,255,255,.06)}
-.ai-item:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
-.ai-icon{font-size:14px;flex-shrink:0;margin-top:1px}
-.ai-text{flex:1;font-size:10.5px;color:rgba(255,255,255,.65);line-height:1.55}
-.ai-text strong{color:#fff;font-size:11px;display:block;margin-bottom:2px}
-.ai-conf{font-size:9px;color:#4ade80;font-weight:600;font-family:var(--mono);margin-top:3px}
-.hm-grid{display:grid;grid-template-columns:repeat(21,1fr);gap:3px;margin-top:6px}
-.hm-cell{height:26px;border-radius:4px;cursor:default;transition:transform .15s;display:flex;align-items:center;justify-content:center;font-size:7.5px;font-weight:700;color:rgba(0,0,0,.4)}
-.hm-cell:hover{transform:scaleY(1.2);z-index:5}
-.eco-row{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--border2);font-size:11.5px}
-.eco-row:last-child{border-bottom:none}
-.eco-row .lbl{color:var(--txm)}
-.eco-total{background:linear-gradient(90deg,rgba(26,92,56,.08),rgba(26,92,56,.04));border-radius:8px;padding:10px 12px;margin-top:8px;display:flex;justify-content:space-between;align-items:center}
-.eco-total .lbl{font-size:12px;font-weight:700;color:var(--eco3)}
-.eco-total .val{font-family:var(--mono);font-size:18px;font-weight:800;color:var(--eco)}
-.timeline{position:relative;padding-left:24px}
-.timeline::before{content:'';position:absolute;left:7px;top:6px;bottom:6px;width:2px;background:linear-gradient(180deg,var(--eco),rgba(26,92,56,.1))}
-.tl-item{position:relative;padding-bottom:14px}
-.tl-item:last-child{padding-bottom:0}
-.tl-dot{position:absolute;left:-21px;top:3px;width:12px;height:12px;border-radius:50%;border:2px solid var(--eco);background:var(--surface)}
-.tl-dot.done{background:var(--eco)}.tl-dot.active{background:var(--mint);border-color:var(--mintd);animation:pu 1.5s infinite}.tl-dot.future{border-color:var(--border);background:var(--border2)}
-.tl-h{font-size:11.5px;font-weight:700;color:var(--tx)}.tl-s{font-size:10px;color:var(--txm);margin-top:1px}
-.sg-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}
-.sg-item{background:#f8fafc;border:1px solid var(--border2);border-radius:9px;padding:9px;display:flex;align-items:center;gap:8px}
-.sg-ico{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0}
-.sg-nm{font-size:10.5px;font-weight:700;color:var(--tx)}.sg-vl{font-family:var(--mono);font-size:13px;font-weight:700;line-height:1.1}.sg-st{font-size:9px;font-weight:600;margin-top:1px}
-.kpi-bar{display:flex;gap:0;background:var(--surface);border:1px solid var(--border);border-radius:11px;overflow:hidden;margin-bottom:14px;box-shadow:var(--sh)}
-.kpi-item{flex:1;padding:10px 12px;border-right:1px solid var(--border2);display:flex;align-items:center;gap:8px}
+
+/* SENSOR GRID */
+.sg-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.sg-item{background:#f8fafc;border:1px solid var(--border2);border-radius:8px;padding:8px;display:flex;align-items:center;gap:7px}
+.sg-ico{width:26px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0}
+.sg-nm{font-size:9.5px;font-weight:700;color:var(--tx)}.sg-vl{font-family:var(--mono);font-size:12px;font-weight:700;line-height:1.1}.sg-st{font-size:8.5px;font-weight:600;margin-top:1px}
+
+/* KPI BAR */
+.kpi-bar{display:flex;gap:0;background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:12px;box-shadow:var(--sh);flex-wrap:wrap}
+.kpi-item{flex:1;min-width:80px;padding:9px 10px;border-right:1px solid var(--border2);display:flex;align-items:center;gap:7px}
 .kpi-item:last-child{border-right:none}
-.kpi-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
-.k-l{font-size:9px;color:var(--txm);font-weight:600;text-transform:uppercase;letter-spacing:.4px}
-.k-v{font-family:var(--mono);font-size:14px;font-weight:700;color:var(--tx);line-height:1.1}
+.kpi-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.k-l{font-size:8.5px;color:var(--txm);font-weight:600;text-transform:uppercase;letter-spacing:.4px}
+.k-v{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--tx);line-height:1.1}
 .tscroll{overflow-x:auto}
 .tscroll::-webkit-scrollbar{height:4px}
 .tscroll::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+
+/* SETTINGS */
+.sr{display:flex;align-items:center;padding:10px 0;border-bottom:1px solid var(--border2);flex-wrap:wrap;gap:6px}
+.sr:last-child{border-bottom:none}
+.sr-i{flex:1;min-width:0}.sr-n{font-size:11.5px;font-weight:600;color:var(--tx)}.sr-d{font-size:9.5px;color:var(--txm);margin-top:1px}
+.sr-inp{display:flex;align-items:center;gap:5px;flex-shrink:0;margin-left:auto}
+.si{width:72px;padding:5px 8px;border:1.5px solid var(--border);border-radius:7px;font-size:11.5px;font-weight:600;font-family:var(--mono);color:var(--tx);background:#f8fafc;text-align:center;outline:none}
+.si:focus{border-color:var(--eco);background:#fff}
+.su{font-size:9.5px;color:var(--txm);font-weight:600}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 13px;border-radius:8px;font-size:11.5px;font-weight:600;cursor:pointer;border:none;font-family:var(--sans);transition:all .15s}
+.btn-p{background:var(--eco);color:#fff}.btn-p:hover{background:var(--eco2)}
+.btn-o{background:transparent;border:1.5px solid var(--border);color:var(--tx)}.btn-o:hover{background:#f8fafc}
+.btn-sm{padding:5px 10px;font-size:10.5px}
+
+/* AI CARD */
+.ai-card{background:linear-gradient(135deg,#0f1b2d,#0d2137,#0a2a1a);border-radius:11px;padding:13px;color:#fff;border:1px solid rgba(96,165,250,.15)}
+.ai-head{display:flex;align-items:center;gap:7px;margin-bottom:10px}
+.ai-dot{width:7px;height:7px;background:#60a5fa;border-radius:50%;animation:pu 2s infinite}
+.ai-title{font-size:11.5px;font-weight:700;color:#93c5fd}
+.ai-item{display:flex;align-items:flex-start;gap:7px;margin-bottom:7px;padding-bottom:7px;border-bottom:1px solid rgba(255,255,255,.06)}
+.ai-item:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+.ai-icon{font-size:13px;flex-shrink:0;margin-top:1px}
+.ai-text{flex:1;font-size:10px;color:rgba(255,255,255,.65);line-height:1.5}
+.ai-text strong{color:#fff;font-size:10.5px;display:block;margin-bottom:2px}
+.ai-conf{font-size:8.5px;color:#4ade80;font-weight:600;font-family:var(--mono);margin-top:3px}
+
+/* HEATMAP */
+.hm-grid{display:grid;grid-template-columns:repeat(21,1fr);gap:3px;margin-top:6px}
+.hm-cell{height:24px;border-radius:3px;cursor:default;transition:transform .15s;display:flex;align-items:center;justify-content:center;font-size:7px;font-weight:700;color:rgba(0,0,0,.4)}
+.hm-cell:hover{transform:scaleY(1.2);z-index:5}
+
+/* TIMELINE */
+.timeline{position:relative;padding-left:22px}
+.timeline::before{content:'';position:absolute;left:6px;top:6px;bottom:6px;width:2px;background:linear-gradient(180deg,var(--eco),rgba(26,92,56,.1))}
+.tl-item{position:relative;padding-bottom:13px}
+.tl-item:last-child{padding-bottom:0}
+.tl-dot{position:absolute;left:-19px;top:3px;width:11px;height:11px;border-radius:50%;border:2px solid var(--eco);background:var(--surface)}
+.tl-dot.done{background:var(--eco)}.tl-dot.active{background:var(--mint);border-color:var(--mintd);animation:pu 1.5s infinite}.tl-dot.future{border-color:var(--border);background:var(--border2)}
+.tl-h{font-size:11px;font-weight:700;color:var(--tx)}.tl-s{font-size:9.5px;color:var(--txm);margin-top:1px}
+
+/* SDG */
+.sdg-row{display:flex;gap:8px;margin-top:9px;flex-wrap:wrap;align-items:center}
+.sdg{width:34px;height:34px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#fff;flex-shrink:0}
+
+/* IGRID */
 .igrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;font-size:11px}
 .igrid>div span{color:var(--txm);display:block;font-size:9.5px;margin-bottom:1px}
-.sdg-row{display:flex;gap:10px;margin-top:10px;flex-wrap:wrap;align-items:center}
-.sdg{width:38px;height:38px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#fff;flex-shrink:0}
-#toast{position:fixed;bottom:18px;right:18px;background:var(--eco3);color:#fff;padding:11px 16px;border-radius:10px;font-size:12px;font-weight:600;display:flex;align-items:center;gap:8px;box-shadow:var(--sh2);opacity:0;transform:translateY(14px);transition:all .3s;z-index:999;pointer-events:none;max-width:380px}
+
+/* TOAST */
+#toast{position:fixed;bottom:16px;right:16px;background:var(--eco3);color:#fff;padding:10px 14px;border-radius:9px;font-size:11.5px;font-weight:600;display:flex;align-items:center;gap:7px;box-shadow:var(--sh2);opacity:0;transform:translateY(14px);transition:all .3s;z-index:999;pointer-events:none;max-width:340px}
 #toast.show{opacity:1;transform:translateY(0)}
+
+/* ===== RESPONSIVE MOBILE ===== */
+@media(max-width:767px){
+  :root{--fw:0px;--fh:52px}
+  body{grid-template-columns:1fr;grid-template-rows:var(--fh) 1fr}
+  #sb{position:fixed;top:0;left:0;bottom:0;width:240px;transform:translateX(-100%);z-index:200;grid-column:auto;grid-row:auto}
+  #sb.open{transform:translateX(0)}
+  .sb-overlay.show{display:block}
+  #ham{display:flex}
+  #tb{grid-column:1;padding:0 10px;gap:6px}
+  #main{grid-column:1;grid-row:2;padding:10px 10px 24px}
+  .pill-eco,.pill-green{display:none}
+  .g4{grid-template-columns:repeat(2,1fr)}
+  .g2{grid-template-columns:1fr}
+  .g3{grid-template-columns:1fr}
+  .g13{grid-template-columns:1fr}
+  .g5{grid-template-columns:repeat(2,1fr)}
+  .kpi-bar{flex-wrap:wrap}
+  .kpi-item{min-width:45%;border-right:none;border-bottom:1px solid var(--border2)}
+  .kpi-item:nth-child(odd){border-right:1px solid var(--border2)}
+  .kpi-item:last-child{border-bottom:none;border-right:none}
+  .xl{height:200px}.lg{height:180px}.md{height:160px}.sm{height:130px}
+  .hm-grid{grid-template-columns:repeat(7,1fr)}
+  .flow{gap:6px}
+  .fa{max-width:30px}
+  .igrid{grid-template-columns:repeat(2,1fr)}
+  .sbs.sb3{grid-template-columns:repeat(3,1fr)}
+  .sg-grid{grid-template-columns:1fr}
+  .vwrap{display:none}
+  .dp-n{font-size:42px}
+  .rt-v{font-size:26px}
+  .tscroll{-webkit-overflow-scrolling:touch}
+  .ph{gap:8px}
+  .ph-l h1{font-size:14px}
+}
+@media(max-width:400px){
+  .g4{grid-template-columns:1fr 1fr}
+  .kpi-item{min-width:100%;border-right:none}
+}
 </style>
 </head>
 <body>
@@ -239,7 +327,7 @@ body{display:grid;grid-template-columns:var(--fw) 1fr;grid-template-rows:var(--f
       <div class="sb-icon"><i class="fa-solid fa-leaf"></i></div>
       <div><div class="sb-name">SIRKUL AI</div><div class="sb-tagline">Mini Refinery v1.0</div></div>
     </div>
-    <div class="sb-authors"><p><strong>Farid Nadir Amrulloh</strong> &middot; STT Wastukancana<br><strong>Muhamad Daffa Amrulloh</strong> &middot; Politeknik Bhakti Asih<br>Purwakarta &amp; Bandung, Jawa Barat 2026</p></div>
+    <div class="sb-authors"><p><strong>Farid Nadir Amrulloh</strong> &middot; STT Wastukancana<br><strong>Muhamad Daffa Amrulloh</strong> &middot; Politeknik Bhakti Asih<br>Purwakarta, Jawa Barat 2026</p></div>
     <div class="sb-live"><div class="sb-live-dot"></div><span>Biogas hari ini:&nbsp;</span><strong id="sb-bio">1,124 L</strong></div>
   </div>
   <div class="sb-sec">Monitoring Utama</div>
@@ -249,28 +337,29 @@ body{display:grid;grid-template-columns:var(--fw) 1fr;grid-template-rows:var(--f
   <div class="nav" onclick="go('t3',this)"><i class="fa-solid fa-gas-pump"></i> Tabung 3 &middot; Storage Gas</div>
   <div class="sb-sec">Analisis &amp; AI</div>
   <div class="nav" onclick="go('ai',this)"><i class="fa-solid fa-brain"></i> AI Prediksi &amp; Analisis</div>
-  <div class="nav" onclick="go('eco',this)"><i class="fa-solid fa-coins"></i> Kalkulator Ekonomi</div>
   <div class="nav" onclick="go('sensor',this)"><i class="fa-solid fa-microchip"></i> Status Semua Sensor</div>
   <div class="sb-sec">Produk &amp; Laporan</div>
   <div class="nav" onclick="go('produk',this)"><i class="fa-solid fa-recycle"></i> Produk Turunan</div>
   <div class="nav" onclick="go('log',this)"><i class="fa-solid fa-file-lines"></i> Log &amp; Laporan AI <span class="nb" id="nb">0</span></div>
   <div class="sb-sec">Konfigurasi</div>
   <div class="nav" onclick="go('cfg',this)"><i class="fa-solid fa-sliders"></i> Pengaturan Threshold</div>
-  <div class="sb-foot"><p>SIRKUL AI v1.0.0 &middot; Polling 3s real-time<br>Sistem Integrasi Resource, Karbon,<br>Uap &amp; Limbah &middot; Jawa Barat 2026</p></div>
+  <div class="sb-foot"><p>SIRKUL AI v1.0.0 &middot; Polling 3s real-time<br>Sistem Integrasi Resource, Karbon,<br>Uap &amp; Limbah &middot; Purwakarta 2026</p></div>
 </aside>
+<div class="sb-overlay" id="overlay" onclick="closeSB()"></div>
 
 <!-- TOPBAR -->
 <header id="tb">
+  <button id="ham" onclick="toggleSB()"><i class="fa-solid fa-bars"></i></button>
   <div class="tb-title">
     <h2 id="ptitle">Dashboard Utama Analytics</h2>
     <p>Pemantauan Real-Time &middot; Siklus Fermentasi 21 Hari &middot; AI-Powered IoT</p>
   </div>
-  <div class="pill pill-eco"><i class="fa-solid fa-clock" style="font-size:10px"></i> Inkubasi: Hari <strong style="margin:0 2px">12</strong>/21
-    <div class="pb-wrap" style="margin-left:4px"><div class="pb-track"><div class="pb-fill"></div></div></div>
+  <div class="pill pill-eco"><i class="fa-solid fa-clock" style="font-size:9px"></i> Inkubasi: Hari <strong style="margin:0 2px">12</strong>/21
+    <div class="pb-wrap" style="margin-left:3px"><div class="pb-track"><div class="pb-fill"></div></div></div>
     <span style="font-size:9px;color:var(--txm)">57%</span>
   </div>
-  <div class="pill pill-green"><div class="pill-dot"></div>AI Optimal Mode</div>
-  <div class="pill pill-rose" id="alert-pill" style="display:none"><i class="fa-solid fa-triangle-exclamation"></i> <span id="apill">0 Alert</span></div>
+  <div class="pill pill-green"><div class="pill-dot"></div>AI Optimal</div>
+  <div class="pill pill-rose" id="alert-pill" style="display:none"><i class="fa-solid fa-triangle-exclamation"></i> <span id="apill">0</span></div>
   <div class="clk" id="clk">--:--:--</div>
 </header>
 
@@ -305,14 +394,14 @@ body{display:grid;grid-template-columns:var(--fw) 1fr;grid-template-rows:var(--f
         <div class="fn"><div class="fc fc-a" id="nd2"><i class="fa-solid fa-wind"></i></div><div class="fl">Tabung 2</div><div class="fs">Scrubber</div></div>
         <div class="fa"><div class="fal"></div><div class="fah"></div></div>
         <div class="fn"><div class="fc fc-b" id="nd3"><i class="fa-solid fa-gas-pump"></i></div><div class="fl">Tabung 3</div><div class="fs">Storage</div></div>
-        <div class="fa" style="max-width:36px"><div class="fal"></div><div class="fah"></div></div>
-        <div class="fn"><div class="fc fc-g" style="background:#fef3c7;border-color:#b45309;color:#b45309"><i class="fa-solid fa-bolt"></i></div><div class="fl">Generator</div><div class="fs">Aerator PLN</div></div>
+        <div class="fa" style="max-width:30px"><div class="fal"></div><div class="fah"></div></div>
+        <div class="fn"><div class="fc fc-g" style="background:#fef3c7;border-color:#b45309;color:#b45309"><i class="fa-solid fa-bolt"></i></div><div class="fl">Generator</div><div class="fs">Aerator</div></div>
       </div>
       <div class="dk"><div class="dk-l">Status Sistem Keseluruhan</div><div class="dk-s" id="sys-s">Inisialisasi...</div><div class="dk-d" id="sys-d">Memuat data sensor...</div></div>
     </div>
     <div class="c">
       <div class="ct"><i class="fa-solid fa-terminal"></i> AI Alert Console <span class="ct-r" id="con-cnt">0 event</span></div>
-      <div class="con" id="con" style="height:210px">
+      <div class="con" id="con" style="height:190px">
         <div class="ll info"><span class="lt">[BOOT]</span> SIRKUL AI v1.0.0 dimulai...</div>
         <div class="ll ok"><span class="lt">[BOOT]</span> Semua sensor online &#10003;</div>
         <div class="ll sys"><span class="lt">[BOOT]</span> Polling IoT 3000ms aktif</div>
@@ -320,20 +409,19 @@ body{display:grid;grid-template-columns:var(--fw) 1fr;grid-template-rows:var(--f
       </div>
     </div>
   </div>
-  <!-- HEATMAP -->
   <div class="c mb">
     <div class="ct"><i class="fa-solid fa-fire"></i> Heatmap Intensitas Produksi Biogas &mdash; 21 Hari</div>
-    <div style="font-size:10px;color:var(--txm);margin-bottom:8px">Intensitas warna menunjukkan volume produksi. Abu-abu = data belum tersedia (hari 13&ndash;21)</div>
+    <div style="font-size:9.5px;color:var(--txm);margin-bottom:8px">Intensitas warna menunjukkan volume produksi. Abu-abu = data belum tersedia (hari 13&ndash;21)</div>
     <div class="hm-grid" id="hm-grid"></div>
-    <div style="display:flex;align-items:center;gap:8px;margin-top:10px;font-size:9.5px;color:var(--txm)">
+    <div style="display:flex;align-items:center;gap:7px;margin-top:9px;font-size:9px;color:var(--txm);flex-wrap:wrap">
       <span>Rendah</span>
       <div style="display:flex;gap:2px">
-        <div style="width:14px;height:8px;border-radius:2px;background:#dcfce7"></div>
-        <div style="width:14px;height:8px;border-radius:2px;background:#86efac"></div>
-        <div style="width:14px;height:8px;border-radius:2px;background:#4ade80"></div>
-        <div style="width:14px;height:8px;border-radius:2px;background:#22c55e"></div>
-        <div style="width:14px;height:8px;border-radius:2px;background:#16a34a"></div>
-        <div style="width:14px;height:8px;border-radius:2px;background:#166534"></div>
+        <div style="width:12px;height:7px;border-radius:2px;background:#dcfce7"></div>
+        <div style="width:12px;height:7px;border-radius:2px;background:#86efac"></div>
+        <div style="width:12px;height:7px;border-radius:2px;background:#4ade80"></div>
+        <div style="width:12px;height:7px;border-radius:2px;background:#22c55e"></div>
+        <div style="width:12px;height:7px;border-radius:2px;background:#16a34a"></div>
+        <div style="width:12px;height:7px;border-radius:2px;background:#166534"></div>
       </div>
       <span>Tinggi</span>
     </div>
@@ -342,7 +430,7 @@ body{display:grid;grid-template-columns:var(--fw) 1fr;grid-template-rows:var(--f
 
 <!-- TABUNG 1 -->
 <div id="pg-t1" class="pg">
-  <div class="ph"><div class="ph-l"><h1><i class="fa-solid fa-flask"></i> Tabung 1 &middot; Bioreaktor Anaerobik</h1><p>Pilar S &middot; Volume &gt;200 L &middot; Fermentasi mesofilik ~35.2&deg;C &middot; Pemisahan 3 fase gravitasi</p></div></div>
+  <div class="ph"><div class="ph-l"><h1><i class="fa-solid fa-flask"></i> Tabung 1 &middot; Bioreaktor Anaerobik</h1><p>Pilar S &middot; Volume &gt;200 L &middot; Fermentasi mesofilik ~35.2&deg;C</p></div></div>
   <div class="g4 mb">
     <div class="c mc" id="t1-c-tmp"><div class="mic ma"><i class="fa-solid fa-thermometer-half"></i></div><div class="mlb">Suhu Reaktor</div><div class="mv"><span id="t1-tv">35.2</span><span> &deg;C</span></div><div class="mst ok" id="t1-tst"><i class="fa-solid fa-check"></i> Target ~35.2&deg;C</div></div>
     <div class="c mc" id="t1-c-ph"><div class="mic mb2"><i class="fa-solid fa-flask"></i></div><div class="mlb">pH Reaktor</div><div class="mv"><span id="t1-pv">7.02</span></div><div class="mst ok" id="t1-pst"><i class="fa-solid fa-check"></i> Rentang 6.8&ndash;7.2</div></div>
@@ -354,18 +442,18 @@ body{display:grid;grid-template-columns:var(--fw) 1fr;grid-template-rows:var(--f
     <div>
       <div class="c mb">
         <div class="ct"><i class="fa-solid fa-layer-group"></i> Pemisahan Fase Fluida</div>
-        <div style="display:flex;gap:16px;align-items:flex-start">
+        <div style="display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap">
           <div class="vwrap"><div class="vcap">TABUNG 1</div><div class="vessel"><div class="vg">&#8679; GAS CH&#8324;/CO&#8322;</div><div class="vl">&#128167; CALON POC</div><div class="vs">&#9632; SLUDGE BSF</div></div></div>
-          <div style="flex:1;font-size:11px;line-height:1.6">
-            <div style="margin-bottom:9px"><span style="background:#fef3c7;color:#78350f;font-weight:700;padding:2px 7px;border-radius:5px;font-size:10px">Fase Gas (~25%)</span><br><span style="color:var(--txm);margin-top:4px;display:block">CH&#8324;, CO&#8322;, H&#8322;S &rarr; mengalir ke Tabung 2</span></div>
-            <div style="margin-bottom:9px"><span style="background:#dbeafe;color:#1e40af;font-weight:700;padding:2px 7px;border-radius:5px;font-size:10px">Fase Cair (~50%)</span><br><span style="color:var(--txm);margin-top:4px;display:block">Nutrisi NPK tinggi &rarr; Pupuk Organik Cair (POC)</span></div>
-            <div><span style="background:#fde68a;color:#92400e;font-weight:700;padding:2px 7px;border-radius:5px;font-size:10px">Fase Padat (~25%)</span><br><span style="color:var(--txm);margin-top:4px;display:block">Sludge kaya serat &rarr; media maggot BSF</span></div>
+          <div style="flex:1;min-width:160px;font-size:10.5px;line-height:1.55">
+            <div style="margin-bottom:8px"><span style="background:#fef3c7;color:#78350f;font-weight:700;padding:2px 7px;border-radius:5px;font-size:9.5px">Fase Gas (~25%)</span><br><span style="color:var(--txm);margin-top:3px;display:block">CH&#8324;, CO&#8322;, H&#8322;S &rarr; Tabung 2</span></div>
+            <div style="margin-bottom:8px"><span style="background:#dbeafe;color:#1e40af;font-weight:700;padding:2px 7px;border-radius:5px;font-size:9.5px">Fase Cair (~50%)</span><br><span style="color:var(--txm);margin-top:3px;display:block">Nutrisi NPK tinggi &rarr; Pupuk Organik Cair</span></div>
+            <div><span style="background:#fde68a;color:#92400e;font-weight:700;padding:2px 7px;border-radius:5px;font-size:9.5px">Fase Padat (~25%)</span><br><span style="color:var(--txm);margin-top:3px;display:block">Sludge kaya serat &rarr; media maggot BSF</span></div>
           </div>
         </div>
       </div>
       <div class="c">
         <div class="ct"><i class="fa-solid fa-bacteria"></i> Kinetik Metabolik Bakteri</div>
-        <div class="dk" style="margin-bottom:10px"><div class="dk-l">Metanogen &middot; Acetogen &middot; Hidrolisis</div><div class="dk-s" id="t1-bs">&#10003; AKTIF OPTIMAL</div><div class="dk-d" id="t1-bd">pH 7.02 &middot; Suhu 35.2&deg;C mesofilik &middot; Produksi metana maksimal</div></div>
+        <div class="dk" style="margin-bottom:9px"><div class="dk-l">Metanogen &middot; Acetogen &middot; Hidrolisis</div><div class="dk-s" id="t1-bs">&#10003; AKTIF OPTIMAL</div><div class="dk-d" id="t1-bd">pH 7.02 &middot; Suhu 35.2&deg;C mesofilik</div></div>
         <div class="sbs sb3"><div class="sbx"><div class="sbx-v" id="t1-bact-tmp" style="color:var(--eco)">35.2</div><div class="sbx-l">&deg;C Suhu</div></div><div class="sbx"><div class="sbx-v" id="t1-bact-ph" style="color:var(--blue)">7.02</div><div class="sbx-l">pH</div></div><div class="sbx"><div class="sbx-v" id="t1-bact-kpa" style="color:var(--purple)">1.2</div><div class="sbx-l">kPa Tekanan</div></div></div>
       </div>
     </div>
@@ -394,31 +482,31 @@ body{display:grid;grid-template-columns:var(--fw) 1fr;grid-template-rows:var(--f
   <div class="g13">
     <div class="c">
       <div class="ct"><i class="fa-solid fa-gauge"></i> Readout &#916;P</div>
-      <div class="dp-big"><div class="dp-n dp-ok" id="dp2-n">12.4</div><div class="dp-u">kPa</div><div style="margin-top:6px"><span class="dp-b dpb-ok" id="dp2-b">&#10003; NORMAL</span></div><div style="font-size:10px;color:var(--txm);margin-top:8px">Batas: <strong id="dp2-max">25.0</strong> kPa</div></div>
-      <div style="margin-top:4px"><div style="font-size:10px;color:var(--txm);margin-bottom:5px;font-weight:600">Saturasi Ca(OH)&#8322; &rarr; CaCO&#8323;</div><div class="pbt" style="height:14px"><div class="pbf pf-ok" id="ads-bar" style="width:48%">48%</div></div></div>
+      <div class="dp-big"><div class="dp-n dp-ok" id="dp2-n">12.4</div><div class="dp-u">kPa</div><div style="margin-top:5px"><span class="dp-b dpb-ok" id="dp2-b">&#10003; NORMAL</span></div><div style="font-size:9.5px;color:var(--txm);margin-top:7px">Batas: <strong id="dp2-max">25.0</strong> kPa</div></div>
+      <div style="margin-top:4px"><div style="font-size:9.5px;color:var(--txm);margin-bottom:4px;font-weight:600">Saturasi Ca(OH)&#8322; &rarr; CaCO&#8323;</div><div class="pbt" style="height:13px"><div class="pbf pf-ok" id="ads-bar" style="width:48%">48%</div></div></div>
     </div>
     <div>
       <div class="c mb">
         <div class="ct"><i class="fa-solid fa-atom"></i> Konsentrasi Gas Output</div>
-        <div class="pb"><div class="pb-row"><span><i class="fa-solid fa-fire" style="color:#059669;margin-right:3px"></i> Kemurnian CH&#8324;</span><span id="ch4-lv" style="color:var(--eco);font-weight:700">87.4%</span></div><div class="pbt" style="height:20px"><div class="pbf pf-g" id="bar-ch4" style="width:87.4%">87.4%</div></div><div style="font-size:9.5px;color:var(--txm);margin-top:3px">Target &gt;85% &middot; Minimum akseptabel &gt;80%</div></div>
-        <div class="pb" style="margin-bottom:0"><div class="pb-row"><span><i class="fa-solid fa-skull-crossbones" style="color:#dc2626;margin-right:3px"></i> Kadar H&#8322;S</span><span id="h2s-lv" style="color:var(--rose);font-weight:700">2.8 ppm</span></div><div class="pbt" style="height:20px"><div class="pbf pf-r" id="bar-h2s" style="width:56%">2.8 ppm</div></div><div style="font-size:9.5px;color:var(--txm);margin-top:3px">Batas kritis &lt;5.0 ppm &middot; Mencegah oksidasi generator</div></div>
+        <div class="pb"><div class="pb-row"><span><i class="fa-solid fa-fire" style="color:#059669;margin-right:3px"></i> Kemurnian CH&#8324;</span><span id="ch4-lv" style="color:var(--eco);font-weight:700">87.4%</span></div><div class="pbt" style="height:18px"><div class="pbf pf-g" id="bar-ch4" style="width:87.4%">87.4%</div></div><div style="font-size:9px;color:var(--txm);margin-top:3px">Target &gt;85% &middot; Minimum &gt;80%</div></div>
+        <div class="pb" style="margin-bottom:0"><div class="pb-row"><span><i class="fa-solid fa-skull-crossbones" style="color:#dc2626;margin-right:3px"></i> Kadar H&#8322;S</span><span id="h2s-lv" style="color:var(--rose);font-weight:700">2.8 ppm</span></div><div class="pbt" style="height:18px"><div class="pbf pf-r" id="bar-h2s" style="width:56%">2.8 ppm</div></div><div style="font-size:9px;color:var(--txm);margin-top:3px">Batas kritis &lt;5.0 ppm</div></div>
       </div>
       <div class="c"><div class="ct"><i class="fa-solid fa-chart-line"></i> Tren &#916;P &amp; CH&#8324; &mdash; 60 Menit</div><div class="cw sm"><canvas id="ch-t2"></canvas></div></div>
     </div>
   </div>
   <div class="c mb">
     <div class="ct"><i class="fa-solid fa-flask-vial"></i> Reaksi Kimia Aktif dalam Packed Bed Scrubber</div>
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">
-      <div style="background:#f0fdf4;border-radius:9px;padding:13px;border:1px solid #bbf7d0"><div style="font-size:9px;font-weight:700;color:var(--eco);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px">Reaksi H&#8322;S &rarr; Inert</div><div style="font-size:12px;font-weight:700;margin-bottom:4px">H&#8322;S + Ca(OH)&#8322; &rarr; CaS + 2H&#8322;O</div><div style="font-size:10px;color:var(--txm)">H&#8322;S korosif dikonversi menjadi CaS padat inert</div></div>
-      <div style="background:#eff6ff;border-radius:9px;padding:13px;border:1px solid #bfdbfe"><div style="font-size:9px;font-weight:700;color:var(--blue);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px">Reaksi CO&#8322; &rarr; Deposit</div><div style="font-size:12px;font-weight:700;margin-bottom:4px">CO&#8322; + Ca(OH)&#8322; &rarr; CaCO&#8323; + H&#8322;O</div><div style="font-size:10px;color:var(--txm)">CO&#8322; ditangkap membentuk CaCO&#8323; padat (kapur)</div></div>
-      <div style="background:#fefce8;border-radius:9px;padding:13px;border:1px solid #fde68a"><div style="font-size:9px;font-weight:700;color:#a16207;margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px">Indikator Saturasi</div><div style="font-size:12px;font-weight:700;margin-bottom:4px">&#916;P &gt; <span id="dp2-thr">25.0</span> kPa &rarr; Ganti Media</div><div style="font-size:10px;color:var(--txm)">CaCO&#8323; sumbat pori packed bed &rarr; backpressure berbahaya</div></div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:9px">
+      <div style="background:#f0fdf4;border-radius:8px;padding:11px;border:1px solid #bbf7d0"><div style="font-size:8.5px;font-weight:700;color:var(--eco);margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px">H&#8322;S &rarr; Inert</div><div style="font-size:11.5px;font-weight:700;margin-bottom:3px">H&#8322;S + Ca(OH)&#8322; &rarr; CaS + 2H&#8322;O</div><div style="font-size:9.5px;color:var(--txm)">H&#8322;S korosif &rarr; CaS padat inert</div></div>
+      <div style="background:#eff6ff;border-radius:8px;padding:11px;border:1px solid #bfdbfe"><div style="font-size:8.5px;font-weight:700;color:var(--blue);margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px">CO&#8322; &rarr; Deposit</div><div style="font-size:11.5px;font-weight:700;margin-bottom:3px">CO&#8322; + Ca(OH)&#8322; &rarr; CaCO&#8323; + H&#8322;O</div><div style="font-size:9.5px;color:var(--txm)">CO&#8322; ditangkap &rarr; CaCO&#8323; (kapur)</div></div>
+      <div style="background:#fefce8;border-radius:8px;padding:11px;border:1px solid #fde68a"><div style="font-size:8.5px;font-weight:700;color:#a16207;margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px">Indikator Saturasi</div><div style="font-size:11.5px;font-weight:700;margin-bottom:3px">&#916;P &gt; <span id="dp2-thr">25.0</span> kPa &rarr; Ganti Media</div><div style="font-size:9.5px;color:var(--txm)">CaCO&#8323; sumbat pori &rarr; backpressure</div></div>
     </div>
   </div>
 </div>
 
 <!-- TABUNG 3 -->
 <div id="pg-t3" class="pg">
-  <div class="ph"><div class="ph-l"><h1><i class="fa-solid fa-gas-pump"></i> Tabung 3 &middot; Penyimpanan Gas Metana</h1><p>Pilar U &middot; Tabung baja bertekanan rendah &middot; Metana murni &gt;85% &middot; Aerator &amp; dapur</p></div></div>
+  <div class="ph"><div class="ph-l"><h1><i class="fa-solid fa-gas-pump"></i> Tabung 3 &middot; Penyimpanan Gas Metana</h1><p>Pilar U &middot; Tabung baja bertekanan rendah &middot; Metana murni &gt;85%</p></div></div>
   <div class="g4 mb">
     <div class="c mc"><div class="mic mg"><i class="fa-solid fa-circle-dot"></i></div><div class="mlb">Kapasitas Terisi</div><div class="mv"><span id="t3-pct-mc">73</span><span> %</span></div><div class="mst ok"><i class="fa-solid fa-check"></i> Cukup 18+ jam</div></div>
     <div class="c mc"><div class="mic mb2"><i class="fa-solid fa-cubes"></i></div><div class="mlb">Volume Tersimpan</div><div class="mv"><span id="t3-vol-mc">146</span><span> L</span></div><div class="mst neu"><i class="fa-solid fa-circle-dot"></i> Kapasitas 200 L</div></div>
@@ -428,18 +516,19 @@ body{display:grid;grid-template-columns:var(--fw) 1fr;grid-template-rows:var(--f
   <div class="g3">
     <div class="c">
       <div class="ct"><i class="fa-solid fa-circle-dot"></i> Gauge Kapasitas</div>
-      <div class="gdc" style="height:175px"><canvas id="ch-gauge" width="175" height="175"></canvas><div class="gdt"><div class="gdt-v" id="t3-pct">73%</div><div class="gdt-l">kapasitas</div></div></div>
-      <div class="sbs sb2" style="margin-top:8px"><div class="sbx"><div class="sbx-v" id="t3-vol" style="color:var(--eco)">146</div><div class="sbx-l">Liter tersimpan</div></div><div class="sbx"><div class="sbx-v" id="t3-prs" style="color:var(--blue)">0.8</div><div class="sbx-l">kPa tekanan</div></div></div>
+      <div class="gdc" style="height:155px"><canvas id="ch-gauge" width="155" height="155"></canvas><div class="gdt"><div class="gdt-v" id="t3-pct">73%</div><div class="gdt-l">kapasitas</div></div></div>
+      <div class="sbs sb2" style="margin-top:7px"><div class="sbx"><div class="sbx-v" id="t3-vol" style="color:var(--eco)">146</div><div class="sbx-l">Liter tersimpan</div></div><div class="sbx"><div class="sbx-v" id="t3-prs" style="color:var(--blue)">0.8</div><div class="sbx-l">kPa tekanan</div></div></div>
     </div>
-    <div style="grid-column:span 2;display:flex;flex-direction:column;gap:14px">
+    <div style="grid-column:span 2;display:flex;flex-direction:column;gap:12px">
       <div class="rt"><div class="rt-l"><i class="fa-solid fa-hourglass-half"></i>&nbsp; Estimasi Sisa Pasokan Gas</div><div class="rt-v" id="rtclk">18:32:00</div><div class="rt-s">Jam : Menit : Detik &middot; Generator aerator kolam lele 24 jam</div></div>
       <div class="g2" style="margin-bottom:0">
-        <div class="c"><div class="ct"><i class="fa-solid fa-chart-pie"></i> Alokasi Gas Metana</div><div style="display:flex;gap:12px;align-items:center"><div style="width:140px;height:140px;flex-shrink:0"><canvas id="ch-alloc" width="140" height="140"></canvas></div><div style="flex:1;font-size:11px"><div style="margin-bottom:10px"><div style="display:flex;align-items:center;gap:7px;margin-bottom:3px"><div style="width:10px;height:10px;background:var(--eco);border-radius:3px;flex-shrink:0"></div><span style="font-weight:700">75% Generator Aerator</span></div><div style="color:var(--txm)">Aerasi 24 jam &middot; Substitusi PLN 100%</div></div><div><div style="display:flex;align-items:center;gap:7px;margin-bottom:3px"><div style="width:10px;height:10px;background:#60a5fa;border-radius:3px;flex-shrink:0"></div><span style="font-weight:700">25% Gas Masak</span></div><div style="color:var(--txm)">Pengganti LPG rumah tangga</div></div></div></div></div>
+        <div class="c"><div class="ct"><i class="fa-solid fa-chart-pie"></i> Alokasi Gas Metana</div><div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><div style="width:120px;height:120px;flex-shrink:0"><canvas id="ch-alloc" width="120" height="120"></canvas></div><div style="flex:1;min-width:100px;font-size:10.5px"><div style="margin-bottom:8px"><div style="display:flex;align-items:center;gap:6px;margin-bottom:2px"><div style="width:9px;height:9px;background:var(--eco);border-radius:2px;flex-shrink:0"></div><span style="font-weight:700">75% Generator</span></div><div style="color:var(--txm);font-size:9.5px">Aerasi 24 jam &middot; Substitusi PLN</div></div><div><div style="display:flex;align-items:center;gap:6px;margin-bottom:2px"><div style="width:9px;height:9px;background:#60a5fa;border-radius:2px;flex-shrink:0"></div><span style="font-weight:700">25% Gas Masak</span></div><div style="color:var(--txm);font-size:9.5px">Pengganti LPG rumah tangga</div></div></div></div></div>
         <div class="c"><div class="ct"><i class="fa-solid fa-chart-line"></i> Histori Volume (24 Jam)</div><div class="cw sm"><canvas id="ch-t3h"></canvas></div></div>
       </div>
     </div>
   </div>
 </div>
+
 <!-- AI PREDIKSI -->
 <div id="pg-ai" class="pg">
   <div class="ph"><div class="ph-l"><h1><i class="fa-solid fa-brain"></i> AI Prediksi &amp; Analisis Cerdas</h1><p>Model prediktif berbasis data historis sensor &middot; Deteksi anomali dini &middot; Rekomendasi preventif otomatis</p></div></div>
@@ -447,16 +536,16 @@ body{display:grid;grid-template-columns:var(--fw) 1fr;grid-template-rows:var(--f
     <div>
       <div class="ai-card mb">
         <div class="ai-head"><div class="ai-dot"></div><div class="ai-title">Prediksi AI &mdash; 24 Jam ke Depan</div></div>
-        <div class="ai-item"><div class="ai-icon">&#128293;</div><div class="ai-text"><strong>Puncak Produksi Biogas: Hari 13&ndash;15</strong>Berdasarkan tren hari 8&ndash;12, model memprediksi puncak 140&ndash;160 L/hari. Kondisi suhu dan pH saat ini mendukung prediksi ini dengan baik.<div class="ai-conf">Confidence: 87.3%</div></div></div>
-        <div class="ai-item"><div class="ai-icon">&#9879;&#65039;</div><div class="ai-text"><strong>Penggantian Adsorben: ~Hari 16</strong>Berdasarkan laju kenaikan &#916;P (+0.4 kPa/hari), Ca(OH)&#8322; akan mencapai saturasi 80% sekitar hari ke-16. Siapkan penggantian media packed bed segera.<div class="ai-conf">Confidence: 92.1%</div></div></div>
-        <div class="ai-item"><div class="ai-icon">&#127777;&#65039;</div><div class="ai-text"><strong>Risiko Penurunan Suhu: Rendah</strong>Suhu reaktor stabil di 35.0&ndash;35.5&deg;C. Tidak ada tanda anomali termal dalam 6 jam ke depan berdasarkan pola historis sensor.<div class="ai-conf">Confidence: 78.6%</div></div></div>
-        <div class="ai-item"><div class="ai-icon">&#128167;</div><div class="ai-text"><strong>Estimasi Panen POC: Hari 21</strong>Volume POC diproyeksikan 180&ndash;195 L dengan kandungan NPK optimal setelah 21 hari fermentasi penuh. Siapkan wadah 200 L.<div class="ai-conf">Confidence: 84.5%</div></div></div>
+        <div class="ai-item"><div class="ai-icon">&#128293;</div><div class="ai-text"><strong>Puncak Produksi Biogas: Hari 13&ndash;15</strong>Berdasarkan tren hari 8&ndash;12, model memprediksi puncak 140&ndash;160 L/hari. Kondisi suhu dan pH saat ini mendukung prediksi ini.<div class="ai-conf">Confidence: 87.3%</div></div></div>
+        <div class="ai-item"><div class="ai-icon">&#9879;&#65039;</div><div class="ai-text"><strong>Penggantian Adsorben: ~Hari 16</strong>Berdasarkan laju kenaikan &#916;P (+0.4 kPa/hari), Ca(OH)&#8322; akan mencapai saturasi 80% sekitar hari ke-16.<div class="ai-conf">Confidence: 92.1%</div></div></div>
+        <div class="ai-item"><div class="ai-icon">&#127777;&#65039;</div><div class="ai-text"><strong>Risiko Penurunan Suhu: Rendah</strong>Suhu reaktor stabil di 35.0&ndash;35.5&deg;C. Tidak ada tanda anomali termal dalam 6 jam ke depan.<div class="ai-conf">Confidence: 78.6%</div></div></div>
+        <div class="ai-item"><div class="ai-icon">&#128167;</div><div class="ai-text"><strong>Estimasi Panen POC: Hari 21</strong>Volume POC diproyeksikan 180&ndash;195 L dengan kandungan NPK optimal setelah 21 hari fermentasi.<div class="ai-conf">Confidence: 84.5%</div></div></div>
       </div>
       <div class="ai-card">
         <div class="ai-head"><div class="ai-dot" style="background:#4ade80"></div><div class="ai-title">Rekomendasi Tindakan Preventif</div></div>
-        <div class="ai-item"><div class="ai-icon">&#128203;</div><div class="ai-text"><strong>Segera (0&ndash;24 jam)</strong>Pantau kadar H&#8322;S tiap 6 jam. Jika mendekati 4.0 ppm, lakukan penambahan Ca(OH)&#8322; sebagai tindakan preventif sebelum &#916;P naik signifikan.<div class="ai-conf">Prioritas: SEDANG</div></div></div>
-        <div class="ai-item"><div class="ai-icon">&#128295;</div><div class="ai-text"><strong>3&ndash;5 Hari ke Depan</strong>Pesan media Ca(OH)&#8322; pengganti untuk packed bed. Estimasi kebutuhan: 5&ndash;8 kg untuk satu kali penggantian penuh sistem scrubber.<div class="ai-conf">Prioritas: RENCANA</div></div></div>
-        <div class="ai-item"><div class="ai-icon">&#128202;</div><div class="ai-text"><strong>Hari 20&ndash;21: Panen &amp; Dokumentasi</strong>Siapkan wadah panen POC dan timbangan untuk BSF maggot. Dokumentasi output lengkap untuk analisis ROI siklus ke-4.<div class="ai-conf">Prioritas: TERJADWAL</div></div></div>
+        <div class="ai-item"><div class="ai-icon">&#128203;</div><div class="ai-text"><strong>Segera (0&ndash;24 jam)</strong>Pantau kadar H&#8322;S tiap 6 jam. Jika mendekati 4.0 ppm, lakukan penambahan Ca(OH)&#8322; preventif.<div class="ai-conf">Prioritas: SEDANG</div></div></div>
+        <div class="ai-item"><div class="ai-icon">&#128295;</div><div class="ai-text"><strong>3&ndash;5 Hari ke Depan</strong>Pesan media Ca(OH)&#8322; pengganti untuk packed bed. Estimasi kebutuhan: 5&ndash;8 kg.<div class="ai-conf">Prioritas: RENCANA</div></div></div>
+        <div class="ai-item"><div class="ai-icon">&#128202;</div><div class="ai-text"><strong>Hari 20&ndash;21: Panen &amp; Dokumentasi</strong>Siapkan wadah panen POC dan timbangan untuk BSF maggot.<div class="ai-conf">Prioritas: TERJADWAL</div></div></div>
       </div>
     </div>
     <div>
@@ -465,32 +554,6 @@ body{display:grid;grid-template-columns:var(--fw) 1fr;grid-template-rows:var(--f
     </div>
   </div>
   <div class="c mb"><div class="ct"><i class="fa-solid fa-circle-nodes"></i> Korelasi Suhu&ndash;pH&ndash;Produksi Biogas (Scatter Plot)</div><div class="cw md"><canvas id="ch-scatter"></canvas></div></div>
-</div>
-
-<!-- EKONOMI -->
-<div id="pg-eco" class="pg">
-  <div class="ph"><div class="ph-l"><h1><i class="fa-solid fa-coins"></i> Kalkulator Ekonomi SIRKUL</h1><p>Estimasi penghematan &amp; pendapatan &middot; Analisis ROI &middot; Per siklus 21 hari operasional</p></div></div>
-  <div class="g4 mb">
-    <div class="c mc"><div class="mic mg"><i class="fa-solid fa-bolt"></i></div><div class="mlb">Hemat Listrik / Siklus</div><div class="mv" style="font-size:17px"><span id="eco-listrik">Rp 468.000</span></div><div class="mst ok"><i class="fa-solid fa-check"></i> Substitusi PLN 100%</div></div>
-    <div class="c mc"><div class="mic mb2"><i class="fa-solid fa-seedling"></i></div><div class="mlb">Nilai POC / Siklus</div><div class="mv" style="font-size:17px"><span id="eco-poc">Rp 270.000</span></div><div class="mst ok"><i class="fa-solid fa-check"></i> ~180 L &times; Rp 1.500</div></div>
-    <div class="c mc"><div class="mic ma"><i class="fa-solid fa-bugs"></i></div><div class="mlb">Nilai Maggot BSF</div><div class="mv" style="font-size:17px"><span id="eco-maggot">Rp 175.000</span></div><div class="mst ok"><i class="fa-solid fa-check"></i> ~3.5 kg &times; Rp 50.000</div></div>
-    <div class="c mc" style="background:var(--ok);border-color:var(--okb)"><div class="mic mg"><i class="fa-solid fa-hand-holding-dollar"></i></div><div class="mlb">Total Manfaat Ekonomi</div><div class="mv" style="font-size:17px;color:var(--eco)"><span id="eco-total">Rp 913.000</span></div><div class="mst ok"><i class="fa-solid fa-arrow-trend-up"></i> Per siklus 21 hari</div></div>
-  </div>
-  <div class="g2">
-    <div class="c">
-      <div class="ct"><i class="fa-solid fa-sliders"></i> Input Parameter Kalkulasi</div>
-      <div class="eco-row"><span class="lbl">Tarif listrik PLN</span><div style="display:flex;align-items:center;gap:5px"><span style="font-size:10px;color:var(--txm)">Rp</span><input type="number" id="eco-tarif" value="1500" class="si" style="width:72px" oninput="calcEco()"><span class="su">/kWh</span></div></div>
-      <div class="eco-row"><span class="lbl">Konsumsi aerator</span><div style="display:flex;align-items:center;gap:5px"><input type="number" id="eco-watt" value="250" class="si" style="width:72px" oninput="calcEco()"><span class="su">Watt</span></div></div>
-      <div class="eco-row"><span class="lbl">Jam operasi aerator</span><div style="display:flex;align-items:center;gap:5px"><input type="number" id="eco-jam" value="24" class="si" style="width:72px" oninput="calcEco()"><span class="su">jam/hari</span></div></div>
-      <div class="eco-row"><span class="lbl">Volume POC panen</span><div style="display:flex;align-items:center;gap:5px"><input type="number" id="eco-pocvol" value="180" class="si" style="width:72px" oninput="calcEco()"><span class="su">Liter</span></div></div>
-      <div class="eco-row"><span class="lbl">Harga POC pasar</span><div style="display:flex;align-items:center;gap:5px"><span style="font-size:10px;color:var(--txm)">Rp</span><input type="number" id="eco-pocprice" value="1500" class="si" style="width:72px" oninput="calcEco()"><span class="su">/L</span></div></div>
-      <div class="eco-row"><span class="lbl">Berat maggot BSF</span><div style="display:flex;align-items:center;gap:5px"><input type="number" id="eco-maggwt" value="3.5" class="si" style="width:72px" step="0.1" oninput="calcEco()"><span class="su">kg</span></div></div>
-      <div class="eco-row"><span class="lbl">Harga maggot pasar</span><div style="display:flex;align-items:center;gap:5px"><span style="font-size:10px;color:var(--txm)">Rp</span><input type="number" id="eco-maggprice" value="50000" class="si" style="width:72px" oninput="calcEco()"><span class="su">/kg</span></div></div>
-      <div class="eco-total"><span class="lbl">Total Manfaat / Siklus (21 hari)</span><span class="val" id="eco-ttl">Rp 913.000</span></div>
-    </div>
-    <div class="c"><div class="ct"><i class="fa-solid fa-chart-bar"></i> Breakdown Manfaat Ekonomi per Siklus</div><div class="cw xl"><canvas id="ch-eco"></canvas></div></div>
-  </div>
-  <div class="c mb"><div class="ct"><i class="fa-solid fa-chart-line"></i> Proyeksi ROI Kumulatif &mdash; 12 Siklus (1 Tahun)</div><div class="cw md"><canvas id="ch-roi"></canvas></div></div>
 </div>
 
 <!-- SENSOR STATUS -->
@@ -514,15 +577,15 @@ body{display:grid;grid-template-columns:var(--fw) 1fr;grid-template-rows:var(--f
 
 <!-- PRODUK -->
 <div id="pg-produk" class="pg">
-  <div class="ph"><div class="ph-l"><h1><i class="fa-solid fa-recycle"></i> Produk Turunan &amp; Resource Recovery</h1><p>Pilar I &amp; R &amp; L &middot; Ekonomi Sirkular &middot; Zero Waste 100% &middot; Hukum Termodinamika I terbukti</p></div></div>
+  <div class="ph"><div class="ph-l"><h1><i class="fa-solid fa-recycle"></i> Produk Turunan &amp; Resource Recovery</h1><p>Pilar I &amp; R &amp; L &middot; Ekonomi Sirkular &middot; Zero Waste 100%</p></div></div>
   <div class="ndc">
     <div class="ndc-l"><i class="fa-solid fa-earth-asia"></i>&nbsp; Kontribusi SIRKUL terhadap Target NDC Indonesia 2030</div>
     <div class="ndc-v">31.89%</div>
     <div class="ndc-d">Reduksi emisi gas rumah kaca nasional &middot; SIRKUL menangkap CH&#8324; yang sebelumnya terlepas bebas ke atmosfer dari pembuangan limbah kolam terbuka &middot; Setiap siklus 21 hari = aksi mitigasi iklim nyata skala UMKM perikanan</div>
     <div class="sdg-row">
-      <div class="sdg" style="background:#FCC30B">7</div><div style="font-size:10px;color:rgba(255,255,255,.6)">SDG 7<br>Energi Bersih</div>
-      <div class="sdg" style="background:#BF8B2E" style="margin-left:8px">12</div><div style="font-size:10px;color:rgba(255,255,255,.6)">SDG 12<br>Produksi Berkelanjutan</div>
-      <div class="sdg" style="background:#3F7E44">13</div><div style="font-size:10px;color:rgba(255,255,255,.6)">SDG 13<br>Aksi Iklim</div>
+      <div class="sdg" style="background:#FCC30B">7</div><div style="font-size:9.5px;color:rgba(255,255,255,.6)">SDG 7<br>Energi Bersih</div>
+      <div class="sdg" style="background:#BF8B2E">12</div><div style="font-size:9.5px;color:rgba(255,255,255,.6)">SDG 12<br>Produksi Berkelanjutan</div>
+      <div class="sdg" style="background:#3F7E44">13</div><div style="font-size:9.5px;color:rgba(255,255,255,.6)">SDG 13<br>Aksi Iklim</div>
     </div>
   </div>
   <div class="g2">
@@ -536,8 +599,7 @@ body{display:grid;grid-template-columns:var(--fw) 1fr;grid-template-rows:var(--f
       <div class="pcd-f"><i class="fa-solid fa-check"></i> Substitusi penuh pupuk kimia sintetis (Purba, 2025)</div>
       <div class="pcd-f"><i class="fa-solid fa-check"></i> Terbukti meningkatkan pertumbuhan tanaman (Bhuimbar et al., 2023)</div>
       <div class="pcd-f"><i class="fa-solid fa-check"></i> COD limbah berkurang hingga 82.6% (Darwin et al., 2017)</div>
-      <div class="pcd-f"><i class="fa-solid fa-check"></i> Eliminasi biaya pupuk kimia = 100% penghematan</div>
-      <div style="margin-top:11px;display:flex;gap:6px;flex-wrap:wrap"><span class="badge bg-g" style="font-size:10px;padding:3px 9px">&#10003; Zero Waste</span><span class="badge bg-b" style="font-size:10px;padding:3px 9px">NPK Terverifikasi</span></div>
+      <div style="margin-top:10px;display:flex;gap:5px;flex-wrap:wrap"><span class="badge bg-g" style="font-size:9.5px;padding:3px 8px">&#10003; Zero Waste</span><span class="badge bg-b" style="font-size:9.5px;padding:3px 8px">NPK Terverifikasi</span></div>
     </div>
     <div class="pcd">
       <div class="pcd-ico">&#129426;</div>
@@ -547,10 +609,9 @@ body{display:grid;grid-template-columns:var(--fw) 1fr;grid-template-rows:var(--f
       <div class="pcd-div"></div>
       <div class="pcd-f"><i class="fa-solid fa-check"></i> Kandungan protein 40&ndash;48% (Munguti et al., 2025)</div>
       <div class="pcd-f"><i class="fa-solid fa-check"></i> Hemat biaya pakan komersial hingga <strong>25%</strong></div>
-      <div class="pcd-f"><i class="fa-solid fa-check"></i> Media tumbuh optimal: sludge kaya serat &amp; nutrisi terdegradasi</div>
-      <div class="pcd-f"><i class="fa-solid fa-check"></i> Cocok untuk lele ukuran sedang (benih &gt;5 cm) sampai panen</div>
-      <div class="pcd-f"><i class="fa-solid fa-check"></i> Hermetia illucens &mdash; food conversion ratio terbaik industri</div>
-      <div style="margin-top:11px;display:flex;gap:6px;flex-wrap:wrap"><span class="badge bg-g" style="font-size:10px;padding:3px 9px">&#10003; Zero Waste</span><span class="badge bg-a" style="font-size:10px;padding:3px 9px">Protein 42.5%</span></div>
+      <div class="pcd-f"><i class="fa-solid fa-check"></i> Media tumbuh optimal: sludge kaya serat &amp; nutrisi</div>
+      <div class="pcd-f"><i class="fa-solid fa-check"></i> Hermetia illucens &mdash; food conversion ratio terbaik</div>
+      <div style="margin-top:10px;display:flex;gap:5px;flex-wrap:wrap"><span class="badge bg-g" style="font-size:9.5px;padding:3px 8px">&#10003; Zero Waste</span><span class="badge bg-a" style="font-size:9.5px;padding:3px 8px">Protein 42.5%</span></div>
     </div>
   </div>
   <div class="c mb"><div class="ct"><i class="fa-solid fa-chart-bar"></i> Perbandingan Output Lintas Siklus</div><div class="cw md"><canvas id="ch-produk"></canvas></div></div>
@@ -558,12 +619,12 @@ body{display:grid;grid-template-columns:var(--fw) 1fr;grid-template-rows:var(--f
     <div class="ct"><i class="fa-solid fa-table"></i> Riwayat Lengkap Output Per Siklus</div>
     <div class="tscroll">
       <table class="tbl">
-        <thead><tr><th>Siklus</th><th>Tanggal</th><th>Biogas (L)</th><th>CH&#8324;</th><th>POC (L)</th><th>Maggot (kg)</th><th>Protein %</th><th>Hemat Listrik</th><th>Nilai POC</th><th>Status</th></tr></thead>
+        <thead><tr><th>Siklus</th><th>Tanggal</th><th>Biogas (L)</th><th>CH&#8324;</th><th>POC (L)</th><th>Maggot (kg)</th><th>Protein %</th><th>Status</th></tr></thead>
         <tbody>
-          <tr><td><strong>#001</strong></td><td>15 Jan&ndash;05 Feb 2026</td><td style="font-family:var(--mono);font-weight:700">1,847</td><td><span class="badge bg-g">88.2%</span></td><td>165</td><td>3.4</td><td>42.3%</td><td>Rp 420.000</td><td>Rp 247.500</td><td><span class="badge bg-g">Zero Waste &#10003;</span></td></tr>
-          <tr><td><strong>#002</strong></td><td>10 Feb&ndash;02 Mar 2026</td><td style="font-family:var(--mono);font-weight:700">2,104</td><td><span class="badge bg-g">86.7%</span></td><td>172</td><td>3.8</td><td>43.1%</td><td>Rp 485.000</td><td>Rp 258.000</td><td><span class="badge bg-g">Zero Waste &#10003;</span></td></tr>
-          <tr><td><strong>#003</strong></td><td>07 Mar&ndash;28 Mar 2026</td><td style="font-family:var(--mono);font-weight:700">1,992</td><td><span class="badge bg-a">83.1%</span></td><td>158</td><td>3.1</td><td>41.8%</td><td>Rp 451.000</td><td>Rp 237.000</td><td><span class="badge bg-g">Zero Waste &#10003;</span></td></tr>
-          <tr><td><strong>#004 (aktif)</strong></td><td>01 Apr&ndash;Sekarang</td><td style="font-family:var(--mono);font-weight:700" id="cy-bio">1,124</td><td><span class="badge bg-g" id="cy-ch4">87.4%</span></td><td id="cy-poc">~180</td><td>&mdash;</td><td>42.5% (est.)</td><td>&mdash;</td><td>&mdash;</td><td><span class="badge bg-b">&#128260; Hari 12/21</span></td></tr>
+          <tr><td><strong>#001</strong></td><td>15 Jan&ndash;05 Feb 2026</td><td style="font-family:var(--mono);font-weight:700">1,847</td><td><span class="badge bg-g">88.2%</span></td><td>165</td><td>3.4</td><td>42.3%</td><td><span class="badge bg-g">Zero Waste &#10003;</span></td></tr>
+          <tr><td><strong>#002</strong></td><td>10 Feb&ndash;02 Mar 2026</td><td style="font-family:var(--mono);font-weight:700">2,104</td><td><span class="badge bg-g">86.7%</span></td><td>172</td><td>3.8</td><td>43.1%</td><td><span class="badge bg-g">Zero Waste &#10003;</span></td></tr>
+          <tr><td><strong>#003</strong></td><td>07 Mar&ndash;28 Mar 2026</td><td style="font-family:var(--mono);font-weight:700">1,992</td><td><span class="badge bg-a">83.1%</span></td><td>158</td><td>3.1</td><td>41.8%</td><td><span class="badge bg-g">Zero Waste &#10003;</span></td></tr>
+          <tr><td><strong>#004 (aktif)</strong></td><td>01 Apr&ndash;Sekarang</td><td style="font-family:var(--mono);font-weight:700" id="cy-bio">1,124</td><td><span class="badge bg-g" id="cy-ch4">87.4%</span></td><td id="cy-poc">~180</td><td>&mdash;</td><td>42.5% (est.)</td><td><span class="badge bg-b">&#128260; Hari 12/21</span></td></tr>
         </tbody>
       </table>
     </div>
@@ -574,17 +635,17 @@ body{display:grid;grid-template-columns:var(--fw) 1fr;grid-template-rows:var(--f
 <div id="pg-log" class="pg">
   <div class="ph">
     <div class="ph-l"><h1><i class="fa-solid fa-file-lines"></i> Log &amp; Laporan AI</h1><p>Audit trail anomali &middot; Rekomendasi mitigasi otomatis &middot; Riwayat sesi IoT aktif</p></div>
-    <div class="ph-r"><button class="btn btn-p" onclick="exportPDF()"><i class="fa-solid fa-file-pdf"></i> Export PDF</button><button class="btn btn-o" onclick="clearLogs()"><i class="fa-solid fa-trash"></i> Hapus</button><span style="font-size:11px;color:var(--txm)" id="lcount">0 entri</span></div>
+    <div class="ph-r"><button class="btn btn-p btn-sm" onclick="exportPDF()"><i class="fa-solid fa-file-pdf"></i> Export PDF</button><button class="btn btn-o btn-sm" onclick="clearLogs()"><i class="fa-solid fa-trash"></i> Hapus</button><span style="font-size:10.5px;color:var(--txm)" id="lcount">0 entri</span></div>
   </div>
   <div class="g4 mb">
     <div class="c mc"><div class="mic mr"><i class="fa-solid fa-triangle-exclamation"></i></div><div class="mlb">Total DANGER</div><div class="mv"><span id="cnt-danger" style="color:var(--rose)">0</span></div><div class="mst neu">Anomali kritis</div></div>
     <div class="c mc"><div class="mic ma"><i class="fa-solid fa-circle-exclamation"></i></div><div class="mlb">Total WARNING</div><div class="mv"><span id="cnt-warn" style="color:var(--amber)">0</span></div><div class="mst neu">Peringatan</div></div>
     <div class="c mc"><div class="mic mb2"><i class="fa-solid fa-circle-info"></i></div><div class="mlb">Total INFO</div><div class="mv"><span id="cnt-info">0</span></div><div class="mst neu">Informasi</div></div>
-    <div class="c mc"><div class="mic mg"><i class="fa-solid fa-clock"></i></div><div class="mlb">Uptime Sesi</div><div class="mv"><span id="cnt-up" style="font-size:16px">00:00</span></div><div class="mst ok">Jam aktif</div></div>
+    <div class="c mc"><div class="mic mg"><i class="fa-solid fa-clock"></i></div><div class="mlb">Uptime Sesi</div><div class="mv"><span id="cnt-up" style="font-size:15px">00:00</span></div><div class="mst ok">Jam aktif</div></div>
   </div>
   <div class="c">
     <div class="tscroll">
-      <table class="tbl"><thead><tr><th>Timestamp</th><th>Sensor</th><th>Konteks Bahaya</th><th>Rekomendasi Mitigasi AI</th><th>Level</th></tr></thead><tbody id="ltbody"><tr><td colspan="5" style="text-align:center;color:var(--txm);padding:28px">Belum ada anomali. Sistem berjalan normal.</td></tr></tbody></table>
+      <table class="tbl"><thead><tr><th>Timestamp</th><th>Sensor</th><th>Konteks Bahaya</th><th>Rekomendasi Mitigasi AI</th><th>Level</th></tr></thead><tbody id="ltbody"><tr><td colspan="5" style="text-align:center;color:var(--txm);padding:24px">Belum ada anomali. Sistem berjalan normal.</td></tr></tbody></table>
     </div>
   </div>
 </div>
@@ -598,7 +659,7 @@ body{display:grid;grid-template-columns:var(--fw) 1fr;grid-template-rows:var(--f
   <div class="g2">
     <div class="c">
       <div class="ct"><i class="fa-solid fa-flask"></i> Tabung 1 &middot; Bioreaktor</div>
-      <div class="sr"><div class="sr-i"><div class="sr-n">Suhu Maksimum</div><div class="sr-d">Batas atas mesofilik &middot; Default 40&deg;C &middot; Kritis pada +3&deg;C</div></div><div class="sr-inp"><input class="si" type="number" id="set-tmax" value="40" step="0.5"><span class="su">&deg;C</span></div></div>
+      <div class="sr"><div class="sr-i"><div class="sr-n">Suhu Maksimum</div><div class="sr-d">Batas atas mesofilik &middot; Default 40&deg;C</div></div><div class="sr-inp"><input class="si" type="number" id="set-tmax" value="40" step="0.5"><span class="su">&deg;C</span></div></div>
       <div class="sr"><div class="sr-i"><div class="sr-n">Suhu Minimum</div><div class="sr-d">Batas bawah mesofilik &middot; Default 30&deg;C</div></div><div class="sr-inp"><input class="si" type="number" id="set-tmin" value="30" step="0.5"><span class="su">&deg;C</span></div></div>
       <div class="sr"><div class="sr-i"><div class="sr-n">pH Minimum</div><div class="sr-d">Asiditas kritis metanogen &middot; Default 6.8</div></div><div class="sr-inp"><input class="si" type="number" id="set-phmin" value="6.8" step="0.1"><span class="su">pH</span></div></div>
       <div class="sr"><div class="sr-i"><div class="sr-n">pH Maksimum</div><div class="sr-d">Alkalinitas berlebih &middot; Default 7.2</div></div><div class="sr-inp"><input class="si" type="number" id="set-phmax" value="7.2" step="0.1"><span class="su">pH</span></div></div>
@@ -632,9 +693,19 @@ Chart.defaults.color='#64748b';
 let T={tmax:40,tmin:30,phmax:7.2,phmin:6.8,dpmax:25,h2smax:5,ch4min:80,vmin:10};
 let S={bio:1124,ch4:87.4,tmp:35.2,ph:7.02,dp:12.4,h2s:2.8,kpa:1.2,pct:73,vol:146,rt:66720,ads:48.4,rate:3.2};
 let logs=[],dCnt=0,wCnt=0,iCnt=0,tick=0,sessSec=0,conCnt=0,sensorHist=[];
-const titles={dash:'Dashboard Utama Analytics',t1:'Tabung 1 · Bioreaktor Anaerobik',t2:'Tabung 2 · Packed Bed Scrubber',t3:'Tabung 3 · Penyimpanan Gas',ai:'AI Prediksi & Analisis',eco:'Kalkulator Ekonomi SIRKUL',sensor:'Status Semua Sensor',produk:'Produk Turunan & Resource Recovery',log:'Log & Laporan AI',cfg:'Pengaturan Threshold'};
+const titles={dash:'Dashboard Utama Analytics',t1:'Tabung 1 · Bioreaktor Anaerobik',t2:'Tabung 2 · Packed Bed Scrubber',t3:'Tabung 3 · Penyimpanan Gas',ai:'AI Prediksi & Analisis',sensor:'Status Semua Sensor',produk:'Produk Turunan & Resource Recovery',log:'Log & Laporan AI',cfg:'Pengaturan Threshold'};
 
-function go(id,el){document.querySelectorAll('.pg').forEach(p=>p.classList.remove('on'));document.querySelectorAll('.nav').forEach(n=>n.classList.remove('on'));document.getElementById('pg-'+id).classList.add('on');el.classList.add('on');document.getElementById('ptitle').textContent=titles[id];}
+function go(id,el){
+  document.querySelectorAll('.pg').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.nav').forEach(n=>n.classList.remove('on'));
+  document.getElementById('pg-'+id).classList.add('on');
+  el.classList.add('on');
+  document.getElementById('ptitle').textContent=titles[id];
+  closeSB();
+}
+
+function toggleSB(){document.getElementById('sb').classList.toggle('open');document.getElementById('overlay').classList.toggle('show');}
+function closeSB(){document.getElementById('sb').classList.remove('open');document.getElementById('overlay').classList.remove('show');}
 
 // HEATMAP
 function buildHM(){
@@ -642,9 +713,11 @@ function buildHM(){
   const mx=Math.max(...vals);
   const cols=['#dcfce7','#86efac','#4ade80','#22c55e','#16a34a','#166534'];
   const g=document.getElementById('hm-grid');g.innerHTML='';
-  for(let i=0;i<21;i++){
+  const isMob=window.innerWidth<768;
+  const showDays=isMob?7:21;
+  for(let i=0;i<showDays;i++){
     const wrap=document.createElement('div');wrap.style.cssText='display:flex;flex-direction:column;align-items:center;gap:2px';
-    const lbl=document.createElement('div');lbl.style.cssText='font-size:7.5px;color:var(--txm);text-align:center;font-weight:600';lbl.textContent='H'+(i+1);
+    const lbl=document.createElement('div');lbl.style.cssText='font-size:7px;color:var(--txm);text-align:center;font-weight:600';lbl.textContent='H'+(i+1);
     const cell=document.createElement('div');cell.className='hm-cell';
     if(i<vals.length){const v=vals[i];const ci=Math.floor((v/mx)*5);cell.style.background=cols[ci];cell.textContent=i===11?'NOW':'';cell.style.color='rgba(0,0,0,.35)';cell.title='Hari '+(i+1)+': '+v.toLocaleString('id-ID')+' L';}
     else{cell.style.background='#e2e8f0';cell.title='Hari '+(i+1)+': Belum diproduksi';}
@@ -652,40 +725,36 @@ function buildHM(){
   }
 }
 buildHM();
+window.addEventListener('resize',buildHM);
 
 // CHARTS
 function ra(b,v,n=14){return Array.from({length:n},()=>+(b+(Math.random()-.5)*v*2).toFixed(2));}
 const bioDat=[54,112,178,251,338,429,534,645,762,884,1004,1124,null,null,null,null,null,null,null,null,null];
 const bioPrj=[null,null,null,null,null,null,null,null,null,null,null,1124,1210,1320,1440,1540,1610,1665,1705,1735,1755];
-const cBio=new Chart(document.getElementById('ch-bio').getContext('2d'),{type:'line',data:{labels:Array.from({length:21},(_,i)=>'H-'+(i+1)),datasets:[{label:'Aktual (L)',data:bioDat,borderColor:'#1a5c38',backgroundColor:'rgba(26,92,56,0.07)',fill:true,tension:0.4,pointBackgroundColor:'#1a5c38',pointRadius:4,borderWidth:2.5,spanGaps:false},{label:'Proyeksi AI',data:bioPrj,borderColor:'rgba(26,92,56,.35)',backgroundColor:'transparent',borderDash:[5,4],tension:0.4,pointRadius:3,borderWidth:1.5,spanGaps:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{usePointStyle:true,font:{size:11}}}},scales:{x:{grid:{color:'#f1f5f9'},ticks:{font:{size:10}}},y:{beginAtZero:true,grid:{color:'#f1f5f9'},ticks:{callback:v=>v+' L',font:{size:10}}}}}});
+const cBio=new Chart(document.getElementById('ch-bio').getContext('2d'),{type:'line',data:{labels:Array.from({length:21},(_,i)=>'H-'+(i+1)),datasets:[{label:'Aktual (L)',data:bioDat,borderColor:'#1a5c38',backgroundColor:'rgba(26,92,56,0.07)',fill:true,tension:0.4,pointBackgroundColor:'#1a5c38',pointRadius:3,borderWidth:2,spanGaps:false},{label:'Proyeksi AI',data:bioPrj,borderColor:'rgba(26,92,56,.35)',backgroundColor:'transparent',borderDash:[5,4],tension:0.4,pointRadius:2,borderWidth:1.5,spanGaps:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{usePointStyle:true,font:{size:10}}}},scales:{x:{grid:{color:'#f1f5f9'},ticks:{font:{size:9},maxTicksLimit:10}},y:{beginAtZero:true,grid:{color:'#f1f5f9'},ticks:{callback:v=>v+' L',font:{size:9}}}}}});
 
 const trendBuf={tmp:Array.from({length:40},()=>+(35.2+(Math.random()-.5)*1).toFixed(2)),ph:Array.from({length:40},()=>+(7.02+(Math.random()-.5)*.1).toFixed(3))};
-const cTrend=new Chart(document.getElementById('ch-trend').getContext('2d'),{type:'line',data:{labels:Array.from({length:40},(_,i)=>i%8===0?i*3+'s':''),datasets:[{label:'Suhu °C',data:[...trendBuf.tmp],borderColor:'#d97706',backgroundColor:'rgba(217,119,6,.07)',fill:true,tension:0.4,borderWidth:2,pointRadius:0,yAxisID:'yT'},{label:'pH',data:[...trendBuf.ph],borderColor:'#2563eb',backgroundColor:'transparent',tension:0.4,borderWidth:2,pointRadius:0,yAxisID:'yP'}]},options:{responsive:true,maintainAspectRatio:false,animation:{duration:200},plugins:{legend:{position:'top',labels:{usePointStyle:true,font:{size:11}}}},scales:{x:{grid:{display:false},ticks:{font:{size:9},maxTicksLimit:6}},yT:{type:'linear',position:'left',grid:{color:'#f1f5f9'},min:30,max:42,ticks:{callback:v=>v+'°',font:{size:10}}},yP:{type:'linear',position:'right',grid:{display:false},min:6.5,max:7.5,ticks:{callback:v=>v,font:{size:10}}}}}});
+const cTrend=new Chart(document.getElementById('ch-trend').getContext('2d'),{type:'line',data:{labels:Array.from({length:40},(_,i)=>i%8===0?i*3+'s':''),datasets:[{label:'Suhu °C',data:[...trendBuf.tmp],borderColor:'#d97706',backgroundColor:'rgba(217,119,6,.07)',fill:true,tension:0.4,borderWidth:2,pointRadius:0,yAxisID:'yT'},{label:'pH',data:[...trendBuf.ph],borderColor:'#2563eb',backgroundColor:'transparent',tension:0.4,borderWidth:2,pointRadius:0,yAxisID:'yP'}]},options:{responsive:true,maintainAspectRatio:false,animation:{duration:200},plugins:{legend:{position:'top',labels:{usePointStyle:true,font:{size:10}}}},scales:{x:{grid:{display:false},ticks:{font:{size:9},maxTicksLimit:6}},yT:{type:'linear',position:'left',grid:{color:'#f1f5f9'},min:30,max:42,ticks:{callback:v=>v+'°',font:{size:9}}},yP:{type:'linear',position:'right',grid:{display:false},min:6.5,max:7.5,ticks:{callback:v=>v,font:{size:9}}}}}});
 
 const lbs14=[];for(let i=0;i<14;i++)lbs14.push(String(Math.floor(i/2)).padStart(2,'0')+':'+(i%2===0?'00':'30'));
-const cT1=new Chart(document.getElementById('ch-t1').getContext('2d'),{type:'line',data:{labels:lbs14,datasets:[{label:'Suhu °C',data:ra(35.2,.8),borderColor:'#d97706',backgroundColor:'transparent',yAxisID:'yT',tension:0.4,borderWidth:2,pointRadius:2},{label:'pH',data:ra(7.02,.12),borderColor:'#2563eb',backgroundColor:'transparent',yAxisID:'yP',tension:0.4,borderWidth:2,pointRadius:2},{label:'Tekanan kPa',data:ra(1.2,.15),borderColor:'#7c3aed',backgroundColor:'transparent',yAxisID:'yK',tension:0.4,borderWidth:2,pointRadius:2}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{usePointStyle:true,font:{size:11}}}},scales:{x:{grid:{color:'#f1f5f9'},ticks:{font:{size:10}}},yT:{type:'linear',position:'left',title:{display:true,text:'°C',font:{size:9}},grid:{color:'#f1f5f9'},min:28,max:42},yP:{type:'linear',position:'right',title:{display:true,text:'pH',font:{size:9}},grid:{display:false},min:6.4,max:7.6},yK:{type:'linear',position:'right',display:false}}}});
+const cT1=new Chart(document.getElementById('ch-t1').getContext('2d'),{type:'line',data:{labels:lbs14,datasets:[{label:'Suhu °C',data:ra(35.2,.8),borderColor:'#d97706',backgroundColor:'transparent',yAxisID:'yT',tension:0.4,borderWidth:2,pointRadius:2},{label:'pH',data:ra(7.02,.12),borderColor:'#2563eb',backgroundColor:'transparent',yAxisID:'yP',tension:0.4,borderWidth:2,pointRadius:2},{label:'Tekanan kPa',data:ra(1.2,.15),borderColor:'#7c3aed',backgroundColor:'transparent',yAxisID:'yK',tension:0.4,borderWidth:2,pointRadius:2}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{usePointStyle:true,font:{size:10}}}},scales:{x:{grid:{color:'#f1f5f9'},ticks:{font:{size:9}}},yT:{type:'linear',position:'left',title:{display:true,text:'°C',font:{size:9}},grid:{color:'#f1f5f9'},min:28,max:42},yP:{type:'linear',position:'right',title:{display:true,text:'pH',font:{size:9}},grid:{display:false},min:6.4,max:7.6},yK:{type:'linear',position:'right',display:false}}}});
 
-const cT2=new Chart(document.getElementById('ch-t2').getContext('2d'),{type:'line',data:{labels:Array.from({length:20},(_,i)=>i*3+'m'),datasets:[{label:'ΔP kPa',data:Array.from({length:20},()=>+(12.4+(Math.random()-.5)*2).toFixed(1)),borderColor:'#1a5c38',backgroundColor:'rgba(26,92,56,.07)',fill:true,tension:0.4,borderWidth:2,pointRadius:2,yAxisID:'yD'},{label:'CH₄ %',data:Array.from({length:20},()=>+(87.4+(Math.random()-.5)*3).toFixed(1)),borderColor:'#2563eb',backgroundColor:'transparent',tension:0.4,borderWidth:2,pointRadius:2,yAxisID:'yC'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{usePointStyle:true,font:{size:11}}}},scales:{x:{grid:{color:'#f1f5f9'},ticks:{font:{size:9},maxTicksLimit:10}},yD:{type:'linear',position:'left',grid:{color:'#f1f5f9'},min:0,max:30,ticks:{font:{size:9}}},yC:{type:'linear',position:'right',grid:{display:false},min:70,max:100,ticks:{font:{size:9}}}}}});
+const cT2=new Chart(document.getElementById('ch-t2').getContext('2d'),{type:'line',data:{labels:Array.from({length:20},(_,i)=>i*3+'m'),datasets:[{label:'ΔP kPa',data:Array.from({length:20},()=>+(12.4+(Math.random()-.5)*2).toFixed(1)),borderColor:'#1a5c38',backgroundColor:'rgba(26,92,56,.07)',fill:true,tension:0.4,borderWidth:2,pointRadius:2,yAxisID:'yD'},{label:'CH₄ %',data:Array.from({length:20},()=>+(87.4+(Math.random()-.5)*3).toFixed(1)),borderColor:'#2563eb',backgroundColor:'transparent',tension:0.4,borderWidth:2,pointRadius:2,yAxisID:'yC'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{usePointStyle:true,font:{size:10}}}},scales:{x:{grid:{color:'#f1f5f9'},ticks:{font:{size:9},maxTicksLimit:10}},yD:{type:'linear',position:'left',grid:{color:'#f1f5f9'},min:0,max:30,ticks:{font:{size:9}}},yC:{type:'linear',position:'right',grid:{display:false},min:70,max:100,ticks:{font:{size:9}}}}}});
 
 const cGauge=new Chart(document.getElementById('ch-gauge').getContext('2d'),{type:'doughnut',data:{datasets:[{data:[73,27],backgroundColor:['#1a5c38','#e2e8f0'],borderWidth:0}]},options:{responsive:false,maintainAspectRatio:false,cutout:'72%',plugins:{legend:{display:false}}}});
 new Chart(document.getElementById('ch-alloc').getContext('2d'),{type:'doughnut',data:{labels:['Generator','Gas Masak'],datasets:[{data:[75,25],backgroundColor:['#1a5c38','#60a5fa'],borderWidth:0}]},options:{responsive:false,maintainAspectRatio:false,cutout:'55%',plugins:{legend:{display:false}}}});
 const cT3h=new Chart(document.getElementById('ch-t3h').getContext('2d'),{type:'line',data:{labels:Array.from({length:24},(_,i)=>i+'h'),datasets:[{label:'Volume (L)',data:Array.from({length:24},(_,i)=>+(Math.max(10,146+(i-12)*(-.4)+(Math.random()-.5)*3)).toFixed(1)),borderColor:'#2563eb',backgroundColor:'rgba(37,99,235,.07)',fill:true,tension:0.4,borderWidth:2,pointRadius:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{font:{size:9},maxTicksLimit:8}},y:{grid:{color:'#f1f5f9'},ticks:{font:{size:9}}}}}});
 
-const cProj=new Chart(document.getElementById('ch-proj').getContext('2d'),{type:'line',data:{labels:Array.from({length:21},(_,i)=>'H-'+(i+1)),datasets:[{label:'Aktual (L)',data:[...bioDat],borderColor:'#1a5c38',backgroundColor:'rgba(26,92,56,.08)',fill:true,tension:0.4,borderWidth:2.5,pointRadius:4},{label:'Proyeksi AI',data:bioPrj,borderColor:'rgba(37,99,235,.5)',backgroundColor:'rgba(37,99,235,.04)',fill:true,borderDash:[5,4],tension:0.4,borderWidth:2,pointRadius:3},{label:'Batas Bawah',data:[null,null,null,null,null,null,null,null,null,null,null,null,1100,1200,1310,1400,1465,1510,1545,1565,1580],borderColor:'rgba(37,99,235,.15)',backgroundColor:'transparent',borderDash:[2,4],tension:0.4,borderWidth:1,pointRadius:0},{label:'Batas Atas',data:[null,null,null,null,null,null,null,null,null,null,null,null,1320,1440,1570,1680,1755,1820,1865,1905,1930],borderColor:'rgba(37,99,235,.15)',backgroundColor:'transparent',borderDash:[2,4],tension:0.4,borderWidth:1,pointRadius:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{usePointStyle:true,font:{size:11}}}},scales:{x:{grid:{color:'#f1f5f9'},ticks:{font:{size:10}}},y:{grid:{color:'#f1f5f9'},beginAtZero:true,ticks:{font:{size:10},callback:v=>v+' L'}}}}});
+const cProj=new Chart(document.getElementById('ch-proj').getContext('2d'),{type:'line',data:{labels:Array.from({length:21},(_,i)=>'H-'+(i+1)),datasets:[{label:'Aktual (L)',data:[...bioDat],borderColor:'#1a5c38',backgroundColor:'rgba(26,92,56,.08)',fill:true,tension:0.4,borderWidth:2,pointRadius:3},{label:'Proyeksi AI',data:bioPrj,borderColor:'rgba(37,99,235,.5)',backgroundColor:'rgba(37,99,235,.04)',fill:true,borderDash:[5,4],tension:0.4,borderWidth:2,pointRadius:2},{label:'Batas Bawah',data:[null,null,null,null,null,null,null,null,null,null,null,null,1100,1200,1310,1400,1465,1510,1545,1565,1580],borderColor:'rgba(37,99,235,.15)',backgroundColor:'transparent',borderDash:[2,4],tension:0.4,borderWidth:1,pointRadius:0},{label:'Batas Atas',data:[null,null,null,null,null,null,null,null,null,null,null,null,1320,1440,1570,1680,1755,1820,1865,1905,1930],borderColor:'rgba(37,99,235,.15)',backgroundColor:'transparent',borderDash:[2,4],tension:0.4,borderWidth:1,pointRadius:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{usePointStyle:true,font:{size:10}}}},scales:{x:{grid:{color:'#f1f5f9'},ticks:{font:{size:9}}},y:{grid:{color:'#f1f5f9'},beginAtZero:true,ticks:{font:{size:9},callback:v=>v+' L'}}}}});
 
-const cHist=new Chart(document.getElementById('ch-hist').getContext('2d'),{type:'bar',data:{labels:['<30','30-31','31-32','32-33','33-34','34-35','35-36','36-37','37-38','>38'],datasets:[{label:'Frekuensi (%)',data:[1,2,4,8,12,28,35,20,8,2],backgroundColor:[1,2,4,8,12,28,35,20,8,2].map(v=>v>20?'#1a5c38':v>10?'#2a7d4f':v>5?'#4ade80':'#bbf7d0'),borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{font:{size:10}}},y:{grid:{color:'#f1f5f9'},ticks:{font:{size:10}}}}}});
+const cHist=new Chart(document.getElementById('ch-hist').getContext('2d'),{type:'bar',data:{labels:['<30','30-31','31-32','32-33','33-34','34-35','35-36','36-37','37-38','>38'],datasets:[{label:'Frekuensi (%)',data:[1,2,4,8,12,28,35,20,8,2],backgroundColor:[1,2,4,8,12,28,35,20,8,2].map(v=>v>20?'#1a5c38':v>10?'#2a7d4f':v>5?'#4ade80':'#bbf7d0'),borderRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{font:{size:9}}},y:{grid:{color:'#f1f5f9'},ticks:{font:{size:9}}}}}});
 
 const scD=Array.from({length:60},()=>({x:+(32+(Math.random()*8)).toFixed(1),y:+(6.5+(Math.random()*.8)).toFixed(2),r:+(3+Math.random()*5).toFixed(1)}));
-const cScatter=new Chart(document.getElementById('ch-scatter').getContext('2d'),{type:'bubble',data:{datasets:[{label:'Suhu vs pH (ukuran = produksi)',data:scD,backgroundColor:scD.map(d=>d.x>=32&&d.x<=38&&d.y>=6.8&&d.y<=7.2?'rgba(26,92,56,.5)':'rgba(225,29,72,.25)'),borderColor:'transparent'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{font:{size:11}}}},scales:{x:{title:{display:true,text:'Suhu (°C)',font:{size:10}},grid:{color:'#f1f5f9'},min:28,max:42},y:{title:{display:true,text:'pH',font:{size:10}},grid:{color:'#f1f5f9'},min:6,max:8}}}});
+const cScatter=new Chart(document.getElementById('ch-scatter').getContext('2d'),{type:'bubble',data:{datasets:[{label:'Suhu vs pH (ukuran = produksi)',data:scD,backgroundColor:scD.map(d=>d.x>=32&&d.x<=38&&d.y>=6.8&&d.y<=7.2?'rgba(26,92,56,.5)':'rgba(225,29,72,.25)'),borderColor:'transparent'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{font:{size:10}}}},scales:{x:{title:{display:true,text:'Suhu (°C)',font:{size:9}},grid:{color:'#f1f5f9'},min:28,max:42},y:{title:{display:true,text:'pH',font:{size:9}},grid:{color:'#f1f5f9'},min:6,max:8}}}});
 
-const cEco=new Chart(document.getElementById('ch-eco').getContext('2d'),{type:'bar',data:{labels:['Hemat Listrik','Nilai POC','Nilai Maggot BSF'],datasets:[{label:'Siklus #001',data:[420000,247500,170000],backgroundColor:'rgba(26,92,56,.45)',borderRadius:4},{label:'Siklus #002',data:[485000,258000,190000],backgroundColor:'rgba(26,92,56,.65)',borderRadius:4},{label:'Siklus #003',data:[451000,237000,155000],backgroundColor:'rgba(26,92,56,.35)',borderRadius:4},{label:'Siklus #004 (est.)',data:[468000,270000,175000],backgroundColor:'rgba(42,125,79,.9)',borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{font:{size:10}}}},scales:{x:{grid:{display:false},ticks:{font:{size:10}}},y:{grid:{color:'#f1f5f9'},ticks:{callback:v=>'Rp '+(v/1000).toFixed(0)+'rb',font:{size:9}}}}}});
+const cProduk=new Chart(document.getElementById('ch-produk').getContext('2d'),{type:'bar',data:{labels:['#001','#002','#003','#004 (est.)'],datasets:[{label:'Biogas (L)',data:[1847,2104,1992,1700],backgroundColor:'rgba(26,92,56,.8)',borderRadius:3,yAxisID:'yB'},{label:'POC (L)',data:[165,172,158,180],backgroundColor:'rgba(37,99,235,.6)',borderRadius:3,yAxisID:'yP'},{label:'Maggot (kg×10)',data:[34,38,31,35],backgroundColor:'rgba(217,119,6,.6)',borderRadius:3,yAxisID:'yB'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{font:{size:10}}}},scales:{x:{grid:{display:false}},yB:{type:'linear',position:'left',grid:{color:'#f1f5f9'},ticks:{font:{size:9}}},yP:{type:'linear',position:'right',display:false}}}});
 
-let acc=0;const cumB=[];for(let i=0;i<12;i++){acc+=913000;cumB.push(acc);}
-const cRoi=new Chart(document.getElementById('ch-roi').getContext('2d'),{type:'line',data:{labels:Array.from({length:12},(_,i)=>'Siklus '+(i+1)),datasets:[{label:'Investasi Awal',data:Array(12).fill(5000000),borderColor:'rgba(225,29,72,.5)',borderDash:[5,4],backgroundColor:'transparent',borderWidth:2,pointRadius:0},{label:'Manfaat Kumulatif',data:cumB,borderColor:'#1a5c38',backgroundColor:'rgba(26,92,56,.08)',fill:true,borderWidth:2.5,tension:0.3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{font:{size:11}}}},scales:{x:{grid:{display:false},ticks:{font:{size:10}}},y:{grid:{color:'#f1f5f9'},ticks:{callback:v=>'Rp '+(v/1000000).toFixed(1)+'jt',font:{size:9}}}}}});
-
-const cProduk=new Chart(document.getElementById('ch-produk').getContext('2d'),{type:'bar',data:{labels:['#001','#002','#003','#004 (est.)'],datasets:[{label:'Biogas (L)',data:[1847,2104,1992,1700],backgroundColor:'rgba(26,92,56,.8)',borderRadius:4,yAxisID:'yB'},{label:'POC (L)',data:[165,172,158,180],backgroundColor:'rgba(37,99,235,.6)',borderRadius:4,yAxisID:'yP'},{label:'Maggot (kg×10)',data:[34,38,31,35],backgroundColor:'rgba(217,119,6,.6)',borderRadius:4,yAxisID:'yB'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{font:{size:11}}}},scales:{x:{grid:{display:false}},yB:{type:'linear',position:'left',grid:{color:'#f1f5f9'},ticks:{font:{size:9}}},yP:{type:'linear',position:'right',display:false}}}});
-
-const cRadar=new Chart(document.getElementById('ch-radar').getContext('2d'),{type:'radar',data:{labels:['Suhu (norm.)','pH (norm.)','CH₄ %','ΔP (inv.)','H₂S (inv.)','Volume %'],datasets:[{label:'Nilai Aktual',data:[87,88,87.4,75,76,73],backgroundColor:'rgba(26,92,56,.15)',borderColor:'#1a5c38',borderWidth:2,pointBackgroundColor:'#1a5c38',pointRadius:4},{label:'Target Optimal',data:[100,100,95,100,100,80],backgroundColor:'rgba(37,99,235,.05)',borderColor:'rgba(37,99,235,.4)',borderDash:[4,4],borderWidth:1.5,pointRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{font:{size:11}}}},scales:{r:{beginAtZero:true,max:100,ticks:{font:{size:9},stepSize:25},pointLabels:{font:{size:10}}}}}});
+const cRadar=new Chart(document.getElementById('ch-radar').getContext('2d'),{type:'radar',data:{labels:['Suhu (norm.)','pH (norm.)','CH₄ %','ΔP (inv.)','H₂S (inv.)','Volume %'],datasets:[{label:'Nilai Aktual',data:[87,88,87.4,75,76,73],backgroundColor:'rgba(26,92,56,.15)',borderColor:'#1a5c38',borderWidth:2,pointBackgroundColor:'#1a5c38',pointRadius:3},{label:'Target Optimal',data:[100,100,95,100,100,80],backgroundColor:'rgba(37,99,235,.05)',borderColor:'rgba(37,99,235,.4)',borderDash:[4,4],borderWidth:1.5,pointRadius:2}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{font:{size:10}}}},scales:{r:{beginAtZero:true,max:100,ticks:{font:{size:8},stepSize:25},pointLabels:{font:{size:9}}}}}});
 
 // CLOCK
 function tickClock(){const n=new Date();document.getElementById('clk').textContent=String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0')+':'+String(n.getSeconds()).padStart(2,'0');}
@@ -711,12 +780,12 @@ function addLog(sensor,ctx,mit,lvl){
   renderLog();
   const tot=dCnt+wCnt;
   document.getElementById('nb').textContent=tot;
-  if(tot>0){document.getElementById('alert-pill').style.display='flex';document.getElementById('apill').textContent=tot+' Alert';}
+  if(tot>0){document.getElementById('alert-pill').style.display='flex';document.getElementById('apill').textContent=tot;}
 }
 function renderLog(){
   const tb=document.getElementById('ltbody');
-  tb.innerHTML=logs.length===0?'<tr><td colspan="5" style="text-align:center;color:var(--txm);padding:28px">Belum ada anomali.</td></tr>':
-    logs.map(l=>'<tr><td style="font-family:var(--mono);font-size:9.5px;white-space:nowrap;color:var(--txm)">'+l.ts+'</td><td style="font-weight:700;font-size:11px">'+l.sensor+'</td><td style="font-size:11px">'+l.ctx+'</td><td style="font-size:10.5px;color:var(--eco);font-style:italic;line-height:1.4">'+l.mit+'</td><td><span class="badge '+l.bc+'">'+l.lvl+'</span></td></tr>').join('');
+  tb.innerHTML=logs.length===0?'<tr><td colspan="5" style="text-align:center;color:var(--txm);padding:24px">Belum ada anomali.</td></tr>':
+    logs.map(l=>'<tr><td style="font-family:var(--mono);font-size:9px;white-space:nowrap;color:var(--txm)">'+l.ts+'</td><td style="font-weight:700;font-size:10.5px">'+l.sensor+'</td><td style="font-size:10.5px">'+l.ctx+'</td><td style="font-size:10px;color:var(--eco);font-style:italic;line-height:1.4">'+l.mit+'</td><td><span class="badge '+l.bc+'">'+l.lvl+'</span></td></tr>').join('');
   document.getElementById('lcount').textContent=logs.length+' entri';
   document.getElementById('cnt-danger').textContent=dCnt;
   document.getElementById('cnt-warn').textContent=wCnt;
@@ -725,24 +794,11 @@ function renderLog(){
 function clearLogs(){logs=[];dCnt=0;wCnt=0;iCnt=0;document.getElementById('nb').textContent='0';document.getElementById('alert-pill').style.display='none';renderLog();document.getElementById('con').innerHTML='<div class="ll sys"><span class="lt">[SYS]</span> Log dibersihkan operator.</div>';conCnt=0;document.getElementById('con-cnt').textContent='0 event';toast('Log berhasil dihapus.');}
 function exportPDF(){toast('Laporan PDF sedang disiapkan... (memerlukan backend server)');}
 
-function calcEco(){
-  const tarif=+document.getElementById('eco-tarif').value,watt=+document.getElementById('eco-watt').value,jam=+document.getElementById('eco-jam').value;
-  const pocvol=+document.getElementById('eco-pocvol').value,pocprice=+document.getElementById('eco-pocprice').value;
-  const maggwt=+document.getElementById('eco-maggwt').value,maggprice=+document.getElementById('eco-maggprice').value;
-  const listrik=Math.round((watt/1000)*jam*21*tarif),poc=Math.round(pocvol*pocprice),magg=Math.round(maggwt*maggprice),total=listrik+poc+magg;
-  const fmt=v=>'Rp '+v.toLocaleString('id-ID');
-  document.getElementById('eco-listrik').textContent=fmt(listrik);
-  document.getElementById('eco-poc').textContent=fmt(poc);
-  document.getElementById('eco-maggot').textContent=fmt(magg);
-  document.getElementById('eco-total').textContent=fmt(total);
-  document.getElementById('eco-ttl').textContent=fmt(total);
-}
-
 function buildSG(){
   const t1=[{nm:'Suhu Reaktor',ic:'fa-thermometer-half',val:S.tmp.toFixed(1),unit:'°C',ok:S.tmp>=T.tmin&&S.tmp<=T.tmax,clr:'#d97706'},{nm:'pH Reaktor',ic:'fa-flask',val:S.ph.toFixed(2),unit:'',ok:S.ph>=T.phmin&&S.ph<=T.phmax,clr:'#2563eb'},{nm:'Tekanan T1',ic:'fa-compress',val:S.kpa.toFixed(1),unit:'kPa',ok:true,clr:'#7c3aed'},{nm:'Viabilitas',ic:'fa-bacteria',val:(S.tmp>=T.tmin&&S.tmp<=T.tmax&&S.ph>=T.phmin&&S.ph<=T.phmax)?'Aktif':'Lemah',unit:'',ok:S.tmp>=T.tmin&&S.tmp<=T.tmax&&S.ph>=T.phmin&&S.ph<=T.phmax,clr:'#16a34a'}];
   const t2=[{nm:'Diff Pressure',ic:'fa-gauge',val:S.dp.toFixed(1),unit:'kPa',ok:S.dp<T.dpmax,clr:'#e11d48'},{nm:'Kemurnian CH₄',ic:'fa-atom',val:S.ch4.toFixed(1),unit:'%',ok:S.ch4>=T.ch4min,clr:'#2563eb'},{nm:'Kadar H₂S',ic:'fa-skull-crossbones',val:S.h2s.toFixed(1),unit:'ppm',ok:S.h2s<T.h2smax,clr:'#dc2626'},{nm:'Saturasi Ads.',ic:'fa-filter',val:S.ads.toFixed(0),unit:'%',ok:S.ads<80,clr:'#d97706'}];
   const t3=[{nm:'Kapasitas',ic:'fa-circle-dot',val:S.pct,unit:'%',ok:S.pct>=T.vmin,clr:'#1a5c38'},{nm:'Volume Gas',ic:'fa-cubes',val:Math.round(S.vol),unit:'L',ok:true,clr:'#1a5c38'},{nm:'Tekanan T3',ic:'fa-compress-arrows-alt',val:S.kpa.toFixed(2),unit:'kPa',ok:true,clr:'#2563eb'},{nm:'Laju Pakai',ic:'fa-gauge-high',val:S.rate.toFixed(1),unit:'L/h',ok:true,clr:'#7c3aed'}];
-  function rSG(id,items){const el=document.getElementById(id);if(!el)return;el.innerHTML=items.map(s=>`<div class="sg-item"><div class="sg-ico" style="background:${s.ok?'#dcfce7':'#fff1f2'}"><i class="fa-solid ${s.ic}" style="color:${s.ok?s.clr:'#e11d48'}"></i></div><div><div class="sg-nm">${s.nm}</div><div class="sg-vl" style="color:${s.ok?s.clr:'#e11d48'}">${s.val}${s.unit?' <span style="font-size:9px;color:var(--txm)">'+s.unit+'</span>':''}</div><div class="sg-st" style="color:${s.ok?'var(--mintd)':'var(--rose)'}">${s.ok?'● Normal':'● Anomali'}</div></div></div>`).join('');}
+  function rSG(id,items){const el=document.getElementById(id);if(!el)return;el.innerHTML=items.map(s=>`<div class="sg-item"><div class="sg-ico" style="background:${s.ok?'#dcfce7':'#fff1f2'}"><i class="fa-solid ${s.ic}" style="color:${s.ok?s.clr:'#e11d48'}"></i></div><div><div class="sg-nm">${s.nm}</div><div class="sg-vl" style="color:${s.ok?s.clr:'#e11d48'}">${s.val}${s.unit?' <span style="font-size:8.5px;color:var(--txm)">'+s.unit+'</span>':''}</div><div class="sg-st" style="color:${s.ok?'var(--mintd)':'var(--rose)'}">${s.ok?'● Normal':'● Anomali'}</div></div></div>`).join('');}
   rSG('sg-t1',t1);rSG('sg-t2',t2);rSG('sg-t3',t3);
 }
 
@@ -751,7 +807,7 @@ function addSR(){
   sensorHist.unshift({ts:n.toLocaleTimeString('id-ID'),tmp:S.tmp.toFixed(1),ph:S.ph.toFixed(2),dp:S.dp.toFixed(1),ch4:S.ch4.toFixed(1),h2s:S.h2s.toFixed(1),ok});
   if(sensorHist.length>20)sensorHist.pop();
   const tb=document.getElementById('sensor-log-body');if(!tb)return;
-  tb.innerHTML=sensorHist.map(r=>`<tr><td style="font-family:var(--mono);font-size:10px">${r.ts}</td><td>${r.tmp}</td><td>${r.ph}</td><td>${r.dp}</td><td>${r.ch4}</td><td>${r.h2s}</td><td><span class="badge ${r.ok?'bg-g':'bg-r'}">${r.ok?'OK':'Anomali'}</span></td></tr>`).join('');
+  tb.innerHTML=sensorHist.map(r=>`<tr><td style="font-family:var(--mono);font-size:9.5px">${r.ts}</td><td>${r.tmp}</td><td>${r.ph}</td><td>${r.dp}</td><td>${r.ch4}</td><td>${r.h2s}</td><td><span class="badge ${r.ok?'bg-g':'bg-r'}">${r.ok?'OK':'Anomali'}</span></td></tr>`).join('');
 }
 
 function saveCfg(){
@@ -795,7 +851,7 @@ setInterval(()=>{
   updCard('crd-tmp',tCrit,!tOk,'ms-tmp','Mesofilik optimal','Suhu menyimpang','KRITIS di luar batas');
   updCard('crd-dp',dpD,dpW,'ms-dp','Normal <25 kPa','ΔP meningkat','BAHAYA kritis!');
   updCard('crd-ch4',c4D,c4W,'ms-ch4','Melampaui 85%','Mendekati batas','DI BAWAH BATAS!');
-  
+
   document.getElementById('nd1').className='fc '+(tCrit||phCrit?'fc-r':!tOk||!phOk?'fc-a':'fc-g');
   document.getElementById('nd2').className='fc '+(dpD||h2D?'fc-r':dpW||h2W?'fc-a':'fc-g');
   document.getElementById('nd3').className='fc '+(S.pct<T.vmin?'fc-r':S.pct<20?'fc-a':'fc-b');
@@ -805,7 +861,6 @@ setInterval(()=>{
   else if(anyW){sel('sys-s','⚠️ PERINGATAN AKTIF');sel('sys-d','Satu atau lebih parameter mendekati batas. Pantau ketat.');}
   else{sel('sys-s','✅ SISTEM BERJALAN OPTIMAL');sel('sys-d','Semua parameter normal · Inkubasi hari 12/21 · '+bStr+' L biogas');}
 
-  // T1
   sel('t1-tv',S.tmp.toFixed(1));sel('t1-pv',S.ph.toFixed(2));sel('t1-kv',S.kpa);
   sel('t1-bact-tmp',S.tmp.toFixed(1));sel('t1-bact-ph',S.ph.toFixed(2));sel('t1-bact-kpa',S.kpa);
   const bpct=Math.min(100,Math.max(0,100-Math.abs(S.tmp-35.2)*5-Math.abs(S.ph-7.0)*20)).toFixed(0);
@@ -819,7 +874,6 @@ setInterval(()=>{
   else{bs='⚠️ AKTIVITAS MENURUN';bd=(!phOk?'pH '+S.ph.toFixed(2)+' di luar 6.8–7.2 ':'')+(!tOk?'Suhu '+S.tmp.toFixed(1)+'°C menyimpang':'');}
   sel('t1-bs',bs);sel('t1-bd',bd);
 
-  // T2
   sel('mv-dp2',S.dp.toFixed(1));sel('mv-ch4t2',S.ch4.toFixed(1));sel('mv-h2s',S.h2s.toFixed(1));sel('mv-ads',S.ads.toFixed(0));
   cs('crd-dp2',dpD?'cdanger':dpW?'cwarn':'cok');
   const dpNEl=document.getElementById('dp2-n');if(dpNEl){dpNEl.textContent=S.dp.toFixed(1);dpNEl.className='dp-n '+(dpD?'dp-bad':dpW?'dp-warn':'dp-ok');}
@@ -831,13 +885,11 @@ setInterval(()=>{
   const ab=document.getElementById('ads-bar');if(ab){const aw=Math.min(100,S.ads);ab.style.width=aw.toFixed(0)+'%';ab.textContent=aw.toFixed(0)+'%';ab.className='pbf '+(aw>80?'pf-bad':aw>60?'pf-w':'pf-ok');}
   const mads=document.getElementById('ms-ads');if(mads){mads.className='mst '+(S.ads>80?'bad':S.ads>60?'warn':'neu');mads.innerHTML=S.ads>80?'<i class="fa-solid fa-triangle-exclamation"></i> Segera ganti!':S.ads>60?'<i class="fa-solid fa-circle-exclamation"></i> Mulai jenuh':'<i class="fa-solid fa-circle-dot"></i> Ca(OH)₂ aktif';}
 
-  // T3
   sel('t3-pct',S.pct+'%');sel('t3-pct-mc',S.pct);sel('t3-vol',Math.round(S.vol));sel('t3-vol-mc',Math.round(S.vol));sel('t3-prs',S.kpa);sel('t3-kpa-mc',S.kpa);sel('t3-rate',S.rate);
   cGauge.data.datasets[0].data=[S.pct,100-S.pct];cGauge.update('none');
 
   sel('cy-bio',Math.round(S.bio).toLocaleString('id-ID'));sel('cy-ch4',S.ch4.toFixed(1)+'%');sel('cy-poc','~'+Math.round(S.vol*1.2));
 
-  // rolling charts
   trendBuf.tmp.push(+S.tmp.toFixed(2));trendBuf.tmp.shift();
   trendBuf.ph.push(+S.ph.toFixed(3));trendBuf.ph.shift();
   cTrend.data.datasets[0].data=[...trendBuf.tmp];cTrend.data.datasets[1].data=[...trendBuf.ph];cTrend.update('none');
@@ -852,14 +904,14 @@ setInterval(()=>{
   if(tCrit)addLog('Sensor Suhu · Tabung 1','Suhu '+S.tmp.toFixed(1)+'°C — '+(S.tmp>T.tmax?'terlalu tinggi':'terlalu rendah')+' · Batas '+T.tmin+'–'+T.tmax+'°C',S.tmp>T.tmax?'ALERT: Aktifkan pendinginan reaktor. Kurangi paparan sinar matahari. Periksa insulasi.':'ALERT: Tambahkan insulasi termal. Pertimbangkan pemanas tercelup 12V DC. Target ~35.2°C.','DANGER');
   else if(!tOk&&tick%3===0)addLog('Sensor Suhu · Tabung 1','Suhu '+S.tmp.toFixed(1)+'°C mendekati batas mesofilik','WARNING: Pantau tiap 15 menit. Siapkan tindakan korektif bila tren berlanjut keluar 30–40°C.','WARNING');
   if(phCrit)addLog('Sensor pH · Tabung 1','pH '+S.ph.toFixed(2)+' kritis di luar 6.8–7.2',S.ph<T.phmin?'ALERT: Asidifikasi kritis! Tambahkan larutan buffer NaHCO₃ bertahap. Kurangi loading bahan organik.':'ALERT: pH terlalu basa. Periksa kelebihan aktivator. Tambahkan asam asetat encer.','DANGER');
-  if(dpD)addLog('Sensor ΔP · Tabung 2 Scrubber','ΔP = '+S.dp.toFixed(1)+' kPa — MELAMPAUI BATAS '+T.dpmax+' kPa','ALERT: Adsorben Ca(OH)₂ jenuh akibat pembentukan CaCO₃. Sistem menginstruksikan peternak untuk segera mengganti media filter Packed Bed guna menghindari kelayuan bakteri akibat backpressure!','DANGER');
-  else if(dpW&&tick%4===0)addLog('Sensor ΔP · Tabung 2 Scrubber','ΔP = '+S.dp.toFixed(1)+' kPa — mendekati batas ('+T.dpmax+' kPa)','WARNING: Jadwalkan penggantian Ca(OH)₂ dalam 24–48 jam. Periksa whitening visual pada packed bed.','WARNING');
-  if(h2D)addLog('Sensor H₂S · Tabung 2 Scrubber','H₂S = '+S.h2s.toFixed(1)+' ppm — MELEBIHI '+T.h2smax+' ppm','ALERT KRITIS: H₂S di atas ambang korosivitas! Hentikan aliran ke generator. Ganti Ca(OH)₂ segera. Cek fitting kebocoran. Ventilasi area kerja!','DANGER');
-  if(c4D)addLog('Sensor CH₄ · Output Scrubber','CH₄ = '+S.ch4.toFixed(1)+'% — DI BAWAH MINIMUM '+T.ch4min+'%','ALERT: Kemurnian metana tidak memadai untuk pembakaran aman. Periksa efisiensi scrubber. Ganti adsorben. Cek kebocoran udara masuk sistem.','DANGER');
-  if(S.pct<=T.vmin&&tick%8===0)addLog('Sensor Volume · Tabung 3 Storage','Volume = '+S.pct+'% — di bawah minimum '+T.vmin+'%','WARNING: Pasokan gas hampis habis. Siapkan cadangan PLN/genset solar. Tunggu akumulasi biogas siklus berikutnya.','WARNING');
+  if(dpD)addLog('Sensor ΔP · Tabung 2 Scrubber','ΔP = '+S.dp.toFixed(1)+' kPa — MELAMPAUI BATAS '+T.dpmax+' kPa','ALERT: Adsorben Ca(OH)₂ jenuh akibat pembentukan CaCO₃. Segera ganti media filter Packed Bed!','DANGER');
+  else if(dpW&&tick%4===0)addLog('Sensor ΔP · Tabung 2 Scrubber','ΔP = '+S.dp.toFixed(1)+' kPa — mendekati batas ('+T.dpmax+' kPa)','WARNING: Jadwalkan penggantian Ca(OH)₂ dalam 24–48 jam.','WARNING');
+  if(h2D)addLog('Sensor H₂S · Tabung 2 Scrubber','H₂S = '+S.h2s.toFixed(1)+' ppm — MELEBIHI '+T.h2smax+' ppm','ALERT KRITIS: H₂S di atas ambang korosivitas! Hentikan aliran ke generator. Ganti Ca(OH)₂ segera.','DANGER');
+  if(c4D)addLog('Sensor CH₄ · Output Scrubber','CH₄ = '+S.ch4.toFixed(1)+'% — DI BAWAH MINIMUM '+T.ch4min+'%','ALERT: Kemurnian metana tidak memadai. Periksa efisiensi scrubber. Ganti adsorben.','DANGER');
+  if(S.pct<=T.vmin&&tick%8===0)addLog('Sensor Volume · Tabung 3 Storage','Volume = '+S.pct+'% — di bawah minimum '+T.vmin+'%','WARNING: Pasokan gas hampir habis. Siapkan cadangan PLN/genset solar.','WARNING');
 },3000);
 
-saveCfg();calcEco();buildSG();
+saveCfg();buildSG();
 </script>
 </body>
 </html>
